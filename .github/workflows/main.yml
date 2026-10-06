@@ -1,31 +1,36 @@
-name: BTCC Signal Bot
+name: Run Signal Bot
 
 on:
   schedule:
-    # 15분마다 자동 실행 (UTC 기준)
-    - cron: '*/15 * * * *'
-  workflow_dispatch: # 수동 즉시 실행 버튼 활성화
+    - cron: '*/5 * * * *'  # 5분마다 실행
+  workflow_dispatch:
+
+permissions:
+  contents: write  # bot_state.json 저장을 위한 쓰기 권한 설정
 
 jobs:
-  run-signal:
+  run-bot:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v3
+      - name: Checkout Repository
+        uses: actions/checkout@v3
 
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.10'
+      - name: Set up Python
+        uses: actions/python-system-info@v1
+        with:
+          python-version: '3.10'
 
-    - name: Install Dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install requests pandas ta
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests pandas ta
 
-    - name: Run Signal Bot
-      env:
-        TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-        TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-      run: python main.py
+      - name: Run Main Script
+        run: python main.py
+
+      - name: Commit and Push Updated State
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add bot_state.json
+          git diff --quiet && git diff --staged --quiet || (git commit -m "chore: update bot_state.json [skip ci]" && git push)
