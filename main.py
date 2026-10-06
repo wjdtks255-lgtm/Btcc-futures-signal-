@@ -11,7 +11,7 @@ TELEGRAM_BOT_TOKEN = "8913250892:AAEQxGKfFC1ru9oJyacy6cdUllER2K0UbiY"
 TELEGRAM_CHAT_ID = "-1004443428081"
 
 STATE_FILE = "bot_state.json"
-MAX_POSITIONS = 5  # 최대 동시 관리 포지션 수
+MAX_POSITIONS = 15  # 최대 동시 관리 포지션 수 (15개로 변경)
 
 def send_telegram_message(message):
     if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
@@ -34,7 +34,7 @@ def send_telegram_message(message):
         print(f"❌ 텔레그램 전송 중 예외 발생: {e}")
 
 # ---------------------------------------------------------
-# 가격 포맷팅 함수 (동전주 및 소수점 자리 대응)
+# 가격 포맷팅 함수
 # ---------------------------------------------------------
 def format_price(price):
     if price >= 100:
@@ -45,14 +45,13 @@ def format_price(price):
         return f"{price:.8f}".rstrip('0').rstrip('.')
 
 # ---------------------------------------------------------
-# 상태 파일(bot_state.json) 관리 함수 (리스트 개편)
+# 상태 파일(bot_state.json) 관리 함수
 # ---------------------------------------------------------
 def load_state():
     if os.path.exists(STATE_FILE):
         try:
             with open(STATE_FILE, "r", encoding="utf-8") as f:
                 data = json.load(f)
-                # 기존 단일 포지션 구조와 호환성 처리
                 if "active_positions" in data:
                     return data
                 elif "active_position" in data and data["active_position"]:
@@ -69,7 +68,7 @@ def save_state(state):
         print(f"상태 저장 중 에러: {e}")
 
 # ---------------------------------------------------------
-# 시세 데이터 수집 (BTCC API 1순위 / OKX 백업)
+# 시세 데이터 수집 (BTCC / OKX)
 # ---------------------------------------------------------
 def get_all_futures_symbols():
     headers = {"User-Agent": "Mozilla/5.0"}
@@ -88,12 +87,12 @@ def get_all_futures_symbols():
     except Exception:
         pass
 
-    return sorted(list(set(symbols))) if symbols else ["BTCUSDT", "ETHUSDT", "TACUSDT", "XRPUSDT", "SOLUSDT"]
+    return sorted(list(set(symbols))) if symbols else ["BTCUSDT", "ETHUSDT", "XRPUSDT", "SOLUSDT", "DOGEUSDT"]
 
 def fetch_market_data(symbol, interval="15m", limit=100):
     headers = {"User-Agent": "Mozilla/5.0"}
     
-    # 1. BTCC API 시도
+    # 1. BTCC API
     try:
         formatted_symbol = symbol.replace("USDT", "_USDT") if "_" not in symbol else symbol
         url = f"https://api.btcc.com/api/v1/market/kline?symbol={formatted_symbol}&period={interval}&limit={limit}"
@@ -114,7 +113,7 @@ def fetch_market_data(symbol, interval="15m", limit=100):
     except Exception:
         pass
 
-    # 2. OKX API 백업 시도
+    # 2. OKX API 백업
     try:
         base_asset = symbol.replace("USDT", "").replace("_", "")
         okx_symbol = f"{base_asset}-USDT-SWAP"
@@ -135,7 +134,7 @@ def fetch_market_data(symbol, interval="15m", limit=100):
     return pd.DataFrame()
 
 # ---------------------------------------------------------
-# 변동성(ATR) 기반 레버리지 추천 산출 함수
+# 레버리지 추천 산출
 # ---------------------------------------------------------
 def calculate_recommended_leverage(df):
     try:
@@ -168,7 +167,7 @@ def main():
     active_positions = state.get("active_positions", [])
 
     # ---------------------------------------------------------
-    # 1. 보유 중인 포지션 감시 및 청산 체크 (최대 5개 대상)
+    # 1. 보유 포지션 감시 및 청산 체크
     # ---------------------------------------------------------
     remaining_positions = []
     
@@ -255,16 +254,15 @@ def main():
         else:
             remaining_positions.append(pos)
 
-    # 업데이트된 활성 포지션 저장
     state["active_positions"] = remaining_positions
     save_state(state)
 
     # ---------------------------------------------------------
-    # 2. 신규 포지션 탐색 (슬롯 여유가 있을 때만 진행)
+    # 2. 신규 포지션 탐색 (슬롯 여유 확인)
     # ---------------------------------------------------------
     current_count = len(remaining_positions)
     if current_count >= MAX_POSITIONS:
-        print(f"⚠️ [최대 포지션 달성] 현재 {current_count}/{MAX_POSITIONS}개 관리 중으로 신규 탐색을 스킵합니다.")
+        print(f"⚠️ [최대 포지션 달성] 현재 {current_count}/{MAX_POSITIONS}개 관리 중입니다.")
         return
 
     print(f"🔎 신규 시그널 탐색 중... (현재 {current_count}/{MAX_POSITIONS} 슬롯 사용 중)")
@@ -272,7 +270,6 @@ def main():
     all_symbols = get_all_futures_symbols()
 
     for symbol in all_symbols:
-        # 이미 진입 중인 종목은 제외
         if symbol in active_symbols:
             continue
 
@@ -297,26 +294,31 @@ def main():
         signal_type = None
         strategy_name = ""
 
-        # LONG 조건
+        # ---------------------------------------------------------
+        # 전략 조건 (실전 포착률 향상 조정)
+        # ---------------------------------------------------------
+        # 1. RSI 역발상 시그널
         if prev['rsi'] <= 30 and latest['rsi'] > 30:
             signal_type = "LONG"
             strategy_name = "RSI 과매도 반등 추세전환"
-        elif prev['ema_short'] < prev['ema_long'] and latest['ema_short'] > latest['ema_long']:
-            is_macd_bullish = (latest['macd_diff'] > prev['macd_diff']) and (latest['macd'] > latest['macd_signal'])
-            if is_macd_bullish and latest['rsi'] > 50:
-                signal_type = "LONG"
-                strategy_name = "EMA 골든크로스 + MACD 상승확정"
-
-        # SHORT 조건
         elif prev['rsi'] >= 70 and latest['rsi'] < 70:
             signal_type = "SHORT"
             strategy_name = "RSI 과매수 이탈 반전"
-        elif prev['ema_short'] > prev['ema_long'] and latest['ema_short'] < latest['ema_long']:
-            is_macd_bearish = (latest['macd_diff'] < prev['macd_diff']) and (latest['macd'] < latest['macd_signal'])
-            if is_macd_bearish and latest['rsi'] < 50:
-                signal_type = "SHORT"
-                strategy_name = "EMA 데드크로스 + MACD 하락확정"
 
+        # 2. EMA 크로스 + MACD 확인 시그널
+        elif prev['ema_short'] < prev['ema_long'] and latest['ema_short'] > latest['ema_long']:
+            if latest['macd_diff'] > prev['macd_diff'] and latest['rsi'] < 70:
+                signal_type = "LONG"
+                strategy_name = "EMA 골든크로스 + MACD 모멘텀"
+
+        elif prev['ema_short'] > prev['ema_long'] and latest['ema_short'] < latest['ema_long']:
+            if latest['macd_diff'] < prev['macd_diff'] and latest['rsi'] > 30:
+                signal_type = "SHORT"
+                strategy_name = "EMA 데드크로스 + MACD 모멘텀"
+
+        # ---------------------------------------------------------
+        # 시그널 발생 시 등록 및 알림 발송
+        # ---------------------------------------------------------
         if signal_type:
             rec_lev, risk_level = calculate_recommended_leverage(df)
 
@@ -335,7 +337,7 @@ def main():
             tp2_roe = 3.00 * rec_lev
             sl_roe = 1.50 * rec_lev
 
-            new_slot_count = current_count + 1
+            current_count += 1
             message = (
                 f"{side_header}\n"
                 f"──────────────────────\n"
@@ -356,7 +358,7 @@ def main():
                 f"• **2차 목표가 (전량 익절)**: `${format_price(tp2)}` (`+{tp2_roe:.1f}%` ROE)\n"
                 f"• **손절가 (손절)**: `${format_price(sl)}` (`-{sl_roe:.1f}%` ROE)\n"
                 f"──────────────────────\n"
-                f"📌 *멀티 관리 모드: 현재 {new_slot_count}/{MAX_POSITIONS}개 포지션 트래킹 중*"
+                f"📌 *멀티 관리 모드: 현재 {current_count}/{MAX_POSITIONS}개 포지션 트래킹 중*"
             )
             send_telegram_message(message)
 
@@ -371,11 +373,11 @@ def main():
                 "tp1_reached": False
             }
             state["active_positions"].append(new_position)
+            active_symbols.append(symbol)
             save_state(state)
 
-            # 한 번의 주기 실행에 1개씩 추가 후 최대치 채우기
-            current_count += 1
             if current_count >= MAX_POSITIONS:
+                print("🏁 최대 포지션 15개가 채워져 이번 스캔을 종료합니다.")
                 break
 
 if __name__ == "__main__":
