@@ -29,39 +29,51 @@ def send_telegram_message(message):
 
 def fetch_btcc_market_data(symbol="BTCUSDT", interval="15m", limit=100):
     headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Accept": "application/json"
     }
-    
-    # 1차 시도: BTCC 공식 API
-    url = f"https://api.btcc.com/v1/market/kline?symbol={symbol}&interval={interval}&limit={limit}"
-    try:
-        res = requests.get(url, headers=headers, timeout=5)
-        data = res.json()
-        if isinstance(data, dict) and data.get("code") == 0 and "data" in data:
-            df = pd.DataFrame(data["data"])
-            df['close'] = df['close'].astype(float)
-            df['high'] = df['high'].astype(float)
-            df['low'] = df['low'].astype(float)
-            return df
-    except Exception as e:
-        print(f"BTCC 직접 호출 타임아웃/차단: {e}")
 
-    # 2차 시도: 선물 시세 미러링 엔드포인트 (Bybit Linear USDT 선물)
+    # 1차 시도: OKX 선물 API (GitHub Actions 클라우드 환경에서 차단 없음)
     try:
-        print("BTCC 우회 연결: 선물 글로벌 엔드포인트에서 시세를 수집합니다.")
-        bybit_url = f"https://api.bybit.com/v5/market/kline?category=linear&symbol={symbol}&interval=15&limit={limit}"
-        res = requests.get(bybit_url, headers=headers, timeout=5)
-        data = res.json()
-        raw_list = data.get("result", {}).get("list", [])
-        if raw_list:
-            df = pd.DataFrame(raw_list, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume', 'turnover'])
-            df = df.iloc[::-1].reset_index(drop=True)
-            df['close'] = df['close'].astype(float)
-            df['high'] = df['high'].astype(float)
-            df['low'] = df['low'].astype(float)
-            return df
+        okx_interval_map = {"1m": "1m", "5m": "5m", "15m": "15m", "1h": "1H", "4h": "4H"}
+        bar = okx_interval_map.get(interval, "15m")
+        okx_symbol = f"{symbol[:3]}-{symbol[3:]}-SWAP"  # BTC-USDT-SWAP
+        
+        url = f"https://www.okx.com/api/v5/market/candles?instId={okx_symbol}&bar={bar}&limit={limit}"
+        res = requests.get(url, headers=headers, timeout=8)
+        
+        if res.status_code == 200:
+            data = res.json()
+            raw_list = data.get("data", [])
+            if raw_list:
+                # OKX format: [ts, open, high, low, close, volume, ...]
+                df = pd.DataFrame(raw_list, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume', 'volCcy', 'volCcyQuote', 'confirm'])
+                df = df.iloc[::-1].reset_index(drop=True)
+                df['close'] = df['close'].astype(float)
+                df['high'] = df['high'].astype(float)
+                df['low'] = df['low'].astype(float)
+                return df
     except Exception as e:
-        print(f"선물 우회 API 호출 실패: {e}")
+        print(f"1차 선물 API 호출 예외 발생: {e}")
+
+    # 2차 시도: Gate.io 선물 API (보완 엔드포인트)
+    try:
+        gate_symbol = f"{symbol[:3]}_{symbol[3:]}"  # BTC_USDT
+        url = f"https://api.gateio.ws/api/v4/futures/usdt/candlesticks?contract={gate_symbol}&interval={interval}&limit={limit}"
+        res = requests.get(url, headers=headers, timeout=8)
+        
+        if res.status_code == 200:
+            data = res.json()
+            if isinstance(data, list) and len(data) > 0:
+                # Gate.io format: [t, v, c, h, l, o]
+                df = pd.DataFrame(data)
+                df.rename(columns={'c': 'close', 'h': 'high', 'l': 'low'}, inplace=True)
+                df['close'] = df['close'].astype(float)
+                df['high'] = df['high'].astype(float)
+                df['low'] = df['low'].astype(float)
+                return df
+    except Exception as e:
+        print(f"2차 선물 API 호출 예외 발생: {e}")
 
     return pd.DataFrame()
 
@@ -108,12 +120,12 @@ def analyze_and_signal():
             tp1 = entry_price * 1.015  # +1.5%
             tp2 = entry_price * 1.030  # +3.0%
             sl = entry_price * 0.985   # -1.5%
-            header = "🟢 **BTCC LONG (매수) 시그널**"
+            header = "🟢 **BTCC 선물 LONG (매수) 시그널**"
         else:
             tp1 = entry_price * 0.985  # -1.5%
             tp2 = entry_price * 0.970  # -3.0%
             sl = entry_price * 1.015   # +1.5%
-            header = "🔴 **BTCC SHORT (매도) 시그널**"
+            header = "🔴 **BTCC 선물 SHORT (매도) 시그널**"
 
         message = (
             f"{header}\n\n"
@@ -131,7 +143,7 @@ def analyze_and_signal():
         )
         send_telegram_message(message)
     else:
-        print(f"[BTCC 선물 - {symbol}] 현재 특이 시그널이 없습니다. (현재가: {latest['close']:,.2f}, RSI: {latest['rsi']:.2f})")
+        print(f"[BTCC 선물 - {symbol}] 현재 특이 시그널이 없습니다. (현재가: ${latest['close']:,.2f}, RSI: {latest['rsi']:.2f})")
 
 if __name__ == "__main__":
     analyze_and_signal()
