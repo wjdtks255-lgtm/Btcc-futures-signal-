@@ -26,7 +26,7 @@ def send_telegram_message(message):
     try:
         response = requests.post(url, json=payload, timeout=10)
         if response.status_code == 200:
-            print("📱 텔레그램 알림 전송 성공!")
+            print("📱 텔레그램 메시지 전송 성공!")
         else:
             print(f"❌ 텔레그램 전송 실패 ({response.status_code}): {response.text}")
     except Exception as e:
@@ -92,7 +92,7 @@ def fetch_market_data(symbol, interval="15m", limit=100):
     return pd.DataFrame()
 
 # ---------------------------------------------------------
-# 변동성(ATR) 기반 레버리지 추천 산출 함수 (한국어)
+# 변동성(ATR) 기반 레버리지 추천 산출 함수
 # ---------------------------------------------------------
 def calculate_recommended_leverage(df):
     try:
@@ -124,7 +124,7 @@ def main():
     state = load_state()
     pos = state.get("active_position")
 
-    # 1. 포지션 감시 모드
+    # 1. 포지션 청산 감시 모드
     if pos:
         symbol = pos["symbol"]
         df = fetch_market_data(symbol)
@@ -149,50 +149,59 @@ def main():
         if position_type == "LONG":
             pnl_pct = ((latest_price - entry_price) / entry_price) * 100
             if high_price >= tp2:
-                close_reason = "🎯 2차 목표가(TP2) 도달 - 전량 익절 완료"
+                close_reason = "🎯 2차 목표가 (TP2) 도달 - 전량 익절 완료"
                 is_closed = True
             elif high_price >= tp1 and not pos.get("tp1_reached"):
                 pos["tp1_reached"] = True
                 save_state(state)
                 msg = (
-                    f"🎯 **BTCC 선물 {symbol} 1차 목표가 달성 (TP1)**\n\n"
-                    f"• 현재가: ${latest_price:,.4f}\n"
-                    f"• 수익률: +1.50% (추천 {rec_lev}배 적용 시: +{1.50*rec_lev:.1f}%)\n"
-                    f"📌 *잔여 물량은 본절가(SL=진입가) 설정 후 holding 권장*"
+                    f"🎯 **[BTCC 퀀트] 1차 목표가 달성 (TP1)**\n"
+                    f"──────────────────────\n"
+                    f"• **종목**: #{symbol}\n"
+                    f"• **현재가**: `${latest_price:,.4f}`\n"
+                    f"• **목표 수익률**: `+1.50%` (추천 {rec_lev}배 적용 시: `+{1.50*rec_lev:.1f}%`)\n"
+                    f"──────────────────────\n"
+                    f"💡 *팁: 잔여 물량 본절가(SL=진입가) 설정 후 TP2 보유 권장*"
                 )
                 send_telegram_message(msg)
             elif low_price <= sl:
-                close_reason = "🛑 손절가(SL) 이탈 - 포지션 손절 청산"
+                close_reason = "🛑 손절가 (SL) 이탈 - 포지션 손절 청산"
                 is_closed = True
 
         elif position_type == "SHORT":
             pnl_pct = ((entry_price - latest_price) / entry_price) * 100
             if low_price <= tp2:
-                close_reason = "🎯 2차 목표가(TP2) 도달 - 전량 익절 완료"
+                close_reason = "🎯 2차 목표가 (TP2) 도달 - 전량 익절 완료"
                 is_closed = True
             elif low_price <= tp1 and not pos.get("tp1_reached"):
                 pos["tp1_reached"] = True
                 save_state(state)
                 msg = (
-                    f"🎯 **BTCC 선물 {symbol} 1차 목표가 달성 (TP1)**\n\n"
-                    f"• 현재가: ${latest_price:,.4f}\n"
-                    f"• 수익률: +1.50% (추천 {rec_lev}배 적용 시: +{1.50*rec_lev:.1f}%)\n"
-                    f"📌 *잔여 물량은 본절가(SL=진입가) 설정 후 holding 권장*"
+                    f"🎯 **[BTCC 퀀트] 1차 목표가 달성 (TP1)**\n"
+                    f"──────────────────────\n"
+                    f"• **종목**: #{symbol}\n"
+                    f"• **현재가**: `${latest_price:,.4f}`\n"
+                    f"• **목표 수익률**: `+1.50%` (추천 {rec_lev}배 적용 시: `+{1.50*rec_lev:.1f}%`)\n"
+                    f"──────────────────────\n"
+                    f"💡 *팁: 잔여 물량 본절가(SL=진입가) 설정 후 TP2 보유 권장*"
                 )
                 send_telegram_message(msg)
             elif high_price >= sl:
-                close_reason = "🛑 손절가(SL) 이탈 - 포지션 손절 청산"
+                close_reason = "🛑 손절가 (SL) 이탈 - 포지션 손절 청산"
                 is_closed = True
 
         if is_closed:
             status_icon = "🟢" if pnl_pct > 0 else "🔴"
             leveraged_pnl = pnl_pct * rec_lev
             message = (
-                f"{status_icon} **BTCC 선물 {symbol} 포지션 종료**\n\n"
-                f"• 구분: {position_type}\n"
-                f"• 종료 사유: {close_reason}\n"
-                f"• 청산가: ${latest_price:,.4f}\n"
-                f"• 예상 수익률: {leveraged_pnl:+.2f}% (추천 {rec_lev}배 기준)\n\n"
+                f"{status_icon} **[BTCC 퀀트] 포지션 종료 알림**\n"
+                f"──────────────────────\n"
+                f"• **종목**: #{symbol}\n"
+                f"• **포지션**: `{position_type}`\n"
+                f"• **종료 사유**: {close_reason}\n"
+                f"• **청산가**: `${latest_price:,.4f}`\n"
+                f"• **추정 수익률**: `{leveraged_pnl:+.2f}%` (추천 {rec_lev}배 기준)\n"
+                f"──────────────────────\n"
                 f"📌 *포지션 종료 완료. 신규 종목 탐색을 재개합니다.*"
             )
             send_telegram_message(message)
@@ -215,22 +224,26 @@ def main():
         latest = df.iloc[-1]
         prev = df.iloc[-2]
         entry_price = latest['close']
+        rsi_val = latest['rsi']
 
         signal_type = None
-        reason_text = ""
+        strategy_name = ""
 
+        # 롱 조건
         if prev['rsi'] <= 30 and latest['rsi'] > 30:
             signal_type = "LONG"
-            reason_text = "RSI 과매도 구간(30 이하) 탈출"
+            strategy_name = "RSI 과매도 반등 추세전환"
         elif prev['ema_short'] < prev['ema_long'] and latest['ema_short'] > latest['ema_long']:
             signal_type = "LONG"
-            reason_text = "EMA 골든크로스 발생 (20/50)"
+            strategy_name = "EMA 골든크로스 추세추종"
+
+        # 숏 조건
         elif prev['rsi'] >= 70 and latest['rsi'] < 70:
             signal_type = "SHORT"
-            reason_text = "RSI 과매수 구간(70 이상) 이탈"
+            strategy_name = "RSI 과매수 이탈 반전"
         elif prev['ema_short'] > prev['ema_long'] and latest['ema_short'] < latest['ema_long']:
             signal_type = "SHORT"
-            reason_text = "EMA 데드크로스 발생 (20/50)"
+            strategy_name = "EMA 데드크로스 추세추종"
 
         if signal_type:
             rec_lev, risk_level = calculate_recommended_leverage(df)
@@ -239,30 +252,39 @@ def main():
                 tp1 = entry_price * 1.015
                 tp2 = entry_price * 1.030
                 sl = entry_price * 0.985
-                header = f"🟢 BTCC 선물 {symbol} LONG 진입 시그널"
+                side_header = f"🟢 **[시그널] LONG 진입 포지션**"
             else:
                 tp1 = entry_price * 0.985
                 tp2 = entry_price * 0.970
                 sl = entry_price * 1.015
-                header = f"🔴 BTCC 선물 {symbol} SHORT 진입 시그널"
+                side_header = f"🔴 **[시그널] SHORT 진입 포지션**"
 
             tp1_roe = 1.50 * rec_lev
             tp2_roe = 3.00 * rec_lev
             sl_roe = 1.50 * rec_lev
 
+            # 영어 레이아웃 서식 100% 유지 + 한글 번역
             message = (
-                f"{header}\n\n"
-                f"• 거래소: BTCC 선물\n"
-                f"• 종목: {symbol}\n"
-                f"• 근거: {reason_text}\n"
-                f"• 시장 위험도: {risk_level}\n"
-                f"• 추천 레버리지: {rec_lev}배 (격리)\n\n"
-                f"🎯 **목표가 / 손절가 설정**\n"
-                f"• 진입가: ${entry_price:,.4f}\n"
-                f"• 1차 목표가 (TP1): ${tp1:,.4f} (+{tp1_roe:.1f}%)\n"
-                f"• 2차 목표가 (TP2): ${tp2:,.4f} (+{tp2_roe:.1f}%)\n"
-                f"• 손절가 (SL): ${sl:,.4f} (-{sl_roe:.1f}%)\n\n"
-                f"📌 *해당 종목 종료 전까지 추가 탐색을 대기합니다.*"
+                f"{side_header}\n"
+                f"──────────────────────\n"
+                f"• **거래소**: BTCC 선물\n"
+                f"• **종목**: #{symbol}\n"
+                f"• **타임프레임**: `15분` 캔들\n"
+                f"• **매매 전략**: `{strategy_name}`\n"
+                f"──────────────────────\n"
+                f"⚙️ **[ 변동성 및 위험도 분석 ]**\n"
+                f"• **시장 위험도**: {risk_level}\n"
+                f"• **추천 레버리지**: `⚡ {rec_lev}배` (격리)\n"
+                f"• **진입가**: `${entry_price:,.4f}`\n"
+                f"• **RSI (14)**: `{rsi_val:.2f}`\n"
+                f"• **손익비**: `1 : 2` (R:R 비율)\n"
+                f"──────────────────────\n"
+                f"🎯 **[ 추천 목표가 및 손절가 ]**\n"
+                f"• **1차 목표가 (50% 익절)**: `${tp1:,.4f}` (`+{tp1_roe:.1f}%` ROE)\n"
+                f"• **2차 목표가 (전량 익절)**: `${tp2:,.4f}` (`+{tp2_roe:.1f}%` ROE)\n"
+                f"• **손절가 (손절)**: `${sl:,.4f}` (`-{sl_roe:.1f}%` ROE)\n"
+                f"──────────────────────\n"
+                f"📌 *단일 종목 집중 관리 모드: 포지션 종료 전까지 추가 탐색을 대기합니다.*"
             )
             send_telegram_message(message)
 
