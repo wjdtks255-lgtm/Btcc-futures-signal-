@@ -11,7 +11,7 @@ TELEGRAM_BOT_TOKEN = "8913250892:AAEQxGKfFC1ru9oJyacy6cdUllER2K0UbiY"
 TELEGRAM_CHAT_ID = "-1004443428081"
 
 STATE_FILE = "bot_state.json"
-MAX_POSITIONS = 15  # 최대 동시 관리 포지션 수 (15개로 변경)
+MAX_POSITIONS = 15  # 최대 동시 관리 포지션 수
 
 def send_telegram_message(message):
     if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
@@ -64,6 +64,7 @@ def save_state(state):
     try:
         with open(STATE_FILE, "w", encoding="utf-8") as f:
             json.dump(state, f, ensure_ascii=False, indent=4)
+        print("💾 bot_state.json 업데이트 완료")
     except Exception as e:
         print(f"상태 저장 중 에러: {e}")
 
@@ -258,7 +259,7 @@ def main():
     save_state(state)
 
     # ---------------------------------------------------------
-    # 2. 신규 포지션 탐색 (슬롯 여유 확인)
+    # 2. 신규 포지션 탐색 (15개 채우기 모드)
     # ---------------------------------------------------------
     current_count = len(remaining_positions)
     if current_count >= MAX_POSITIONS:
@@ -294,9 +295,6 @@ def main():
         signal_type = None
         strategy_name = ""
 
-        # ---------------------------------------------------------
-        # 전략 조건 (실전 포착률 향상 조정)
-        # ---------------------------------------------------------
         # 1. RSI 역발상 시그널
         if prev['rsi'] <= 30 and latest['rsi'] > 30:
             signal_type = "LONG"
@@ -305,7 +303,7 @@ def main():
             signal_type = "SHORT"
             strategy_name = "RSI 과매수 이탈 반전"
 
-        # 2. EMA 크로스 + MACD 확인 시그널
+        # 2. EMA 크로스 + MACD 모멘텀 시그널
         elif prev['ema_short'] < prev['ema_long'] and latest['ema_short'] > latest['ema_long']:
             if latest['macd_diff'] > prev['macd_diff'] and latest['rsi'] < 70:
                 signal_type = "LONG"
@@ -316,9 +314,7 @@ def main():
                 signal_type = "SHORT"
                 strategy_name = "EMA 데드크로스 + MACD 모멘텀"
 
-        # ---------------------------------------------------------
         # 시그널 발생 시 등록 및 알림 발송
-        # ---------------------------------------------------------
         if signal_type:
             rec_lev, risk_level = calculate_recommended_leverage(df)
 
