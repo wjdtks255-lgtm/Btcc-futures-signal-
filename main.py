@@ -4,9 +4,11 @@ import requests
 import pandas as pd
 import ta
 
-# 환경 변수 설정
-TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "8913250892:AAEQxGKfFC1ru9oJyacy6cdUllER2K0UbiY")
-TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "-1004443428081")
+# ==========================================
+# 텔레그램 인증 정보
+# ==========================================
+TELEGRAM_BOT_TOKEN = "8913250892:AAEQxGKfFC1ru9oJyacy6cdUllER2K0UbiY"
+TELEGRAM_CHAT_ID = "-1004443428081"
 
 STATE_FILE = "bot_state.json"
 
@@ -23,10 +25,12 @@ def send_telegram_message(message):
     }
     try:
         response = requests.post(url, json=payload, timeout=10)
-        if response.status_code != 200:
-            print(f"전송 실패: {response.status_code}, {response.text}")
+        if response.status_code == 200:
+            print("📱 텔레그램 메시지 전송 성공!")
+        else:
+            print(f"❌ 텔레그램 전송 실패 ({response.status_code}): {response.text}")
     except Exception as e:
-        print(f"텔레그램 전송 중 에러 발생: {e}")
+        print(f"❌ 텔레그램 전송 중 예외 발생: {e}")
 
 # ---------------------------------------------------------
 # 상태 파일(bot_state.json) 관리 함수
@@ -94,7 +98,7 @@ def main():
     state = load_state()
     pos = state.get("active_position")
 
-    # 1. 이미 진입한 포지션이 있는 경우 ➔ 청산(목표가/손절가) 여부만 감시
+    # 1. 이미 진입한 포지션이 있는 경우 ➔ 청산(목표가/손절가) 여부 감시
     if pos:
         symbol = pos["symbol"]
         df = fetch_market_data(symbol)
@@ -106,7 +110,7 @@ def main():
         high_price = df.iloc[-1]['high']
         low_price = df.iloc[-1]['low']
 
-        position_type = pos["type"] # LONG or SHORT
+        position_type = pos["type"]  # LONG or SHORT
         tp1 = pos["tp1"]
         tp2 = pos["tp2"]
         sl = pos["sl"]
@@ -154,7 +158,7 @@ def main():
             print(f"⏳ [{symbol}] {position_type} 포지션 진행 중... (현재가: ${latest_price:,.4f})")
         return
 
-    # 2. 보유 포지션이 없는 경우 ➔ 전 종목 스캔 후 최초 1개 종목 잡히면 즉시 탐색 중단
+    # 2. 보유 포지션이 없는 경우 ➔ 전 종목 스캔 후 최초 1개 종목 잡히면 탐색 중단
     print("🔍 보유 중인 포지션 없음. 전 종목 스캔 중...")
     all_symbols = get_all_futures_symbols()
 
