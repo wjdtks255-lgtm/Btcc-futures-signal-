@@ -33,7 +33,7 @@ def send_telegram_message(message):
         print(f"❌ 텔레그램 전송 중 예외 발생: {e}")
 
 # ---------------------------------------------------------
-# 가격 포맷팅 함수 (소수점 자릿수 유연 대응)
+# 가격 포맷팅 함수 (동전주 및 소수점 자리 대응)
 # ---------------------------------------------------------
 def format_price(price):
     if price >= 100:
@@ -256,9 +256,16 @@ def main():
         if df.empty or len(df) < 50:
             continue
 
+        # 지표 산출
         df['rsi'] = ta.momentum.rsi(df['close'], window=14)
         df['ema_short'] = ta.trend.ema_indicator(df['close'], window=20)
         df['ema_long'] = ta.trend.ema_indicator(df['close'], window=50)
+
+        # MACD 산출 (12, 26, 9)
+        macd_indicator = ta.trend.MACD(df['close'], window_slow=26, window_fast=12, window_sign=9)
+        df['macd'] = macd_indicator.macd()
+        df['macd_signal'] = macd_indicator.macd_signal()
+        df['macd_diff'] = macd_indicator.macd_diff()
 
         latest = df.iloc[-1]
         prev = df.iloc[-2]
@@ -268,19 +275,37 @@ def main():
         signal_type = None
         strategy_name = ""
 
+        # ---------------------------------------------------------
+        # LONG 전략 (MACD + RSI 필터 적용)
+        # ---------------------------------------------------------
         if prev['rsi'] <= 30 and latest['rsi'] > 30:
             signal_type = "LONG"
             strategy_name = "RSI 과매도 반등 추세전환"
         elif prev['ema_short'] < prev['ema_long'] and latest['ema_short'] > latest['ema_long']:
-            signal_type = "LONG"
-            strategy_name = "EMA 골든크로스 추세추종"
+            # [LONG 필터] MACD 하락세가 아니며 RSI가 과매수(50 이상) 방향 상승 중일 때만 진입
+            is_macd_bullish = (latest['macd_diff'] > prev['macd_diff']) and (latest['macd'] > latest['macd_signal'])
+            if is_macd_bullish and latest['rsi'] > 50:
+                signal_type = "LONG"
+                strategy_name = "EMA 골든크로스 + MACD 상승확정"
+
+        # ---------------------------------------------------------
+        # SHORT 전략 (MACD + RSI 필터 적용 - 반등 억제)
+        # ---------------------------------------------------------
         elif prev['rsi'] >= 70 and latest['rsi'] < 70:
             signal_type = "SHORT"
             strategy_name = "RSI 과매수 이탈 반전"
         elif prev['ema_short'] > prev['ema_long'] and latest['ema_short'] < latest['ema_long']:
-            signal_type = "SHORT"
-            strategy_name = "EMA 데드크로스 추세추종"
+            # [SHORT 필터] MACD 하락확정 (DIF < Signal, 히스토그램 감소) + RSI 50 이하일 때만 진입
+            is_macd_bearish = (latest['macd_diff'] < prev['macd_diff']) and (latest['macd'] < latest['macd_signal'])
+            if is_macd_bearish and latest['rsi'] < 50:
+                signal_type = "SHORT"
+                strategy_name = "EMA 데드크로스 + MACD 하락확정"
+            else:
+                print(f"⚠️ [스킵] {symbol}: EMA 데드크로스 발생했으나 MACD/RSI 반등으로 숏 취소")
 
+        # ---------------------------------------------------------
+        # 시그널 포착 시 메시지 발송
+        # ---------------------------------------------------------
         if signal_type:
             rec_lev, risk_level = calculate_recommended_leverage(df)
 
