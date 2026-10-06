@@ -11,6 +11,7 @@ TELEGRAM_BOT_TOKEN = "8913250892:AAEQxGKfFC1ru9oJyacy6cdUllER2K0UbiY"
 TELEGRAM_CHAT_ID = "-1004443428081"
 
 STATE_FILE = "bot_state.json"
+MAX_POSITIONS = 5  # 최대 동시 관리 포지션 수
 
 def send_telegram_message(message):
     if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
@@ -44,16 +45,21 @@ def format_price(price):
         return f"{price:.8f}".rstrip('0').rstrip('.')
 
 # ---------------------------------------------------------
-# 상태 파일(bot_state.json) 관리 함수
+# 상태 파일(bot_state.json) 관리 함수 (리스트 개편)
 # ---------------------------------------------------------
 def load_state():
     if os.path.exists(STATE_FILE):
         try:
             with open(STATE_FILE, "r", encoding="utf-8") as f:
-                return json.load(f)
+                data = json.load(f)
+                # 기존 단일 포지션 구조와 호환성 처리
+                if "active_positions" in data:
+                    return data
+                elif "active_position" in data and data["active_position"]:
+                    return {"active_positions": [data["active_position"]]}
         except Exception:
             pass
-    return {"active_position": None}
+    return {"active_positions": []}
 
 def save_state(state):
     try:
@@ -155,19 +161,24 @@ def calculate_recommended_leverage(df):
         return 5, "⚖️ 보통 변동성"
 
 # ---------------------------------------------------------
-# 메인 분석 및 포지션 추적 로직
+# 메인 분석 및 다중 포지션 관리 로직
 # ---------------------------------------------------------
 def main():
     state = load_state()
-    pos = state.get("active_position")
+    active_positions = state.get("active_positions", [])
 
-    # 1. 포지션 청산 감시 모드
-    if pos:
+    # ---------------------------------------------------------
+    # 1. 보유 중인 포지션 감시 및 청산 체크 (최대 5개 대상)
+    # ---------------------------------------------------------
+    remaining_positions = []
+    
+    for pos in active_positions:
         symbol = pos["symbol"]
         print(f"🔍 기존 포지션 ({symbol}) 모니터링 중...")
         df = fetch_market_data(symbol)
         if df.empty:
-            return
+            remaining_positions.append(pos)
+            continue
 
         latest_price = df.iloc[-1]['close']
         high_price = df.iloc[-1]['high']
@@ -191,7 +202,6 @@ def main():
                 is_closed = True
             elif high_price >= tp1 and not pos.get("tp1_reached"):
                 pos["tp1_reached"] = True
-                save_state(state)
                 msg = (
                     f"🎯 **[BTCC 퀀트] 1차 목표가 달성 (TP1)**\n"
                     f"──────────────────────\n"
@@ -213,7 +223,6 @@ def main():
                 is_closed = True
             elif low_price <= tp1 and not pos.get("tp1_reached"):
                 pos["tp1_reached"] = True
-                save_state(state)
                 msg = (
                     f"🎯 **[BTCC 퀀트] 1차 목표가 달성 (TP1)**\n"
                     f"──────────────────────\n"
@@ -240,28 +249,41 @@ def main():
                 f"• **청산가**: `${format_price(latest_price)}`\n"
                 f"• **추정 수익률**: `{leveraged_pnl:+.2f}%` (추천 {rec_lev}배 기준)\n"
                 f"──────────────────────\n"
-                f"📌 *포지션 종료 완료. 신규 종목 탐색을 재개합니다.*"
+                f"📌 *포지션 종료 완료 ({len(remaining_positions)}/{MAX_POSITIONS} 관리 중)*"
             )
             send_telegram_message(message)
-            state["active_position"] = None
-            save_state(state)
+        else:
+            remaining_positions.append(pos)
+
+    # 업데이트된 활성 포지션 저장
+    state["active_positions"] = remaining_positions
+    save_state(state)
+
+    # ---------------------------------------------------------
+    # 2. 신규 포지션 탐색 (슬롯 여유가 있을 때만 진행)
+    # ---------------------------------------------------------
+    current_count = len(remaining_positions)
+    if current_count >= MAX_POSITIONS:
+        print(f"⚠️ [최대 포지션 달성] 현재 {current_count}/{MAX_POSITIONS}개 관리 중으로 신규 탐색을 스킵합니다.")
         return
 
-    # 2. 신규 포지션 탐색 모드
-    print("🔎 신규 시그널 종목 탐색 시작...")
+    print(f"🔎 신규 시그널 탐색 중... (현재 {current_count}/{MAX_POSITIONS} 슬롯 사용 중)")
+    active_symbols = [p["symbol"] for p in remaining_positions]
     all_symbols = get_all_futures_symbols()
 
     for symbol in all_symbols:
+        # 이미 진입 중인 종목은 제외
+        if symbol in active_symbols:
+            continue
+
         df = fetch_market_data(symbol)
         if df.empty or len(df) < 50:
             continue
 
-        # 지표 산출
         df['rsi'] = ta.momentum.rsi(df['close'], window=14)
         df['ema_short'] = ta.trend.ema_indicator(df['close'], window=20)
         df['ema_long'] = ta.trend.ema_indicator(df['close'], window=50)
 
-        # MACD 산출 (12, 26, 9)
         macd_indicator = ta.trend.MACD(df['close'], window_slow=26, window_fast=12, window_sign=9)
         df['macd'] = macd_indicator.macd()
         df['macd_signal'] = macd_indicator.macd_signal()
@@ -275,37 +297,26 @@ def main():
         signal_type = None
         strategy_name = ""
 
-        # ---------------------------------------------------------
-        # LONG 전략 (MACD + RSI 필터 적용)
-        # ---------------------------------------------------------
+        # LONG 조건
         if prev['rsi'] <= 30 and latest['rsi'] > 30:
             signal_type = "LONG"
             strategy_name = "RSI 과매도 반등 추세전환"
         elif prev['ema_short'] < prev['ema_long'] and latest['ema_short'] > latest['ema_long']:
-            # [LONG 필터] MACD 하락세가 아니며 RSI가 과매수(50 이상) 방향 상승 중일 때만 진입
             is_macd_bullish = (latest['macd_diff'] > prev['macd_diff']) and (latest['macd'] > latest['macd_signal'])
             if is_macd_bullish and latest['rsi'] > 50:
                 signal_type = "LONG"
                 strategy_name = "EMA 골든크로스 + MACD 상승확정"
 
-        # ---------------------------------------------------------
-        # SHORT 전략 (MACD + RSI 필터 적용 - 반등 억제)
-        # ---------------------------------------------------------
+        # SHORT 조건
         elif prev['rsi'] >= 70 and latest['rsi'] < 70:
             signal_type = "SHORT"
             strategy_name = "RSI 과매수 이탈 반전"
         elif prev['ema_short'] > prev['ema_long'] and latest['ema_short'] < latest['ema_long']:
-            # [SHORT 필터] MACD 하락확정 (DIF < Signal, 히스토그램 감소) + RSI 50 이하일 때만 진입
             is_macd_bearish = (latest['macd_diff'] < prev['macd_diff']) and (latest['macd'] < latest['macd_signal'])
             if is_macd_bearish and latest['rsi'] < 50:
                 signal_type = "SHORT"
                 strategy_name = "EMA 데드크로스 + MACD 하락확정"
-            else:
-                print(f"⚠️ [스킵] {symbol}: EMA 데드크로스 발생했으나 MACD/RSI 반등으로 숏 취소")
 
-        # ---------------------------------------------------------
-        # 시그널 포착 시 메시지 발송
-        # ---------------------------------------------------------
         if signal_type:
             rec_lev, risk_level = calculate_recommended_leverage(df)
 
@@ -324,6 +335,7 @@ def main():
             tp2_roe = 3.00 * rec_lev
             sl_roe = 1.50 * rec_lev
 
+            new_slot_count = current_count + 1
             message = (
                 f"{side_header}\n"
                 f"──────────────────────\n"
@@ -344,11 +356,11 @@ def main():
                 f"• **2차 목표가 (전량 익절)**: `${format_price(tp2)}` (`+{tp2_roe:.1f}%` ROE)\n"
                 f"• **손절가 (손절)**: `${format_price(sl)}` (`-{sl_roe:.1f}%` ROE)\n"
                 f"──────────────────────\n"
-                f"📌 *단일 종목 집중 관리 모드: 포지션 종료 전까지 추가 탐색을 대기합니다.*"
+                f"📌 *멀티 관리 모드: 현재 {new_slot_count}/{MAX_POSITIONS}개 포지션 트래킹 중*"
             )
             send_telegram_message(message)
 
-            state["active_position"] = {
+            new_position = {
                 "symbol": symbol,
                 "type": signal_type,
                 "entry_price": entry_price,
@@ -358,8 +370,13 @@ def main():
                 "sl": sl,
                 "tp1_reached": False
             }
+            state["active_positions"].append(new_position)
             save_state(state)
-            break
+
+            # 한 번의 주기 실행에 1개씩 추가 후 최대치 채우기
+            current_count += 1
+            if current_count >= MAX_POSITIONS:
+                break
 
 if __name__ == "__main__":
     main()
