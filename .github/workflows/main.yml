@@ -34,39 +34,3 @@ jobs:
           git config --local user.name "github-actions[bot]"
           git add bot_state.json
           git diff --quiet && git diff --staged --quiet || (git commit -m "chore: update bot_state.json [skip ci]" && git push)
-name: Run Signal Bot
-
-on:
-  schedule:
-    - cron: '*/5 * * * *'  # 5분마다 자동 실행
-  workflow_dispatch:       # 수동 실행 버튼 활성화
-
-permissions:
-  contents: write          # bot_state.json 상태 저장을 위한 repository 쓰기 권한
-
-jobs:
-  run-bot:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
-
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.10'
-
-      - name: Install Dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install requests pandas ta
-
-      - name: Run Main Script
-        run: python main.py
-
-      - name: Commit and Push Updated State
-        run: |
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
-          git add bot_state.json
-          git diff --quiet && git diff --staged --quiet || (git commit -m "chore: update bot_state.json [skip ci]" && git push)
