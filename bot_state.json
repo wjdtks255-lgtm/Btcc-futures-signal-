@@ -315,6 +315,42 @@
       "score": 99,
       "quality": "A+",
       "entry_time": "2026-10-07T17:41:26.749393+09:00"
+    },
+    "TRXUSDT": {
+      "symbol": "TRXUSDT",
+      "direction": "SHORT",
+      "entry": 0.33289,
+      "sl": 0.33455445,
+      "tp1": 0.330393325,
+      "tp2": 0.32872887500000003,
+      "tp1_hit": false,
+      "score": 94,
+      "quality": "A+",
+      "entry_time": "2026-10-07T17:45:02.650937+09:00"
+    },
+    "UNITREEUSDT": {
+      "symbol": "UNITREEUSDT",
+      "direction": "SHORT",
+      "entry": 67.929,
+      "sl": 68.268645,
+      "tp1": 67.4195325,
+      "tp2": 67.0798875,
+      "tp1_hit": false,
+      "score": 94,
+      "quality": "A+",
+      "entry_time": "2026-10-07T17:45:03.964452+09:00"
+    },
+    "ARCUSDT": {
+      "symbol": "ARCUSDT",
+      "direction": "SHORT",
+      "entry": 0.07007,
+      "sl": 0.0704987236047262,
+      "tp1": 0.0694269145929107,
+      "tp2": 0.0689981909881845,
+      "tp1_hit": false,
+      "score": 92,
+      "quality": "A",
+      "entry_time": "2026-10-07T17:45:05.281125+09:00"
     }
   },
   "signals": {
@@ -348,6 +384,9 @@
     "ESPORTSUSDT:SHORT": 1791362439.7748892,
     "SOLUSDC:SHORT": 1791362483.706792,
     "SOLUSDT:SHORT": 1791362483.706792,
-    "BANKUSDT:SHORT": 1791362483.706792
+    "BANKUSDT:SHORT": 1791362483.706792,
+    "TRXUSDT:SHORT": 1791362702.0539832,
+    "UNITREEUSDT:SHORT": 1791362702.0539832,
+    "ARCUSDT:SHORT": 1791362702.0539832
   }
 }
