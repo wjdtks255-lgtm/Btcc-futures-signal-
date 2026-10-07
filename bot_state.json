@@ -9,6 +9,146 @@
             "tp2": 1.451023,
             "sl": 1.5183384999999998,
             "tp1_reached": false
+        },
+        {
+            "symbol": "AAVEUSDT",
+            "type": "SHORT",
+            "entry_price": 179.29,
+            "leverage": 15,
+            "tp1": 176.60065,
+            "tp2": 173.91129999999998,
+            "sl": 181.97934999999998,
+            "tp1_reached": false
+        },
+        {
+            "symbol": "ACUUSDT",
+            "type": "SHORT",
+            "entry_price": 0.12863,
+            "leverage": 15,
+            "tp1": 0.12670055,
+            "tp2": 0.1247711,
+            "sl": 0.13055945,
+            "tp1_reached": false
+        },
+        {
+            "symbol": "AUSDT",
+            "type": "SHORT",
+            "entry_price": 0.10333,
+            "leverage": 15,
+            "tp1": 0.10178005,
+            "tp2": 0.1002301,
+            "sl": 0.10487995,
+            "tp1_reached": false
+        },
+        {
+            "symbol": "AXTIUSDT",
+            "type": "LONG",
+            "entry_price": 84.06,
+            "leverage": 15,
+            "tp1": 85.3209,
+            "tp2": 86.5818,
+            "sl": 82.7991,
+            "tp1_reached": false
+        },
+        {
+            "symbol": "BSBUSDT",
+            "type": "LONG",
+            "entry_price": 0.10335,
+            "leverage": 15,
+            "tp1": 0.10490024999999999,
+            "tp2": 0.1064505,
+            "sl": 0.10179975,
+            "tp1_reached": false
+        },
+        {
+            "symbol": "COHRUSDT",
+            "type": "LONG",
+            "entry_price": 339.15,
+            "leverage": 15,
+            "tp1": 344.23724999999996,
+            "tp2": 349.3245,
+            "sl": 334.06275,
+            "tp1_reached": false
+        },
+        {
+            "symbol": "COREUSDT",
+            "type": "SHORT",
+            "entry_price": 0.02165,
+            "leverage": 15,
+            "tp1": 0.02132525,
+            "tp2": 0.0210005,
+            "sl": 0.021974749999999998,
+            "tp1_reached": false
+        },
+        {
+            "symbol": "CRWDUSDT",
+            "type": "LONG",
+            "entry_price": 279.6,
+            "leverage": 15,
+            "tp1": 283.794,
+            "tp2": 287.98800000000006,
+            "sl": 275.406,
+            "tp1_reached": false
+        },
+        {
+            "symbol": "CTUSDT",
+            "type": "SHORT",
+            "entry_price": 0.3681,
+            "leverage": 10,
+            "tp1": 0.36257849999999997,
+            "tp2": 0.35705699999999996,
+            "sl": 0.37362149999999994,
+            "tp1_reached": false
+        },
+        {
+            "symbol": "CVXUSDT",
+            "type": "LONG",
+            "entry_price": 2.234,
+            "leverage": 15,
+            "tp1": 2.2675099999999997,
+            "tp2": 2.30102,
+            "sl": 2.20049,
+            "tp1_reached": false
+        },
+        {
+            "symbol": "DELLUSDT",
+            "type": "LONG",
+            "entry_price": 576.8,
+            "leverage": 15,
+            "tp1": 585.4519999999999,
+            "tp2": 594.1039999999999,
+            "sl": 568.1479999999999,
+            "tp1_reached": false
+        },
+        {
+            "symbol": "EGLDUSDT",
+            "type": "SHORT",
+            "entry_price": 4.421,
+            "leverage": 15,
+            "tp1": 4.354685,
+            "tp2": 4.2883700000000005,
+            "sl": 4.487315,
+            "tp1_reached": false
+        },
+        {
+            "symbol": "ENAUSDT",
+            "type": "SHORT",
+            "entry_price": 0.23832,
+            "leverage": 15,
+            "tp1": 0.2347452,
+            "tp2": 0.2311704,
+            "sl": 0.2418948,
+            "tp1_reached": false
+        },
+        {
+            "symbol": "ENJUSDT",
+            "type": "SHORT",
+            "entry_price": 0.03288,
+            "leverage": 15,
+            "tp1": 0.0323868,
+            "tp2": 0.0318936,
+            "sl": 0.0333732,
+            "tp1_reached": false
         }
     ]
 }
