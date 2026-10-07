@@ -69,57 +69,83 @@ def save_state(state):
         print(f"상태 저장 중 에러: {e}")
 
 # ---------------------------------------------------------
-# BTCC 거래소 주요 상장 종목 마스터 리스트
+# BTCC 거래소 포함 전체 코인 리스트 완전 수집
 # ---------------------------------------------------------
 def get_all_futures_symbols():
-    headers = {"User-Agent": "Mozilla/5.0"}
+    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
     symbols = []
-    
-    urls = [
-        "https://api.btcc.com/api/v1/market/tickers",
-        "https://api.btcc.com/api/v1/market/symbolList"
-    ]
 
-    for url in urls:
+    # 1. BTCC 공식 엔드포인트 전체 수집
+    btcc_urls = [
+        "https://api.btcc.com/api/v1/market/tickers",
+        "https://api.btcc.com/api/v1/market/symbolList",
+        "https://api.btcc.com/v1/market/getTickers"
+    ]
+    for url in btcc_urls:
         try:
-            res = requests.get(url, headers=headers, timeout=3)
+            res = requests.get(url, headers=headers, timeout=5)
             if res.status_code == 200:
                 raw_data = res.json()
                 items = raw_data.get("data", []) if isinstance(raw_data, dict) else raw_data
                 if isinstance(items, list):
                     for item in items:
-                        raw_symbol = item.get("symbol", "") if isinstance(item, dict) else str(item)
+                        if isinstance(item, dict):
+                            raw_symbol = item.get("symbol") or item.get("symbolName") or item.get("instrument_id") or ""
+                        else:
+                            raw_symbol = str(item)
+                        
                         if "USDT" in raw_symbol.upper():
                             clean_symbol = raw_symbol.replace("_", "").replace("-", "").upper()
                             symbols.append(clean_symbol)
-        except Exception:
-            pass
+        except Exception as e:
+            print(f"BTCC 로드 시도 중 예외: {e}")
 
-    if not symbols:
-        symbols = [
+    # 2. 글로벌 커버리지 보완 (BTCC 상장 종목이 거의 100% 교차되는 바이낸스/OKX 전체 선물 수집)
+    try:
+        res = requests.get("https://fapi.binance.com/fapi/v1/exchangeInfo", headers=headers, timeout=5)
+        if res.status_code == 200:
+            for s in res.json().get("symbols", []):
+                if s.get("quoteAsset") == "USDT" and s.get("status") == "TRADING":
+                    symbols.append(s.get("symbol"))
+    except Exception:
+        pass
+
+    try:
+        res = requests.get("https://www.okx.com/api/v5/public/instruments?instType=SWAP", headers=headers, timeout=5)
+        if res.status_code == 200:
+            for item in res.json().get("data", []):
+                inst_id = item.get("instId", "")
+                if inst_id.endswith("-USDT-SWAP"):
+                    symbols.append(inst_id.replace("-USDT-SWAP", "USDT"))
+    except Exception:
+        pass
+
+    # 중복 제거 및 알파벳 정렬
+    final_symbols = sorted(list(set(symbols)))
+
+    # 비상용 기본 백업
+    if not final_symbols:
+        final_symbols = [
             "BTCUSDT", "ETHUSDT", "SOLUSDT", "XRPUSDT", "DOGEUSDT", "PEPEUSDT",
             "SHIBUSDT", "FLOKIUSDT", "BONKUSDT", "WIFUSDT", "SUIUSDT", "APTUSDT",
             "AVAXUSDT", "ADAUSDT", "LINKUSDT", "DOTUSDT", "NEARUSDT", "MATICUSDT",
-            "LTCUSDT", "BCHUSDT", "ETCUSDT", "TRXUSDT", "ATOMUSDT", "UNIUSDT",
-            "FILUSDT", "ARBUSDT", "OPUSDT", "INJUSDT", "TIAUSDT", "ORDIUSDT",
-            "1000PEPEUSDT", "1000SHIBUSDT", "1000BONKUSDT", "MEMEUSDT", "NOTUSDT"
+            "LTCUSDT", "BCHUSDT", "ETCUSDT", "TRXUSDT", "ATOMUSDT", "UNIUSDT"
         ]
 
-    final_symbols = sorted(list(set(symbols)))
     print(f"📊 스캔 대상 종목 총 {len(final_symbols)}개 로드 완료")
     return final_symbols
 
 # ---------------------------------------------------------
-# 시세 데이터 수집 (글로벌 시세 API 백업)
+# 시세 데이터 수집
 # ---------------------------------------------------------
 def fetch_market_data(symbol, interval="15m", limit=100):
     headers = {"User-Agent": "Mozilla/5.0"}
     clean_symbol = symbol.replace("1000", "")
 
-    # 1. 바이낸스 선물 API
+    # 바이낸스 선물 시세 API
     try:
         url = f"https://fapi.binance.com/fapi/v1/klines?symbol={clean_symbol}&interval={interval}&limit={limit}"
-        res = requests.get(url, headers=headers, timeout=5)
+        res = requests.get(url, headers=headers, timeout=4)
         if res.status_code == 200:
             candles = res.json()
             if candles and isinstance(candles, list):
@@ -127,31 +153,25 @@ def fetch_market_data(symbol, interval="15m", limit=100):
                     'timestamp', 'open', 'high', 'low', 'close', 'volume',
                     'close_time', 'qav', 'num_trades', 'taker_base_vol', 'taker_quote_vol', 'ignore'
                 ])
-                df['close'] = df['close'].astype(float)
-                df['high'] = df['high'].astype(float)
-                df['low'] = df['low'].astype(float)
-                df['open'] = df['open'].astype(float)
-                df['volume'] = df['volume'].astype(float)
+                for col in ['close', 'high', 'low', 'open', 'volume']:
+                    df[col] = df[col].astype(float)
                 return df
     except Exception:
         pass
 
-    # 2. OKX 선물 API
+    # OKX 선물 시세 API 백업
     try:
         base_asset = clean_symbol.replace("USDT", "")
         okx_symbol = f"{base_asset}-USDT-SWAP"
         url = f"https://www.okx.com/api/v5/market/candles?instId={okx_symbol}&bar={interval}&limit={limit}"
-        res = requests.get(url, headers=headers, timeout=5)
+        res = requests.get(url, headers=headers, timeout=4)
         if res.status_code == 200:
             data = res.json().get("data", [])
             if data:
                 df = pd.DataFrame(data, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume', 'v1', 'v2', 'v3'])
                 df = df.iloc[::-1].reset_index(drop=True)
-                df['close'] = df['close'].astype(float)
-                df['high'] = df['high'].astype(float)
-                df['low'] = df['low'].astype(float)
-                df['open'] = df['open'].astype(float)
-                df['volume'] = df['volume'].astype(float)
+                for col in ['close', 'high', 'low', 'open', 'volume']:
+                    df[col] = df[col].astype(float)
                 return df
     except Exception:
         pass
@@ -159,7 +179,7 @@ def fetch_market_data(symbol, interval="15m", limit=100):
     return pd.DataFrame()
 
 # ---------------------------------------------------------
-# 현재 유지 중인 포지션 요약 텍스트 생성 함수
+# 현재 유지 중인 포지션 요약 텍스트
 # ---------------------------------------------------------
 def generate_active_summary_text(active_positions):
     if not active_positions:
@@ -220,15 +240,13 @@ def calculate_recommended_leverage(df):
         return 5, "⚖️ 보통 변동성"
 
 # ---------------------------------------------------------
-# 메인 분석 및 다중 포지션 관리 로직
+# 메인 분석 및 포지션 관리 로직
 # ---------------------------------------------------------
 def main():
     state = load_state()
     active_positions = state.get("active_positions", [])
 
-    # ---------------------------------------------------------
-    # 1. 보유 포지션 감시 및 청산 체크
-    # ---------------------------------------------------------
+    # 1. 보유 포지션 모니터링 및 청산 체크
     remaining_positions = []
     
     for pos in active_positions:
@@ -322,9 +340,7 @@ def main():
     state["active_positions"] = remaining_positions
     save_state(state)
 
-    # ---------------------------------------------------------
-    # 2. 다중 멀티 전략 앙상블 스캔 엔진
-    # ---------------------------------------------------------
+    # 2. 다중 멀티 전략 전체 종목 스캔
     current_count = len(remaining_positions)
     if current_count >= MAX_POSITIONS:
         print(f"⚠️ [최대 포지션 달성] 현재 {current_count}/{MAX_POSITIONS}개 관리 중입니다.")
@@ -342,37 +358,30 @@ def main():
         if df.empty or len(df) < 50:
             continue
 
-        # ---------------------------------------------------------
-        # 지표 산출 모듈
-        # ---------------------------------------------------------
+        # 지표 산출
         df['rsi'] = ta.momentum.rsi(df['close'], window=14)
         df['ema_short'] = ta.trend.ema_indicator(df['close'], window=20)
         df['ema_long'] = ta.trend.ema_indicator(df['close'], window=50)
         df['ema_trend'] = ta.trend.ema_indicator(df['close'], window=200)
 
-        # 1. 볼린저 밴드
         bb = ta.volatility.BollingerBands(df['close'], window=20, window_dev=2)
         df['bb_hband'] = bb.bollinger_hband()
         df['bb_lband'] = bb.bollinger_lband()
 
-        # 2. MACD
         macd_indicator = ta.trend.MACD(df['close'], window_slow=26, window_fast=12, window_sign=9)
         df['macd'] = macd_indicator.macd()
         df['macd_signal'] = macd_indicator.macd_signal()
         df['macd_diff'] = macd_indicator.macd_diff()
 
-        # 3. 스토캐스틱 RSI (Stoch RSI)
         stoch_rsi = ta.momentum.StochRSIIndicator(df['close'], window=14, smooth1=3, smooth2=3)
         df['stoch_k'] = stoch_rsi.stochrsi_k() * 100
         df['stoch_d'] = stoch_rsi.stochrsi_d() * 100
 
-        # 4. 켈트너 채널 (Keltner Channel)
         atr = ta.volatility.average_true_range(df['high'], df['low'], df['close'], window=10)
         kc_middle = ta.trend.ema_indicator(df['close'], window=20)
         df['kc_hband'] = kc_middle + (atr * 1.5)
         df['kc_lband'] = kc_middle - (atr * 1.5)
 
-        # 5. 거래량 평균 (5봉 평균)
         df['vol_ma'] = df['volume'].rolling(window=5).mean()
 
         latest = df.iloc[-1]
@@ -385,11 +394,8 @@ def main():
         signal_type = None
         strategy_name = ""
 
-        # =========================================================
-        # 5대 다중 전략 조건 엔진 (상호 보완)
-        # =========================================================
-
-        # [전략 1] 볼린저 하단/상단 반등 (역발상 전략)
+        # 5대 다중 전략 조건
+        # [전략 1] 볼린저 반등
         if prev['rsi'] <= 40 and latest['rsi'] > 40 and prev['low'] <= prev['bb_lband']:
             signal_type = "LONG"
             strategy_name = "볼린저 하단 반등 + RSI 과매도 회복"
@@ -398,7 +404,7 @@ def main():
             signal_type = "SHORT"
             strategy_name = "볼린저 상단 반전 + RSI 과매수 이탈"
 
-        # [전략 2] EMA 정배열/역배열 + MACD 수급 돌파 (추세 돌파)
+        # [전략 2] EMA + MACD 수급 돌파
         elif latest['ema_short'] > latest['ema_long'] and prev['macd_diff'] < latest['macd_diff'] and latest['macd_diff'] > 0:
             if 38 <= latest['rsi'] <= 68 and vol_confirmed and latest['close'] > latest['ema_trend']:
                 signal_type = "LONG"
@@ -409,7 +415,7 @@ def main():
                 signal_type = "SHORT"
                 strategy_name = "200 EMA 역배열 + MACD 이탈 모멘텀"
 
-        # [전략 3] 스토캐스틱 RSI + EMA 눌림목 골든/데드크로스 (추세 눌림목 매매)
+        # [전략 3] Stoch RSI 눌림목
         elif latest['close'] > latest['ema_short'] and latest['ema_short'] > latest['ema_long']:
             if prev['stoch_k'] <= 25 and latest['stoch_k'] > 25 and latest['stoch_k'] > latest['stoch_d']:
                 signal_type = "LONG"
@@ -420,7 +426,7 @@ def main():
                 signal_type = "SHORT"
                 strategy_name = "스토캐스틱 RSI 과매수 + EMA 역배열 반락"
 
-        # [전략 4] 켈트너 채널 상단/하단 강한 변동성 돌파 (수급 폭발 매매)
+        # [전략 4] 켈트너 채널 돌파
         elif latest['close'] > latest['kc_hband'] and prev['close'] <= prev['kc_hband'] and vol_confirmed:
             if latest['rsi'] >= 50:
                 signal_type = "LONG"
@@ -431,7 +437,7 @@ def main():
                 signal_type = "SHORT"
                 strategy_name = "켈트너 채널 하단 이탈 + 하락 변동성 폭발"
 
-        # [전략 5] MACD 제로라인(0) 돌파 크로스 (모멘텀 전환)
+        # [전략 5] MACD 제로라인 돌파
         elif prev['macd'] < 0 and latest['macd'] >= 0 and latest['macd'] > latest['macd_signal']:
             if latest['close'] > latest['ema_short']:
                 signal_type = "LONG"
@@ -442,7 +448,7 @@ def main():
                 signal_type = "SHORT"
                 strategy_name = "MACD Zero-Line 하향 이탈 + 하락 전환"
 
-        # 시그널 발생 시 텔레그램 알림 발송
+        # 시그널 발생 처리
         if signal_type:
             rec_lev, risk_level = calculate_recommended_leverage(df)
 
