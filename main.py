@@ -69,12 +69,13 @@ def save_state(state):
         print(f"상태 저장 중 에러: {e}")
 
 # ---------------------------------------------------------
-# BTCC 거래소 상장 선물 종목만 수집 (엄격 적용)
+# BTCC 거래소 주요 상장 종목 마스터 리스트 (API 차단 대비 내장)
 # ---------------------------------------------------------
 def get_all_futures_symbols():
     headers = {"User-Agent": "Mozilla/5.0"}
     symbols = []
     
+    # 1. BTCC API 시도
     urls = [
         "https://api.btcc.com/api/v1/market/tickers",
         "https://api.btcc.com/api/v1/market/symbolList"
@@ -82,49 +83,54 @@ def get_all_futures_symbols():
 
     for url in urls:
         try:
-            res = requests.get(url, headers=headers, timeout=8)
+            res = requests.get(url, headers=headers, timeout=3)
             if res.status_code == 200:
                 raw_data = res.json()
                 items = raw_data.get("data", []) if isinstance(raw_data, dict) else raw_data
                 if isinstance(items, list):
                     for item in items:
-                        if isinstance(item, dict):
-                            raw_symbol = item.get("symbol", "") or item.get("symbolName", "")
-                        elif isinstance(item, str):
-                            raw_symbol = item
-                        else:
-                            continue
-
+                        raw_symbol = item.get("symbol", "") if isinstance(item, dict) else str(item)
                         if "USDT" in raw_symbol.upper():
                             clean_symbol = raw_symbol.replace("_", "").replace("-", "").upper()
                             symbols.append(clean_symbol)
-        except Exception as e:
-            print(f"⚠️ BTCC API ({url}) 로드 예외: {e}")
+        except Exception:
+            pass
+
+    # 2. BTCC API 접속 실패(타임아웃) 시 BTCC 주요 상장 종목 마스터 리스트 사용
+    if not symbols:
+        symbols = [
+            "BTCUSDT", "ETHUSDT", "SOLUSDT", "XRPUSDT", "DOGEUSDT", "PEPEUSDT",
+            "SHIBUSDT", "FLOKIUSDT", "BONKUSDT", "WIFUSDT", "SUIUSDT", "APTUSDT",
+            "AVAXUSDT", "ADAUSDT", "LINKUSDT", "DOTUSDT", "NEARUSDT", "MATICUSDT",
+            "LTCUSDT", "BCHUSDT", "ETCUSDT", "TRXUSDT", "ATOMUSDT", "UNIUSDT",
+            "FILUSDT", "ARBUSDT", "OPUSDT", "INJUSDT", "TIAUSDT", "ORDIUSDT",
+            "1000PEPEUSDT", "1000SHIBUSDT", "1000BONKUSDT", "MEMEUSDT", "NOTUSDT"
+        ]
 
     final_symbols = sorted(list(set(symbols)))
-    print(f"📊 BTCC 상장 선물 종목 총 {len(final_symbols)}개 로드 완료")
-    return final_symbols if final_symbols else ["BTCUSDT", "ETHUSDT", "XRPUSDT", "SOLUSDT", "DOGEUSDT"]
+    print(f"📊 스캔 대상 종목 총 {len(final_symbols)}개 로드 완료")
+    return final_symbols
 
 # ---------------------------------------------------------
-# BTCC 시세 데이터 수집 (BTCC API 우선 + OKX 백업)
+# 시세 데이터 수집 (안정적인 글로벌 시세 API 백업)
 # ---------------------------------------------------------
 def fetch_market_data(symbol, interval="15m", limit=100):
     headers = {"User-Agent": "Mozilla/5.0"}
     
-    # 1. BTCC 공식 K라인 API
+    # symbol 표준화 (예: 1000PEPEUSDT -> PEPEUSDT 처리 대응)
+    clean_symbol = symbol.replace("1000", "")
+
+    # 1. 바이낸스 선물 API (GitHub Actions에서 차단 없이 가장 안정적)
     try:
-        formatted_symbol = symbol.replace("USDT", "_USDT") if "_" not in symbol else symbol
-        url = f"https://api.btcc.com/api/v1/market/kline?symbol={formatted_symbol}&period={interval}&limit={limit}"
+        url = f"https://fapi.binance.com/fapi/v1/klines?symbol={clean_symbol}&interval={interval}&limit={limit}"
         res = requests.get(url, headers=headers, timeout=5)
-        
         if res.status_code == 200:
-            raw_data = res.json()
-            candles = raw_data.get("data", []) if isinstance(raw_data, dict) else raw_data
+            candles = res.json()
             if candles and isinstance(candles, list):
-                df = pd.DataFrame(candles)
-                if 'c' in df.columns:
-                    df = df.rename(columns={'o': 'open', 'h': 'high', 'l': 'low', 'c': 'close', 'v': 'volume'})
-                
+                df = pd.DataFrame(candles, columns=[
+                    'timestamp', 'open', 'high', 'low', 'close', 'volume',
+                    'close_time', 'qav', 'num_trades', 'taker_base_vol', 'taker_quote_vol', 'ignore'
+                ])
                 df['close'] = df['close'].astype(float)
                 df['high'] = df['high'].astype(float)
                 df['low'] = df['low'].astype(float)
@@ -133,9 +139,9 @@ def fetch_market_data(symbol, interval="15m", limit=100):
     except Exception:
         pass
 
-    # 2. BTCC API 차단/타임아웃 시 동일 시세 백업 (OKX)
+    # 2. OKX 선물 API 백업
     try:
-        base_asset = symbol.replace("USDT", "").replace("_", "")
+        base_asset = clean_symbol.replace("USDT", "")
         okx_symbol = f"{base_asset}-USDT-SWAP"
         url = f"https://www.okx.com/api/v5/market/candles?instId={okx_symbol}&bar={interval}&limit={limit}"
         res = requests.get(url, headers=headers, timeout=5)
@@ -279,7 +285,7 @@ def main():
     save_state(state)
 
     # ---------------------------------------------------------
-    # 2. BTCC 전체 선물 종목 대상 스캔
+    # 2. 전체 종목 대상 스캔
     # ---------------------------------------------------------
     current_count = len(remaining_positions)
     if current_count >= MAX_POSITIONS:
@@ -287,7 +293,7 @@ def main():
         return
 
     all_symbols = get_all_futures_symbols()
-    print(f"🔎 총 {len(all_symbols)}개 BTCC 상장 코인 스캔 시작... (현재 {current_count}/{MAX_POSITIONS} 사용 중)")
+    print(f"🔎 총 {len(all_symbols)}개 코인 스캔 시작... (현재 {current_count}/{MAX_POSITIONS} 사용 중)")
     active_symbols = [p["symbol"] for p in remaining_positions]
 
     for symbol in all_symbols:
@@ -315,7 +321,7 @@ def main():
         signal_type = None
         strategy_name = ""
 
-        # 1. RSI 역발상 시그널 (기준: 35 / 65)
+        # 1. RSI 역발상 시그널
         if prev['rsi'] <= 35 and latest['rsi'] > 35:
             signal_type = "LONG"
             strategy_name = "RSI 과매도 반등 추세전환"
