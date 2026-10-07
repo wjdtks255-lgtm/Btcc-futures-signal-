@@ -6,7 +6,7 @@ import pandas as pd
 import ta
 
 # ==========================================
-# 텔레그램 인증 및 기본 설정
+# 텔레그램 인증 및 설정
 # ==========================================
 TELEGRAM_BOT_TOKEN = "8913250892:AAEQxGKfFC1ru9oJyacy6cdUllER2K0UbiY"
 TELEGRAM_CHAT_ID = "-1004443428081"
@@ -14,7 +14,8 @@ TELEGRAM_CHAT_ID = "-1004443428081"
 STATE_FILE = "bot_state.json"
 MAX_POSITIONS = 15
 
-FORCE_RESET_STATE = True
+# True 설정 시 기존 포지션 내역을 초기화하고 다시 스캔합니다.
+FORCE_RESET_STATE = False
 
 def send_telegram_message(message):
     if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
@@ -88,41 +89,14 @@ def get_all_futures_symbols():
                 print(f"📊 바이낸스 API 성공: 총 {len(symbols)}개 종목 자동 수집 완료")
                 return sorted(symbols)
     except Exception as e:
-        print(f"⚠️ 종목 목록 API 수집 실패 ({e}), 350+개 백업 전 종목 리스트 사용")
+        print(f"⚠️ 종목 목록 API 수집 실패 ({e}), 백업 종목 리스트 사용")
 
     fallback_symbols = [
-        "1000BONKUSDT", "1000CATUSDT", "1000FLOKIUSDT", "1000LUNCUSDT", "1000PEPEUSDT", "1000SATSUSDT", "1000SHIBUSDT", "1000XECUSDT", "1INCHUSDT", "AAVEUSDT",
-        "ACEUSDT", "ACHUSDT", "ACTUSDT", "ADAUSDT", "AEVOUSDT", "AGLDUSDT", "AIUSDT", "ALGOUSDT", "ALICEUSDT", "ALPHAUSDT",
-        "ALTUSDT", "AMBUSDT", "ANKRUSDT", "APEUSDT", "API3USDT", "APTUSDT", "ARUSDT", "ARBUSDT", "ARKUSDT", "ARKMUSDT",
-        "ARPAUSDT", "ASTRUSDT", "ATAUSDT", "ATOMUSDT", "AUCTIONUSDT", "AUDIOUSDT", "AVAXUSDT", "AXLUSDT", "AXSUSDT", "BADGERUSDT",
-        "BAKEUSDT", "BALUSDT", "BANANAUSDT", "BANDUSDT", "BATUSDT", "BBUSDT", "BCHUSDT", "BELUSDT", "BICOUSDT", "BIGTIMEUSDT",
-        "BLURUSDT", "BNBUSDT", "BNTUSDT", "BNXUSDT", "BOMEUSDT", "BSSVUSDT", "BSVUSDT", "BSWUSDT", "BTCUSDT", "C98USDT",
-        "CAKEUSDT", "CELOUSDT", "CELRUSDT", "CFXUSDT", "CHESSUSDT", "CHRUSDT", "CHZUSDT", "CKBUSDT", "COMBOUSDT", "COMPUSDT",
-        "COSUSDT", "COTIUSDT", "CRVUSDT", "CTSIUSDT", "CTKUSDT", "CVCUSDT", "CYBERUSDT", "DARUSDT", "DASHUSDT", "DEFIUSDT",
-        "DENTUSDT", "DGBUSDT", "DIAUSDT", "DODOUSDT", "DOGEUSDT", "DOGSUSDT", "DOTUSDT", "DRIFTUSDT", "DUSKUSDT", "DYDXUSDT",
-        "DYMUSDT", "EDUUSDT", "EGLDUSDT", "EIGENUSDT", "ENAUSDT", "ENJUSDT", "ENSUSDT", "EOSUSDT", "ETCUSDT", "ETHUSDT",
-        "ETHFIUSDT", "ETHBTC", "ETHWUSDT", "EUROUSDT", "FARMUSDT", "FETUSDT", "FIDAUSDT", "FILUSDT", "FIOUSDT", "FLMUSDT",
-        "FLOWUSDT", "FLUXUSDT", "FORTHUSDT", "FTMUSDT", "FXSUSDT", "GALAUSDT", "GASUSDT", "GHSTUSDT", "GLMRUSDT", "GMTUSDT",
-        "GMXUSDT", "GOATUSDT", "GRTUSDT", "GTCUSDT", "HARDUSDT", "HBARUSDT", "HIGHUSDT", "HIPPOUSDT", "HIFIUSDT", "HMSTRUSDT",
-        "HOOKUSDT", "HOTUSDT", "ICPUSDT", "ICXUSDT", "IDUSDT", "IDEXUSDT", "ILVUSDT", "INJUSDT", "IOSTUSDT", "IOTAUSDT",
-        "IOTXUSDT", "IOUSDT", "JASMYUSDT", "JOEUSDT", "JTOUSDT", "JUPUSDT", "KAIAUSDT", "KAVAUSDT", "KNCUSDT", "KSMUSDT",
-        "LDOUSDT", "LEVERUSDT", "LINAUSDT", "LINKUSDT", "LISTAUSDT", "LITUSDT", "LPTUSDT", "LRCUSDT", "LSKUSDT", "LTCUSDT",
-        "LUNA2USDT", "MAGICUSDT", "MANAUSDT", "MANTAUSDT", "MASAUSDT", "MASKUSDT", "MAVUSDT", "MBLUSDT", "MBOXUSDT", "MDXUSDT",
-        "MEMEUSDT", "METISUSDT", "MINAUSDT", "MKRUSDT", "MOODENGUSDT", "MOVRUSDT", "MTLUSDT", "MYROUSDT", "NEARUSDT", "NEIROUSDT",
-        "NEOUSDT", "NFPUSDT", "KNCLUSDT", "NMRUSDT", "NKNUSDT", "NOTUSDT", "NTRNUSDT", "NULSUSDT", "OCEANUSDT", "OGUSDT",
-        "OGNUSDT", "OMUSDT", "OMGUSDT", "OMNIUSDT", "ONEUSDT", "ONTUSDT", "OPUSDT", "ORBSUSDT", "ORDIUSDT", "OXTUSDT",
-        "PAXGUSDT", "PENDLEUSDT", "PEOPLEUSDT", "PERPUSDT", "PHBUSDT", "PIXELUSDT", "PNUTUSDT", "POLUSDT", "POLXUSDT", "POLYSWARMUSDT",
-        "POPCATUSDT", "PORTALUSDT", "POWRUSDT", "PROMUSDT", "PUFFERUSDT", "PYTHUSDT", "QNTUSDT", "QTUMUSDT", "RADUSDT", "RAREUSDT",
-        "RAYUSDT", "RDNTUSDT", "REEFUSDT", "RENDERUSDT", "RENUSDT", "REQUSDT", "REZUSDT", "RIFUSDT", "RLCUSDT", "RONINUSDT",
-        "ROSEUSDT", "RPLUSDT", "RSRUSDT", "RUNEUSDT", "RVNUSDT", "SAGAUSDT", "SANDUSDT", "SCHECKUSDT", "SCRUSDT", "SEIUSDT",
-        "SFPUSDT", "SKLUSDT", "SLPUSDT", "SNTUSDT", "SNXUSDT", "SOLUSDT", "SPELLUSDT", "SPXUSDT", "SSVUSDT", "STEEMUSDT",
-        "STGUSDT", "STMXUSDT", "STORJUSDT", "STRAXUSDT", "STRKUSDT", "STXUSDT", "SUIUSDT", "SUNUSDT", "SUPERUSDT", "SUSHIUSDT", "SXPUSDT",
-        "SYNUSDT", "SYSUSDT", "TUSDT", "THETAUSDT", "TIAUSDT", "TLMUSDT", "TNSRUSDT", "TOKENUSDT", "TOMOUSDT", "TONUSDT",
-        "TRBUSDT", "TROYUSDT", "TRUUSDT", "TRXUSDT", "TURBOUSDT", "TWTUSDT", "UMAUSDT", "UNFIUSDT", "UNIUSDT", "USDCUSDT",
-        "USDTUSDT", "USUALUSDT", "USTCUSDT", "VANRYUSDT", "VETUSDT", "VGXUSDT", "VICUSDT", "VIRTUALUSDT", "VITEUSDT", "VOXELUSDT",
-        "VTHOUSDT", "WUSDT", "WAXPUSDT", "WLDUSDT", "WIFUSDT", "WOOUSDT", "WRXUSDT", "WTCUSDT", "XAIUSDT", "XECUSDT",
-        "XEMUSDT", "XLMUSDT", "XMRUSDT", "XNOUSDT", "XRPUSDT", "XTZUSDT", "XVGUSDT", "XVSUSDT", "YFIUSDT", "YGGUSDT",
-        "ZECUSDT", "ZENUSDT", "ZILUSDT", "ZKUSDT", "ZROUSDT", "ZRXUSDT"
+        "1000BONKUSDT", "1000CATUSDT", "1000FLOKIUSDT", "1000PEPEUSDT", "1000SHIBUSDT", "AAVEUSDT", "ADAUSDT",
+        "ALGOUSDT", "APTUSDT", "ARBUSDT", "ATOMUSDT", "AVAXUSDT", "BCHUSDT", "BNBUSDT", "BTCUSDT", "DOGEUSDT",
+        "DOTUSDT", "ENAUSDT", "EOSUSDT", "ETCUSDT", "ETHUSDT", "FETUSDT", "FILUSDT", "GALAUSDT", "INJUSDT",
+        "LINKUSDT", "LTCUSDT", "NEARUSDT", "OPUSDT", "ORDIUSDT", "PEOPLEUSDT", "RENDERUSDT", "SEIUSDT",
+        "SOLUSDT", "SUIUSDT", "TIAUSDT", "TONUSDT", "TRXUSDT", "UNIUSDT", "WLDUSDT", "XRPUSDT"
     ]
     return sorted(list(set(fallback_symbols)))
 
@@ -189,25 +163,34 @@ def main():
             continue
 
         df = fetch_market_data(symbol)
-        if df.empty or len(df) < 50:
+        if df.empty or len(df) < 60:
             continue
 
-        # 지표 산출
+        # 지표 산출 (EMA 50, RSI 14)
+        df['ema50'] = ta.trend.ema_indicator(df['close'], window=50)
         df['rsi'] = ta.momentum.rsi(df['close'], window=14)
+
         latest = df.iloc[-1]
+        prev = df.iloc[-2]
+
         entry_price = latest['close']
         rsi_val = latest['rsi']
+        ema_val = latest['ema50']
 
         signal_type = None
         strategy_name = ""
 
-        # 🧪 [테스트 전용 포착 조건] - RSI 지표 범위 기준 유효 시그널 테스트
-        if rsi_val >= 55:
-            signal_type = "SHORT"
-            strategy_name = "RSI 상승 구간 모멘텀 시그널"
-        elif rsi_val <= 45:
+        # ---------------------------------------------------------
+        # 📈 매매 전략 조건
+        # 1) LONG : 가격이 EMA 50 위에 위치 + RSI 35 이하에서 반등 상승 전환 시
+        # 2) SHORT: 가격이 EMA 50 아래에 위치 + RSI 65 이상에서 꺾이는 하락 전환 시
+        # ---------------------------------------------------------
+        if entry_price > ema_val and prev['rsi'] <= 35 and rsi_val > prev['rsi']:
             signal_type = "LONG"
-            strategy_name = "RSI 하락 구간 모멘텀 시그널"
+            strategy_name = "EMA50 지지 + RSI 과매도 반등"
+        elif entry_price < ema_val and prev['rsi'] >= 65 and rsi_val < prev['rsi']:
+            signal_type = "SHORT"
+            strategy_name = "EMA50 저항 + RSI 과매수 이탈"
 
         # 시그널 발생 처리
         if signal_type:
@@ -269,11 +252,6 @@ def main():
             state["active_positions"].append(new_position)
             active_symbols.append(symbol)
             save_state(state)
-
-            # 테스트용으로 시그널 3개까지만 전송 후 종료
-            if detected_signals >= 3:
-                print("🧪 테스트용 시그널 3개 포착 완료로 스캔을 종료합니다.")
-                break
 
     print(f"✅ BTCC 전종목 스캔 완료 (포착된 시그널: {detected_signals}개 / 현재 보유 포지션: {len(state['active_positions'])}/{MAX_POSITIONS})")
 
