@@ -29,6 +29,46 @@
             "tp2": 14.4303,
             "sl": 13.79985,
             "tp1_reached": false
+        },
+        {
+            "symbol": "OPUSDT",
+            "type": "SHORT",
+            "entry_price": 0.12983,
+            "leverage": 15,
+            "tp1": 0.12788255,
+            "tp2": 0.1259351,
+            "sl": 0.13177745,
+            "tp1_reached": false
+        },
+        {
+            "symbol": "ORDIUSDT",
+            "type": "SHORT",
+            "entry_price": 4.577,
+            "leverage": 15,
+            "tp1": 4.508345,
+            "tp2": 4.43969,
+            "sl": 4.645655,
+            "tp1_reached": false
+        },
+        {
+            "symbol": "SUIUSDT",
+            "type": "SHORT",
+            "entry_price": 1.1698,
+            "leverage": 15,
+            "tp1": 1.152253,
+            "tp2": 1.134706,
+            "sl": 1.187347,
+            "tp1_reached": false
+        },
+        {
+            "symbol": "XRPUSDT",
+            "type": "SHORT",
+            "entry_price": 1.4946,
+            "leverage": 15,
+            "tp1": 1.472181,
+            "tp2": 1.449762,
+            "sl": 1.5170189999999997,
+            "tp1_reached": false
         }
     ]
 }
