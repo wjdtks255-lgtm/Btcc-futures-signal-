@@ -233,12 +233,36 @@
       "score": 87,
       "quality": "A",
       "entry_time": "2026-10-07T19:53:45.904941+09:00"
+    },
+    "STXUSDT": {
+      "symbol": "STXUSDT",
+      "direction": "LONG",
+      "entry": 0.3954,
+      "sl": 0.3905138419373273,
+      "tp1": 0.402729237094009,
+      "tp2": 0.40761539515668166,
+      "tp1_hit": false,
+      "score": 87,
+      "quality": "A",
+      "entry_time": "2026-10-07T21:03:17.529216+09:00"
+    },
+    "MANTRAUSDT": {
+      "symbol": "MANTRAUSDT",
+      "direction": "SHORT",
+      "entry": 0.004402,
+      "sl": 0.004428379466026237,
+      "tp1": 0.004362430800960643,
+      "tp2": 0.004336051334934405,
+      "tp1_hit": false,
+      "score": 85,
+      "quality": "A",
+      "entry_time": "2026-10-07T21:03:18.885392+09:00"
     }
   },
   "signals": {
     "PUMPUSDT:LONG": 1791358639.5219054,
     "SOPHUSDT:SHORT": 1791358639.5219054,
-    "STXUSDT:LONG": 1791358639.5219054,
+    "STXUSDT:LONG": 1791374596.85774,
     "JUPUSDT:SHORT": 1791358639.5219054,
     "OUSDT:SHORT": 1791358639.5219054,
     "MEMEUSDT:SHORT": 1791358953.0830307,
@@ -295,6 +319,7 @@
     "UAIUSDT:SHORT": 1791370422.583242,
     "CVXUSDT:SHORT": 1791370422.583242,
     "BANUSDT:SHORT": 1791373071.86648,
-    "ASTERUSDT:SHORT": 1791373071.86648
+    "ASTERUSDT:SHORT": 1791373071.86648,
+    "MANTRAUSDT:SHORT": 1791374596.85774
   }
 }
