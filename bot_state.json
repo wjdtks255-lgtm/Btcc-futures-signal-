@@ -404,6 +404,33 @@
       "score": 97,
       "quality": "A+",
       "entry_time": "2026-10-07T18:11:03.410743+09:00"
+    },
+    "CYSUSDT": {
+      "symbol": "CYSUSDT",
+      "direction": "SHORT",
+      "entry": 0.1549,
+      "sl": 0.15577208642378862,
+      "tp1": 0.1535918703643171,
+      "tp2": 0.15271978394052846,
+      "tp1_hit": false
+    },
+    "ONEUSDT": {
+      "symbol": "ONEUSDT",
+      "direction": "SHORT",
+      "entry": 0.0021971,
+      "sl": 0.0022188907850784253,
+      "tp1": 0.0021644138223823623,
+      "tp2": 0.002142623037303937,
+      "tp1_hit": false
+    },
+    "AKEUSDT": {
+      "symbol": "AKEUSDT",
+      "direction": "SHORT",
+      "entry": 0.0283151,
+      "sl": 0.02858818644502735,
+      "tp1": 0.027905470332458975,
+      "tp2": 0.027632383887431625,
+      "tp1_hit": false
     }
   },
   "signals": {
@@ -447,6 +474,9 @@
     "BNBUSDT:SHORT": 1791363415.263516,
     "FOLKSUSDT:SHORT": 1791363415.263516,
     "SKYAIUSDT:SHORT": 1791363415.263516,
-    "USELESSUSDT:SHORT": 1791364262.8499057
+    "USELESSUSDT:SHORT": 1791364262.8499057,
+    "CYSUSDT:SHORT": 1791364574.4470468,
+    "ONEUSDT:SHORT": 1791364574.4470468,
+    "AKEUSDT:SHORT": 1791364574.4470468
   }
 }
