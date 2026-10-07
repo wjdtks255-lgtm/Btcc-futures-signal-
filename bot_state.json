@@ -43,10 +43,10 @@
     "MEMEUSDT": {
       "direction": "SHORT",
       "entry": 0.0005822,
-      "sl": 0.0005863172140113224,
+      "sl": 0.0005822,
       "tp1": 0.0005760241789830163,
       "tp2": 0.000571906964971694,
-      "tp1_hit": false,
+      "tp1_hit": true,
       "created": "2026-10-07T16:42:33.080886+09:00",
       "symbol": "MEMEUSDT"
     },
@@ -151,10 +151,10 @@
       "symbol": "HOMEUSDT",
       "direction": "SHORT",
       "entry": 0.005642,
-      "sl": 0.005679582912412456,
+      "sl": 0.005642,
       "tp1": 0.005585625631381317,
       "tp2": 0.005548042718968861,
-      "tp1_hit": false,
+      "tp1_hit": true,
       "score": 100,
       "entry_time": "2026-10-07T17:07:56.641994+09:00"
     },
@@ -184,10 +184,10 @@
       "symbol": "MERLUSDT",
       "direction": "SHORT",
       "entry": 0.029,
-      "sl": 0.029289039320106368,
+      "sl": 0.029,
       "tp1": 0.02856644101984045,
       "tp2": 0.028277401699734084,
-      "tp1_hit": false,
+      "tp1_hit": true,
       "score": 95,
       "entry_time": "2026-10-07T17:27:15.991240+09:00"
     },
@@ -201,17 +201,6 @@
       "tp1_hit": true,
       "score": 94,
       "entry_time": "2026-10-07T17:27:17.374886+09:00"
-    },
-    "SFPUSDT": {
-      "symbol": "SFPUSDT",
-      "direction": "SHORT",
-      "entry": 0.2864,
-      "sl": 0.2864,
-      "tp1": 0.284252,
-      "tp2": 0.28281999999999996,
-      "tp1_hit": true,
-      "score": 94,
-      "entry_time": "2026-10-07T17:27:18.742283+09:00"
     },
     "ALLOUSDT": {
       "symbol": "ALLOUSDT",
@@ -236,18 +225,6 @@
       "score": 100,
       "quality": "A+",
       "entry_time": "2026-10-07T17:40:41.510341+09:00"
-    },
-    "ESPORTSUSDT": {
-      "symbol": "ESPORTSUSDT",
-      "direction": "SHORT",
-      "entry": 0.0111,
-      "sl": 0.0111,
-      "tp1": 0.01101675,
-      "tp2": 0.01096125,
-      "tp1_hit": true,
-      "score": 100,
-      "quality": "A+",
-      "entry_time": "2026-10-07T17:40:42.731038+09:00"
     },
     "SOLUSDC": {
       "symbol": "SOLUSDC",
@@ -344,18 +321,6 @@
       "score": 92,
       "quality": "A+",
       "entry_time": "2026-10-07T17:50:39.892133+09:00"
-    },
-    "EIGENUSDT": {
-      "symbol": "EIGENUSDT",
-      "direction": "SHORT",
-      "entry": 0.23916,
-      "sl": 0.23916,
-      "tp1": 0.2364715935014268,
-      "tp2": 0.23467932250237797,
-      "tp1_hit": true,
-      "score": 92,
-      "quality": "A+",
-      "entry_time": "2026-10-07T17:50:41.219902+09:00"
     },
     "BNBUSDT": {
       "symbol": "BNBUSDT",
@@ -485,6 +450,18 @@
       "score": 87,
       "quality": "A",
       "entry_time": "2026-10-07T18:39:10.910004+09:00"
+    },
+    "APRUSDT": {
+      "symbol": "APRUSDT",
+      "direction": "SHORT",
+      "entry": 0.11959,
+      "sl": 0.120669242579772,
+      "tp1": 0.11797113613034199,
+      "tp2": 0.11689189355056999,
+      "tp1_hit": false,
+      "score": 87,
+      "quality": "A",
+      "entry_time": "2026-10-07T18:48:37.738000+09:00"
     }
   },
   "signals": {
@@ -537,6 +514,7 @@
     "SANDUSDT:LONG": 1791365141.5239792,
     "ALCHUSDT:SHORT": 1791365406.144873,
     "GRASSUSDT:SHORT": 1791365406.144873,
-    "TACUSDT:SHORT": 1791365950.2822497
+    "TACUSDT:SHORT": 1791365950.2822497,
+    "APRUSDT:SHORT": 1791366517.1654694
   }
 }
