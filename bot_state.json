@@ -40,10 +40,10 @@
       "symbol": "FOLKSUSDT",
       "direction": "SHORT",
       "entry": 2.356,
-      "sl": 2.3884642255506074,
+      "sl": 2.356,
       "tp1": 2.307303661674089,
       "tp2": 2.2748394361234814,
-      "tp1_hit": false,
+      "tp1_hit": true,
       "score": 95,
       "quality": "A+",
       "entry_time": "2026-10-07T17:56:57.085425+09:00"
