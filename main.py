@@ -323,7 +323,7 @@ def main():
     save_state(state)
 
     # ---------------------------------------------------------
-    # 2. 고정밀 고빈도 정밀 스캔 로직
+    # 2. 다중 멀티 전략 앙상블 스캔 엔진
     # ---------------------------------------------------------
     current_count = len(remaining_positions)
     if current_count >= MAX_POSITIONS:
@@ -342,22 +342,37 @@ def main():
         if df.empty or len(df) < 50:
             continue
 
-        # 지표 산출
+        # ---------------------------------------------------------
+        # 지표 산출 모듈
+        # ---------------------------------------------------------
         df['rsi'] = ta.momentum.rsi(df['close'], window=14)
         df['ema_short'] = ta.trend.ema_indicator(df['close'], window=20)
         df['ema_long'] = ta.trend.ema_indicator(df['close'], window=50)
         df['ema_trend'] = ta.trend.ema_indicator(df['close'], window=200)
 
-        # 볼린저 밴드 (20, 2)
+        # 1. 볼린저 밴드
         bb = ta.volatility.BollingerBands(df['close'], window=20, window_dev=2)
         df['bb_hband'] = bb.bollinger_hband()
         df['bb_lband'] = bb.bollinger_lband()
 
-        # MACD
+        # 2. MACD
         macd_indicator = ta.trend.MACD(df['close'], window_slow=26, window_fast=12, window_sign=9)
+        df['macd'] = macd_indicator.macd()
+        df['macd_signal'] = macd_indicator.macd_signal()
         df['macd_diff'] = macd_indicator.macd_diff()
 
-        # 거래량 이동평균 (5봉 평균)
+        # 3. 스토캐스틱 RSI (Stoch RSI)
+        stoch_rsi = ta.momentum.StochRSIIndicator(df['close'], window=14, smooth1=3, smooth2=3)
+        df['stoch_k'] = stoch_rsi.stochrsi_k() * 100
+        df['stoch_d'] = stoch_rsi.stochrsi_d() * 100
+
+        # 4. 켈트너 채널 (Keltner Channel)
+        atr = ta.volatility.average_true_range(df['high'], df['low'], df['close'], window=10)
+        kc_middle = ta.trend.ema_indicator(df['close'], window=20)
+        df['kc_hband'] = kc_middle + (atr * 1.5)
+        df['kc_lband'] = kc_middle - (atr * 1.5)
+
+        # 5. 거래량 평균 (5봉 평균)
         df['vol_ma'] = df['volume'].rolling(window=5).mean()
 
         latest = df.iloc[-1]
@@ -365,17 +380,16 @@ def main():
         entry_price = latest['close']
         rsi_val = latest['rsi']
 
-        # 거래량 증가 조건 (평균 대비 1.15배 이상)
-        vol_confirmed = latest['volume'] > (latest['vol_ma'] * 1.15)
+        vol_confirmed = latest['volume'] > (latest['vol_ma'] * 1.1)
 
         signal_type = None
         strategy_name = ""
 
         # =========================================================
-        # 시그널 조건 (완화 + 정확도 검증 필터)
+        # 5대 다중 전략 조건 엔진 (상호 보완)
         # =========================================================
 
-        # 1. RSI 완화(40/60) + 볼린저밴드 이탈 후 재진입 (고승률 역발상)
+        # [전략 1] 볼린저 하단/상단 반등 (역발상 전략)
         if prev['rsi'] <= 40 and latest['rsi'] > 40 and prev['low'] <= prev['bb_lband']:
             signal_type = "LONG"
             strategy_name = "볼린저 하단 반등 + RSI 과매도 회복"
@@ -384,18 +398,49 @@ def main():
             signal_type = "SHORT"
             strategy_name = "볼린저 상단 반전 + RSI 과매수 이탈"
 
-        # 2. EMA 추세 정배열 + MACD 모멘텀 + 거래량 수급 (고승률 추세 추종)
+        # [전략 2] EMA 정배열/역배열 + MACD 수급 돌파 (추세 돌파)
         elif latest['ema_short'] > latest['ema_long'] and prev['macd_diff'] < latest['macd_diff'] and latest['macd_diff'] > 0:
-            if 38 <= latest['rsi'] <= 68 and vol_confirmed:
-                if latest['close'] > latest['ema_trend']:  # 200 EMA 상승 추세선 위에서만
-                    signal_type = "LONG"
-                    strategy_name = "200 EMA 정배열 + MACD 수급 돌파"
+            if 38 <= latest['rsi'] <= 68 and vol_confirmed and latest['close'] > latest['ema_trend']:
+                signal_type = "LONG"
+                strategy_name = "200 EMA 정배열 + MACD 수급 돌파"
 
         elif latest['ema_short'] < latest['ema_long'] and prev['macd_diff'] > latest['macd_diff'] and latest['macd_diff'] < 0:
-            if 32 <= latest['rsi'] <= 62 and vol_confirmed:
-                if latest['close'] < latest['ema_trend']:  # 200 EMA 하락 추세선 아래서만
-                    signal_type = "SHORT"
-                    strategy_name = "200 EMA 역배열 + MACD 이탈 모멘텀"
+            if 32 <= latest['rsi'] <= 62 and vol_confirmed and latest['close'] < latest['ema_trend']:
+                signal_type = "SHORT"
+                strategy_name = "200 EMA 역배열 + MACD 이탈 모멘텀"
+
+        # [전략 3] 스토캐스틱 RSI + EMA 눌림목 골든/데드크로스 (추세 눌림목 매매)
+        elif latest['close'] > latest['ema_short'] and latest['ema_short'] > latest['ema_long']:
+            if prev['stoch_k'] <= 25 and latest['stoch_k'] > 25 and latest['stoch_k'] > latest['stoch_d']:
+                signal_type = "LONG"
+                strategy_name = "스토캐스틱 RSI 과매도 + EMA 정배열 눌림목 반등"
+
+        elif latest['close'] < latest['ema_short'] and latest['ema_short'] < latest['ema_long']:
+            if prev['stoch_k'] >= 75 and latest['stoch_k'] < 75 and latest['stoch_k'] < latest['stoch_d']:
+                signal_type = "SHORT"
+                strategy_name = "스토캐스틱 RSI 과매수 + EMA 역배열 반락"
+
+        # [전략 4] 켈트너 채널 상단/하단 강한 변동성 돌파 (수급 폭발 매매)
+        elif latest['close'] > latest['kc_hband'] and prev['close'] <= prev['kc_hband'] and vol_confirmed:
+            if latest['rsi'] >= 50:
+                signal_type = "LONG"
+                strategy_name = "켈트너 채널 상단 돌파 + 수급 실린 변동성 폭발"
+
+        elif latest['close'] < latest['kc_lband'] and prev['close'] >= prev['kc_lband'] and vol_confirmed:
+            if latest['rsi'] <= 50:
+                signal_type = "SHORT"
+                strategy_name = "켈트너 채널 하단 이탈 + 하락 변동성 폭발"
+
+        # [전략 5] MACD 제로라인(0) 돌파 크로스 (모멘텀 전환)
+        elif prev['macd'] < 0 and latest['macd'] >= 0 and latest['macd'] > latest['macd_signal']:
+            if latest['close'] > latest['ema_short']:
+                signal_type = "LONG"
+                strategy_name = "MACD Zero-Line 상향 돌파 + 상승 전환"
+
+        elif prev['macd'] > 0 and latest['macd'] <= 0 and latest['macd'] < latest['macd_signal']:
+            if latest['close'] < latest['ema_short']:
+                signal_type = "SHORT"
+                strategy_name = "MACD Zero-Line 하향 이탈 + 하락 전환"
 
         # 시그널 발생 시 텔레그램 알림 발송
         if signal_type:
@@ -459,7 +504,7 @@ def main():
                 print("🏁 최대 포지션 15개가 채워져 스캔을 완료합니다.")
                 break
 
-    print(f"✅ 스캔 종료 (현재 관리 포지션: {len(state['active_positions'])}/{MAX_POSITIONS})")
+    print(f"✅ 전체 다중 스캔 완료 (현재 보유 포지션: {len(state['active_positions'])}/{MAX_POSITIONS})")
 
 if __name__ == "__main__":
     main()
