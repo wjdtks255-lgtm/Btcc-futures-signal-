@@ -10,17 +10,6 @@
       "created": "2026-10-07T16:37:19.520257+09:00",
       "symbol": "SOPHUSDT"
     },
-    "RAVEUSDT": {
-      "symbol": "RAVEUSDT",
-      "direction": "SHORT",
-      "entry": 0.18338,
-      "sl": 0.18338,
-      "tp1": 0.18138007034751613,
-      "tp2": 0.18004678391252688,
-      "tp1_hit": true,
-      "score": 100,
-      "entry_time": "2026-10-07T17:03:07.813983+09:00"
-    },
     "ALLOUSDT": {
       "symbol": "ALLOUSDT",
       "direction": "SHORT",
@@ -44,30 +33,6 @@
       "score": 100,
       "quality": "A+",
       "entry_time": "2026-10-07T17:40:41.510341+09:00"
-    },
-    "SOLUSDC": {
-      "symbol": "SOLUSDC",
-      "direction": "SHORT",
-      "entry": 118.32,
-      "sl": 118.32,
-      "tp1": 117.4326,
-      "tp2": 116.841,
-      "tp1_hit": true,
-      "score": 100,
-      "quality": "A+",
-      "entry_time": "2026-10-07T17:41:24.274264+09:00"
-    },
-    "SOLUSDT": {
-      "symbol": "SOLUSDT",
-      "direction": "SHORT",
-      "entry": 118.21,
-      "sl": 118.21,
-      "tp1": 117.323425,
-      "tp2": 116.73237499999999,
-      "tp1_hit": true,
-      "score": 100,
-      "quality": "A+",
-      "entry_time": "2026-10-07T17:41:25.476916+09:00"
     },
     "TRXUSDT": {
       "symbol": "TRXUSDT",
@@ -129,15 +94,6 @@
       "quality": "A+",
       "entry_time": "2026-10-07T18:11:03.410743+09:00"
     },
-    "AKEUSDT": {
-      "symbol": "AKEUSDT",
-      "direction": "SHORT",
-      "entry": 0.0283151,
-      "sl": 0.0283151,
-      "tp1": 0.027905470332458975,
-      "tp2": 0.027632383887431625,
-      "tp1_hit": true
-    },
     "HEMIUSDT": {
       "symbol": "HEMIUSDT",
       "direction": "SHORT",
@@ -190,10 +146,10 @@
       "symbol": "BSBUSDT",
       "direction": "SHORT",
       "entry": 0.09632,
-      "sl": 0.09705198344105814,
+      "sl": 0.09632,
       "tp1": 0.0952220248384128,
       "tp2": 0.09449004139735466,
-      "tp1_hit": false,
+      "tp1_hit": true,
       "score": 85,
       "quality": "A",
       "entry_time": "2026-10-07T19:38:06.114724+09:00"
@@ -257,6 +213,30 @@
       "score": 85,
       "quality": "A",
       "entry_time": "2026-10-07T21:03:18.885392+09:00"
+    },
+    "MERLUSDT": {
+      "symbol": "MERLUSDT",
+      "direction": "SHORT",
+      "entry": 0.02852,
+      "sl": 0.028805817345422282,
+      "tp1": 0.02809127398186658,
+      "tp2": 0.0278054566364443,
+      "tp1_hit": false,
+      "score": 87,
+      "quality": "A",
+      "entry_time": "2026-10-07T21:28:34.968913+09:00"
+    },
+    "NESUSDT": {
+      "symbol": "NESUSDT",
+      "direction": "SHORT",
+      "entry": 0.1372,
+      "sl": 0.1379764570723632,
+      "tp1": 0.1360353143914552,
+      "tp2": 0.13525885731909199,
+      "tp1_hit": false,
+      "score": 87,
+      "quality": "A",
+      "entry_time": "2026-10-07T21:28:36.231225+09:00"
     }
   },
   "signals": {
@@ -282,7 +262,7 @@
     "BIOUSDT:SHORT": 1791360918.4161968,
     "BUSDT:SHORT": 1791360918.4161968,
     "XLMUSDT:SHORT": 1791360918.4161968,
-    "MERLUSDT:SHORT": 1791361635.0496378,
+    "MERLUSDT:SHORT": 1791376111.1684203,
     "BBUSDT:SHORT": 1791361635.0496378,
     "SFPUSDT:SHORT": 1791361635.0496378,
     "ALLOUSDT:SHORT": 1791362439.7748892,
@@ -320,6 +300,7 @@
     "CVXUSDT:SHORT": 1791370422.583242,
     "BANUSDT:SHORT": 1791373071.86648,
     "ASTERUSDT:SHORT": 1791373071.86648,
-    "MANTRAUSDT:SHORT": 1791374596.85774
+    "MANTRAUSDT:SHORT": 1791374596.85774,
+    "NESUSDT:SHORT": 1791376111.1684203
   }
 }
