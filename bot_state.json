@@ -19,16 +19,6 @@
             "tp2": 116.5358,
             "sl": 121.94209999999998,
             "tp1_reached": true
-        },
-        {
-            "symbol": "NEARUSDT",
-            "type": "LONG",
-            "entry_price": 5.018,
-            "leverage": 10,
-            "tp1": 5.0932699999999995,
-            "tp2": 5.16854,
-            "sl": 4.94273,
-            "tp1_reached": false
         }
     ]
 }
