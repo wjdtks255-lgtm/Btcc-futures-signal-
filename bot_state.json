@@ -200,17 +200,6 @@
       "score": 94,
       "entry_time": "2026-10-07T17:15:18.967765+09:00"
     },
-    "BUSDT": {
-      "symbol": "BUSDT",
-      "direction": "SHORT",
-      "entry": 0.16895,
-      "sl": 0.1699241757112431,
-      "tp1": 0.1674887364331353,
-      "tp2": 0.1665145607218922,
-      "tp1_hit": false,
-      "score": 90,
-      "entry_time": "2026-10-07T17:15:20.330213+09:00"
-    },
     "XLMUSDT": {
       "symbol": "XLMUSDT",
       "direction": "SHORT",
@@ -254,6 +243,42 @@
       "tp1_hit": false,
       "score": 94,
       "entry_time": "2026-10-07T17:27:18.742283+09:00"
+    },
+    "ALLOUSDT": {
+      "symbol": "ALLOUSDT",
+      "direction": "SHORT",
+      "entry": 0.25172,
+      "sl": 0.2531850794890063,
+      "tp1": 0.2495223807664905,
+      "tp2": 0.24805730127748418,
+      "tp1_hit": false,
+      "score": 100,
+      "quality": "A+",
+      "entry_time": "2026-10-07T17:40:40.309371+09:00"
+    },
+    "PIEVERSEUSDT": {
+      "symbol": "PIEVERSEUSDT",
+      "direction": "SHORT",
+      "entry": 1.30091,
+      "sl": 1.30741455,
+      "tp1": 1.291153175,
+      "tp2": 1.284648625,
+      "tp1_hit": false,
+      "score": 100,
+      "quality": "A+",
+      "entry_time": "2026-10-07T17:40:41.510341+09:00"
+    },
+    "ESPORTSUSDT": {
+      "symbol": "ESPORTSUSDT",
+      "direction": "SHORT",
+      "entry": 0.0111,
+      "sl": 0.0111555,
+      "tp1": 0.01101675,
+      "tp2": 0.01096125,
+      "tp1_hit": false,
+      "score": 100,
+      "quality": "A+",
+      "entry_time": "2026-10-07T17:40:42.731038+09:00"
     }
   },
   "signals": {
@@ -281,6 +306,9 @@
     "XLMUSDT:SHORT": 1791360918.4161968,
     "MERLUSDT:SHORT": 1791361635.0496378,
     "BBUSDT:SHORT": 1791361635.0496378,
-    "SFPUSDT:SHORT": 1791361635.0496378
+    "SFPUSDT:SHORT": 1791361635.0496378,
+    "ALLOUSDT:SHORT": 1791362439.7748892,
+    "PIEVERSEUSDT:SHORT": 1791362439.7748892,
+    "ESPORTSUSDT:SHORT": 1791362439.7748892
   }
 }
