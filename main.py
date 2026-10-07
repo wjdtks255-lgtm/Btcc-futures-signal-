@@ -10,8 +10,9 @@ STATE_FILE = "bot_state.json"
 KST = timezone(timedelta(hours=9))
 TV_URL = "https://scanner.tradingview.com/crypto/scan"
 
-MAX_ALERTS = 3
-COOLDOWN = 240
+MAX_SLOTS = 5
+COOLDOWN = 240          # 일반 신호 쿨다운 (4시간)
+SL_PENALTY_HOURS = 12   # 손절(SL) 발생 시 재진입 금지 패널티 시간 (12시간)
 MIN_SCORE = 82
 
 # 바이낸스와 BTCC 간 티커 명칭 불일치 대응 매핑
@@ -21,7 +22,7 @@ SYMBOL_MAP = {
     "1000BONKUSDT": "BONKUSDT",
     "1000FLOKIUSDT": "FLOKIUSDT",
     "1000LUNCUSDT": "LUNCUSDT",
-    "1000SATSUSDT": "1000SATSUSDT",
+    "1000SATSUSDT": "SATSUSDT",
 }
 
 COL = [
@@ -68,9 +69,10 @@ def load():
         with open(STATE_FILE, encoding="utf-8") as f:
             s = json.load(f)
     except Exception:
-        s = {"positions": {}, "signals": {}}
+        s = {"positions": {}, "signals": {}, "sl_penalties": {}}
     s.setdefault("positions", {})
     s.setdefault("signals", {})
+    s.setdefault("sl_penalties", {})
     return s
 
 
@@ -435,7 +437,7 @@ def posmsg(p, k):
         return f"🎯 TP1 HIT\n\n🪙 #{sy}\n📌 {d}\n💰 Entry : {fmt(p['entry'])}\n🎯 TP1 : {fmt(p['tp1'])}\n\n🔒 SL → ENTRY\n원금 방어 모드로 전환"
     if k == "TP2":
         return f"🎯 TP2 HIT\n\n🪙 #{sy}\n📌 {d}\n🎯 TP2 : {fmt(p['tp2'])}\n\n✅ 추적 종료"
-    return f"🛑 STOP LOSS\n\n🪙 #{sy}\n📌 {d}\n🛑 SL : {fmt(p['sl'])}\n\n❌ 포지션 추적 종료"
+    return f"🛑 STOP LOSS\n\n🪙 #{sy}\n📌 {d}\n🛑 SL : {fmt(p['sl'])}\n\n❌ 포지션 추적 종료 (12시간 동안 재진입 금지)"
 
 
 def check(state, rs):
@@ -461,6 +463,8 @@ def check(state, rs):
 
         if long and price <= p["sl"] or not long and price >= p["sl"]:
             tg(posmsg(p, "SL"), f"{p['symbol']} SL")
+            # 손절 발생 시점에 해당 종목에 대한 12시간 패널티 타임스탬프 기록
+            state.setdefault("sl_penalties", {})[key] = time.time()
             state["positions"].pop(key, None)
             continue
 
@@ -474,7 +478,7 @@ def check(state, rs):
 
 def main():
     print("===================================")
-    print(" BTCC FUTURES FINAL ENTRY BOT")
+    print(" BTCC SLOT ROTATION + SL PENALTY BOT")
     print("===================================")
     print("KST:", now().isoformat())
 
@@ -489,6 +493,8 @@ def main():
         return
 
     state = load()
+    
+    # 1. 포지션 청산 조건 검사 (TP2, SL 도달 시 슬롯 회전 및 손절 패널티 부여)
     check(state, rs)
 
     st = {
@@ -533,47 +539,62 @@ def main():
     print("QUALIFIED:", len(candidates))
     print("FILTER STATS:", st)
 
+    current_active_count = len(state["positions"])
+    available_slots = MAX_SLOTS - current_active_count
+    print(f"ACTIVE SLOTS: {current_active_count}/{MAX_SLOTS} (Available: {available_slots})")
+
     sent = 0
     t = time.time()
+    sl_penalties = state.get("sl_penalties", {})
 
-    for s in candidates:
-        if sent >= MAX_ALERTS:
-            break
-        key = s["symbol"]
+    if available_slots > 0:
+        for s in candidates:
+            if sent >= available_slots:
+                break
+            key = s["symbol"]
 
-        if key in state["positions"]:
-            print("SKIP ACTIVE:", key)
-            continue
+            if key in state["positions"]:
+                print("SKIP ACTIVE:", key)
+                continue
 
-        sid = f"{key}:{s['direction']}"
-        if t - float(state["signals"].get(sid, 0) or 0) < COOLDOWN * 60:
-            print("SKIP COOLDOWN:", key)
-            continue
+            # 2. 손절(SL) 패널티 기간(12시간) 내에 있는 종목인지 검사
+            if key in sl_penalties:
+                elapsed = t - float(sl_penalties[key])
+                if elapsed < SL_PENALTY_HOURS * 3600:
+                    print(f"SKIP SL PENALTY ({key}): {int((SL_PENALTY_HOURS * 3600 - elapsed) / 60)}m remaining")
+                    continue
 
-        if not tg(msg(s), f"{key} {s['direction']} {s['quality']}"):
-            print("SEND FAILED:", key)
-            continue
+            sid = f"{key}:{s['direction']}"
+            if t - float(state["signals"].get(sid, 0) or 0) < COOLDOWN * 60:
+                print("SKIP COOLDOWN:", key)
+                continue
 
-        state["signals"][sid] = t
-        state["positions"][key] = {
-            "symbol": key,
-            "direction": s["direction"],
-            "entry": s["price"],
-            "sl": s["sl"],
-            "tp1": s["tp1"],
-            "tp2": s["tp2"],
-            "tp1_hit": False,
-            "score": s["score"],
-            "quality": s["quality"],
-            "entry_time": now().isoformat(),
-        }
-        save(state)
-        sent += 1
-        print("SIGNAL SENT:", key, s["quality"], s["score"])
+            if not tg(msg(s), f"{key} {s['direction']} {s['quality']}"):
+                print("SEND FAILED:", key)
+                continue
+
+            state["signals"][sid] = t
+            state["positions"][key] = {
+                "symbol": key,
+                "direction": s["direction"],
+                "entry": s["price"],
+                "sl": s["sl"],
+                "tp1": s["tp1"],
+                "tp2": s["tp2"],
+                "tp1_hit": False,
+                "score": s["score"],
+                "quality": s["quality"],
+                "entry_time": now().isoformat(),
+            }
+            save(state)
+            sent += 1
+            print("SIGNAL SENT (Slot Filled):", key, s["quality"], s["score"])
+    else:
+        print("ALL SLOTS FULL (5/5). Skipping new entry scans until a slot frees up.")
 
     save(state)
-    print("FINAL SIGNALS:", sent)
-    print("ACTIVE:", len(state["positions"]))
+    print("FINAL NEW SIGNALS SENT:", sent)
+    print("ACTIVE SLOTS NOW:", len(state["positions"]))
     print("DONE")
 
 
