@@ -28,7 +28,7 @@
             "tp1": 0.12788255,
             "tp2": 0.1259351,
             "sl": 0.13177745,
-            "tp1_reached": false
+            "tp1_reached": true
         },
         {
             "symbol": "ORDIUSDT",
