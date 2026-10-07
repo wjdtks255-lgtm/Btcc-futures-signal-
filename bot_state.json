@@ -89,6 +89,39 @@
       "tp2": 0.07122600000488295,
       "tp1_hit": false,
       "created": "2026-10-07T16:42:33.081940+09:00"
+    },
+    "MONUSDT": {
+      "symbol": "MONUSDT",
+      "direction": "SHORT",
+      "entry": 0.02687,
+      "sl": 0.027102677472242806,
+      "tp1": 0.026520983791635797,
+      "tp2": 0.026288306319392992,
+      "tp1_hit": false,
+      "score": 100,
+      "entry_time": "2026-10-07T16:51:51.517546+09:00"
+    },
+    "GUNUSDT": {
+      "symbol": "GUNUSDT",
+      "direction": "SHORT",
+      "entry": 0.00298,
+      "sl": 0.0029997995916976406,
+      "tp1": 0.0029503006124535387,
+      "tp2": 0.002930501020755898,
+      "tp1_hit": false,
+      "score": 100,
+      "entry_time": "2026-10-07T16:51:52.894597+09:00"
+    },
+    "XRPUSDT": {
+      "symbol": "XRPUSDT",
+      "direction": "SHORT",
+      "entry": 1.4698,
+      "sl": 1.4786188,
+      "tp1": 1.4565718,
+      "tp2": 1.447753,
+      "tp1_hit": false,
+      "score": 100,
+      "entry_time": "2026-10-07T16:51:54.284839+09:00"
     }
   },
   "signals": {
@@ -101,6 +134,9 @@
     "FOGOUSDT:SHORT": 1791358953.0830307,
     "BTWUSDT:LONG": 1791358953.0830307,
     "AVNTUSDT:SHORT": 1791358953.0830307,
-    "PYTHUSDT:SHORT": 1791358953.0830307
+    "PYTHUSDT:SHORT": 1791358953.0830307,
+    "MONUSDT:SHORT": 1791359510.753104,
+    "GUNUSDT:SHORT": 1791359510.753104,
+    "XRPUSDT:SHORT": 1791359510.753104
   }
 }
