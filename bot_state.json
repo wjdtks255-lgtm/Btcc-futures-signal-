@@ -53,10 +53,10 @@
     "FOGOUSDT": {
       "direction": "SHORT",
       "entry": 0.00517,
-      "sl": 0.005228538531250802,
+      "sl": 0.00517,
       "tp1": 0.005082192203123798,
       "tp2": 0.005023653671872997,
-      "tp1_hit": false,
+      "tp1_hit": true,
       "created": "2026-10-07T16:42:33.081348+09:00",
       "symbol": "FOGOUSDT"
     },
@@ -85,10 +85,10 @@
       "symbol": "GUNUSDT",
       "direction": "SHORT",
       "entry": 0.00298,
-      "sl": 0.0029997995916976406,
+      "sl": 0.00298,
       "tp1": 0.0029503006124535387,
       "tp2": 0.002930501020755898,
-      "tp1_hit": false,
+      "tp1_hit": true,
       "score": 100,
       "entry_time": "2026-10-07T16:51:52.894597+09:00"
     },
@@ -107,10 +107,10 @@
       "symbol": "ENJUSDT",
       "direction": "SHORT",
       "entry": 0.03071,
-      "sl": 0.031110884645038472,
+      "sl": 0.03071,
       "tp1": 0.03010867303244229,
       "tp2": 0.02970778838740382,
-      "tp1_hit": false,
+      "tp1_hit": true,
       "score": 100,
       "entry_time": "2026-10-07T17:03:05.095159+09:00"
     },
@@ -195,10 +195,10 @@
       "symbol": "BBUSDT",
       "direction": "SHORT",
       "entry": 0.009033,
-      "sl": 0.009110571651415595,
+      "sl": 0.009033,
       "tp1": 0.008916642522876607,
       "tp2": 0.008839070871461014,
-      "tp1_hit": false,
+      "tp1_hit": true,
       "score": 94,
       "entry_time": "2026-10-07T17:27:17.374886+09:00"
     },
@@ -206,10 +206,10 @@
       "symbol": "SFPUSDT",
       "direction": "SHORT",
       "entry": 0.2864,
-      "sl": 0.287832,
+      "sl": 0.2864,
       "tp1": 0.284252,
       "tp2": 0.28281999999999996,
-      "tp1_hit": false,
+      "tp1_hit": true,
       "score": 94,
       "entry_time": "2026-10-07T17:27:18.742283+09:00"
     },
@@ -349,10 +349,10 @@
       "symbol": "EIGENUSDT",
       "direction": "SHORT",
       "entry": 0.23916,
-      "sl": 0.24095227099904884,
+      "sl": 0.23916,
       "tp1": 0.2364715935014268,
       "tp2": 0.23467932250237797,
-      "tp1_hit": false,
+      "tp1_hit": true,
       "score": 92,
       "quality": "A+",
       "entry_time": "2026-10-07T17:50:41.219902+09:00"
@@ -385,10 +385,10 @@
       "symbol": "SKYAIUSDT",
       "direction": "SHORT",
       "entry": 0.03517,
-      "sl": 0.03540396936204519,
+      "sl": 0.03517,
       "tp1": 0.034819045956932214,
       "tp2": 0.03458507659488702,
-      "tp1_hit": false,
+      "tp1_hit": true,
       "score": 92,
       "quality": "A+",
       "entry_time": "2026-10-07T17:56:58.328254+09:00"
@@ -404,15 +404,6 @@
       "score": 97,
       "quality": "A+",
       "entry_time": "2026-10-07T18:11:03.410743+09:00"
-    },
-    "ONEUSDT": {
-      "symbol": "ONEUSDT",
-      "direction": "SHORT",
-      "entry": 0.0021971,
-      "sl": 0.0022188907850784253,
-      "tp1": 0.0021644138223823623,
-      "tp2": 0.002142623037303937,
-      "tp1_hit": false
     },
     "AKEUSDT": {
       "symbol": "AKEUSDT",
@@ -475,13 +466,25 @@
       "symbol": "GRASSUSDT",
       "direction": "SHORT",
       "entry": 0.6695,
-      "sl": 0.6767987126885419,
+      "sl": 0.6695,
       "tp1": 0.6585519309671872,
       "tp2": 0.6512532182786455,
-      "tp1_hit": false,
+      "tp1_hit": true,
       "score": 87,
       "quality": "A",
       "entry_time": "2026-10-07T18:30:07.995172+09:00"
+    },
+    "TACUSDT": {
+      "symbol": "TACUSDT",
+      "direction": "SHORT",
+      "entry": 0.001522,
+      "sl": 0.0015319079525178754,
+      "tp1": 0.0015071380712231865,
+      "tp2": 0.001497230118705311,
+      "tp1_hit": false,
+      "score": 87,
+      "quality": "A",
+      "entry_time": "2026-10-07T18:39:10.910004+09:00"
     }
   },
   "signals": {
@@ -533,6 +536,7 @@
     "AEROUSDT:SHORT": 1791365141.5239792,
     "SANDUSDT:LONG": 1791365141.5239792,
     "ALCHUSDT:SHORT": 1791365406.144873,
-    "GRASSUSDT:SHORT": 1791365406.144873
+    "GRASSUSDT:SHORT": 1791365406.144873,
+    "TACUSDT:SHORT": 1791365950.2822497
   }
 }
