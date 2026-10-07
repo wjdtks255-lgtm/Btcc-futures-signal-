@@ -88,6 +88,7 @@ def tg(msg, label="MSG"):
     data = {
         "chat_id": CHAT_ID,
         "text": msg,
+        "parse_mode": "Markdown",
         "disable_web_page_preview": True,
         "disable_notification": False,
     }
@@ -100,10 +101,8 @@ def tg(msg, label="MSG"):
                 f"message_id={j.get('result', {}).get('message_id')} desc={j.get('description', '')}"
             )
             if r.status_code == 200 and j.get("ok") is True:
-                # 텔레그램 API 제한(초당 전송 제한) 방지를 위한 안전 간격
                 time.sleep(1.2)
                 return True
-            # Rate Limit(429) 걸린 경우 대기 후 재시도
             if r.status_code == 429:
                 retry_after = int(r.headers.get("Retry-After", 3))
                 print(f"Rate limited. Waiting {retry_after}s...")
@@ -384,6 +383,8 @@ def analyze(r, st):
 
 def msg(s):
     icon = "🟢" if s["direction"] == "LONG" else "🔴"
+    tv_chart_url = f"https://www.tradingview.com/chart/?symbol=BTCC:{s['symbol']}.P"
+
     return (
         f"{icon} 🔥 {s['quality']} HIGH QUALITY ENTRY\n\n"
         "━━━━━━━━━━━━━━━━━━━━\n"
@@ -421,7 +422,8 @@ def msg(s):
         f"├ Leverage : {s['lev']}x\n"
         "├ TP1 → SL = ENTRY\n"
         "└ TP2 → TRACKING END\n\n"
-        f"🔗 BTCC:{s['symbol']}.P\n\n"
+        f"🔗 BTCC:{s['symbol']}.P\n"
+        f"📈 [트레이딩뷰 차트 보기]({tv_chart_url})\n\n"
         "⚠️ Signal only / No auto order"
     )
 
