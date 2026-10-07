@@ -30,16 +30,6 @@
       "created": "2026-10-07T16:37:19.520951+09:00",
       "symbol": "JUPUSDT"
     },
-    "OUSDT": {
-      "direction": "SHORT",
-      "entry": 0.4807,
-      "sl": 0.4845456,
-      "tp1": 0.4749316,
-      "tp2": 0.471086,
-      "tp1_hit": false,
-      "created": "2026-10-07T16:37:19.521287+09:00",
-      "symbol": "OUSDT"
-    },
     "MEMEUSDT": {
       "direction": "SHORT",
       "entry": 0.0005822,
@@ -462,6 +452,18 @@
       "score": 87,
       "quality": "A",
       "entry_time": "2026-10-07T18:48:37.738000+09:00"
+    },
+    "4STOCKUSDT": {
+      "symbol": "4STOCKUSDT",
+      "direction": "SHORT",
+      "entry": 0.0063,
+      "sl": 0.006415624237086632,
+      "tp1": 0.006126563644370052,
+      "tp2": 0.00601093940728342,
+      "tp1_hit": false,
+      "score": 90,
+      "quality": "A",
+      "entry_time": "2026-10-07T19:02:20.354370+09:00"
     }
   },
   "signals": {
@@ -515,6 +517,7 @@
     "ALCHUSDT:SHORT": 1791365406.144873,
     "GRASSUSDT:SHORT": 1791365406.144873,
     "TACUSDT:SHORT": 1791365950.2822497,
-    "APRUSDT:SHORT": 1791366517.1654694
+    "APRUSDT:SHORT": 1791366517.1654694,
+    "4STOCKUSDT:SHORT": 1791367339.6996117
   }
 }
