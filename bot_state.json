@@ -118,17 +118,6 @@
       "score": 94,
       "entry_time": "2026-10-07T17:15:18.967765+09:00"
     },
-    "MERLUSDT": {
-      "symbol": "MERLUSDT",
-      "direction": "SHORT",
-      "entry": 0.029,
-      "sl": 0.029,
-      "tp1": 0.02856644101984045,
-      "tp2": 0.028277401699734084,
-      "tp1_hit": true,
-      "score": 95,
-      "entry_time": "2026-10-07T17:27:15.991240+09:00"
-    },
     "BBUSDT": {
       "symbol": "BBUSDT",
       "direction": "SHORT",
@@ -228,10 +217,10 @@
       "symbol": "ARCUSDT",
       "direction": "SHORT",
       "entry": 0.07007,
-      "sl": 0.0704987236047262,
+      "sl": 0.07007,
       "tp1": 0.0694269145929107,
       "tp2": 0.0689981909881845,
-      "tp1_hit": false,
+      "tp1_hit": true,
       "score": 92,
       "quality": "A",
       "entry_time": "2026-10-07T17:45:05.281125+09:00"
@@ -240,10 +229,10 @@
       "symbol": "BCHUSDT",
       "direction": "SHORT",
       "entry": 307.12,
-      "sl": 308.50204,
+      "sl": 307.12,
       "tp1": 305.04694,
       "tp2": 303.6649,
-      "tp1_hit": false,
+      "tp1_hit": true,
       "score": 97,
       "quality": "A+",
       "entry_time": "2026-10-07T17:50:38.530386+09:00"
@@ -424,6 +413,42 @@
       "score": 85,
       "quality": "A",
       "entry_time": "2026-10-07T19:38:06.114724+09:00"
+    },
+    "FLRUSDT": {
+      "symbol": "FLRUSDT",
+      "direction": "SHORT",
+      "entry": 0.007041,
+      "sl": 0.007072684500000001,
+      "tp1": 0.006993473250000001,
+      "tp2": 0.0069617887500000005,
+      "tp1_hit": false,
+      "score": 87,
+      "quality": "A",
+      "entry_time": "2026-10-07T19:53:43.207242+09:00"
+    },
+    "UAIUSDT": {
+      "symbol": "UAIUSDT",
+      "direction": "SHORT",
+      "entry": 0.28253,
+      "sl": 0.2849939433321514,
+      "tp1": 0.2788340850017729,
+      "tp2": 0.2763701416696216,
+      "tp1_hit": false,
+      "score": 87,
+      "quality": "A",
+      "entry_time": "2026-10-07T19:53:44.532269+09:00"
+    },
+    "CVXUSDT": {
+      "symbol": "CVXUSDT",
+      "direction": "SHORT",
+      "entry": 2.114,
+      "sl": 2.131242563009716,
+      "tp1": 2.088136155485426,
+      "tp2": 2.0708935924757097,
+      "tp1_hit": false,
+      "score": 87,
+      "quality": "A",
+      "entry_time": "2026-10-07T19:53:45.904941+09:00"
     }
   },
   "signals": {
@@ -481,6 +506,9 @@
     "4STOCKUSDT:SHORT": 1791367339.6996117,
     "PTBUSDT:SHORT": 1791368494.7645488,
     "LTCUSDT:SHORT": 1791368494.7645488,
-    "BSBUSDT:SHORT": 1791369485.414245
+    "BSBUSDT:SHORT": 1791369485.414245,
+    "FLRUSDT:SHORT": 1791370422.583242,
+    "UAIUSDT:SHORT": 1791370422.583242,
+    "CVXUSDT:SHORT": 1791370422.583242
   }
 }
