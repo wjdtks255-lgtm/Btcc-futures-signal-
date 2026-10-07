@@ -156,17 +156,6 @@
       "score": 100,
       "entry_time": "2026-10-07T17:03:07.813983+09:00"
     },
-    "JASMYUSDT": {
-      "symbol": "JASMYUSDT",
-      "direction": "SHORT",
-      "entry": 0.004954,
-      "sl": 0.004985440291877989,
-      "tp1": 0.004906839562183017,
-      "tp2": 0.004875399270305027,
-      "tp1_hit": false,
-      "score": 100,
-      "entry_time": "2026-10-07T17:07:53.973113+09:00"
-    },
     "PIPPINUSDT": {
       "symbol": "PIPPINUSDT",
       "direction": "SHORT",
@@ -351,6 +340,42 @@
       "score": 92,
       "quality": "A",
       "entry_time": "2026-10-07T17:45:05.281125+09:00"
+    },
+    "BCHUSDT": {
+      "symbol": "BCHUSDT",
+      "direction": "SHORT",
+      "entry": 307.12,
+      "sl": 308.50204,
+      "tp1": 305.04694,
+      "tp2": 303.6649,
+      "tp1_hit": false,
+      "score": 97,
+      "quality": "A+",
+      "entry_time": "2026-10-07T17:50:38.530386+09:00"
+    },
+    "SLXUSDT": {
+      "symbol": "SLXUSDT",
+      "direction": "SHORT",
+      "entry": 0.05972,
+      "sl": 0.060055827322763954,
+      "tp1": 0.059216259015854075,
+      "tp2": 0.05888043169309012,
+      "tp1_hit": false,
+      "score": 92,
+      "quality": "A+",
+      "entry_time": "2026-10-07T17:50:39.892133+09:00"
+    },
+    "EIGENUSDT": {
+      "symbol": "EIGENUSDT",
+      "direction": "SHORT",
+      "entry": 0.23916,
+      "sl": 0.24095227099904884,
+      "tp1": 0.2364715935014268,
+      "tp2": 0.23467932250237797,
+      "tp1_hit": false,
+      "score": 92,
+      "quality": "A+",
+      "entry_time": "2026-10-07T17:50:41.219902+09:00"
     }
   },
   "signals": {
@@ -387,6 +412,9 @@
     "BANKUSDT:SHORT": 1791362483.706792,
     "TRXUSDT:SHORT": 1791362702.0539832,
     "UNITREEUSDT:SHORT": 1791362702.0539832,
-    "ARCUSDT:SHORT": 1791362702.0539832
+    "ARCUSDT:SHORT": 1791362702.0539832,
+    "BCHUSDT:SHORT": 1791363037.8301704,
+    "SLXUSDT:SHORT": 1791363037.8301704,
+    "EIGENUSDT:SHORT": 1791363037.8301704
   }
 }
