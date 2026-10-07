@@ -8,11 +8,12 @@ STATE_FILE="bot_state.json"
 MIN_SCORE=68
 STRONG_SCORE=80
 COOLDOWN_MIN=180
+BASE="https://fapi.binance.com"
 HEADERS={"User-Agent":"Mozilla/5.0","Accept":"application/json"}
 
 def tg(text):
     if not TOKEN or not CHAT_ID:
-        print("❌ TELEGRAM_TOKEN / TELEGRAM_CHAT_ID 없음")
+        print("❌ Telegram Secrets 없음")
         return False
     try:
         r=requests.post(
@@ -22,11 +23,45 @@ def tg(text):
         )
         print(f"Telegram: {r.status_code}")
         if r.status_code!=200:
-            print(r.text[:500])
+            print("Telegram:",r.text[:500])
         return r.status_code==200
     except Exception as e:
         print("Telegram 오류:",e)
         return False
+
+def api(path,params=None,timeout=10):
+    try:
+        r=requests.get(
+            BASE+path,
+            params=params,
+            headers=HEADERS,
+            timeout=timeout
+        )
+
+        print(f"API {path} -> HTTP {r.status_code}")
+
+        if r.status_code!=200:
+            print("API 오류:",r.text[:500])
+            return None
+
+        try:
+            data=r.json()
+        except Exception:
+            print("❌ JSON 변환 실패:",r.text[:500])
+            return None
+
+        if isinstance(data,dict) and data.get("code") not in (None,0):
+            print("❌ Binance 오류:",data)
+            return None
+
+        return data
+
+    except requests.RequestException as e:
+        print("❌ API 연결 오류:",e)
+        return None
+    except Exception as e:
+        print("❌ API 오류:",e)
+        return None
 
 def load_state():
     try:
@@ -48,41 +83,65 @@ def save_state(s):
         print("State 저장 오류:",e)
 
 def get_symbols():
-    try:
-        r=requests.get(
-            "https://fapi.binance.com/fapi/v1/exchangeInfo",
-            headers=HEADERS,timeout=10
-        )
-        data=r.json()
-        symbols=[
-            x["symbol"] for x in data["symbols"]
-            if x.get("quoteAsset")=="USDT"
-            and x.get("status")=="TRADING"
-            and x.get("contractType")=="PERPETUAL"
-        ]
-        print(f"📊 USDT 무기한 선물 {len(symbols)}개")
-        return sorted(symbols)
-    except Exception as e:
-        print("❌ 종목 수집 실패:",e)
+    print("📡 Binance Futures 종목 정보 요청...")
+
+    data=api("/fapi/v1/exchangeInfo",timeout=15)
+
+    if data is None:
+        print("❌ exchangeInfo 응답 없음")
         return []
 
+    if not isinstance(data,dict):
+        print("❌ exchangeInfo 형식 오류")
+        print("응답:",str(data)[:500])
+        return []
+
+    symbols_data=data.get("symbols")
+
+    if not isinstance(symbols_data,list):
+        print("❌ exchangeInfo에 symbols 배열 없음")
+        print("응답 키:",list(data.keys()))
+        print("응답:",str(data)[:1000])
+        return []
+
+    symbols=[]
+
+    for x in symbols_data:
+        try:
+            if (
+                x.get("quoteAsset")=="USDT"
+                and x.get("status")=="TRADING"
+                and x.get("contractType")=="PERPETUAL"
+            ):
+                symbols.append(x["symbol"])
+        except:
+            continue
+
+    symbols=sorted(set(symbols))
+
+    print(f"✅ USDT 무기한 선물 {len(symbols)}개")
+
+    return symbols
+
 def candles(symbol,interval,limit=160):
+    data=api(
+        "/fapi/v1/klines",
+        {
+            "symbol":symbol,
+            "interval":interval,
+            "limit":limit
+        },
+        timeout=8
+    )
+
+    if not isinstance(data,list) or len(data)<80:
+        return pd.DataFrame()
+
     try:
-        r=requests.get(
-            "https://fapi.binance.com/fapi/v1/klines",
-            params={"symbol":symbol,"interval":interval,"limit":limit},
-            headers=HEADERS,timeout=7
-        )
-        if r.status_code!=200:
-            return pd.DataFrame()
-
-        d=r.json()
-        if not isinstance(d,list) or len(d)<80:
-            return pd.DataFrame()
-
-        df=pd.DataFrame(d,columns=[
+        df=pd.DataFrame(data,columns=[
             "time","open","high","low","close","volume",
-            "close_time","qav","trades","tb_base","tb_quote","ignore"
+            "close_time","qav","trades","tb_base",
+            "tb_quote","ignore"
         ])
 
         for c in ["open","high","low","close","volume"]:
@@ -94,6 +153,7 @@ def candles(symbol,interval,limit=160):
 
 def indicators(df):
     df=df.copy()
+
     df["ema20"]=ta.trend.ema_indicator(df.close,20)
     df["ema50"]=ta.trend.ema_indicator(df.close,50)
     df["ema100"]=ta.trend.ema_indicator(df.close,100)
@@ -101,9 +161,12 @@ def indicators(df):
     df["atr"]=ta.volatility.average_true_range(
         df.high,df.low,df.close,14
     )
-    df["adx"]=ta.trend.adx(df.high,df.low,df.close,14)
+    df["adx"]=ta.trend.adx(
+        df.high,df.low,df.close,14
+    )
     df["vol_ma"]=df.volume.rolling(20).mean()
     df["mom"]=df.close.pct_change(4)*100
+
     return df.dropna()
 
 def analyze(h1,m15):
@@ -111,7 +174,8 @@ def analyze(h1,m15):
     m=m15.iloc[-1]
     p=m15.iloc[-2]
 
-    L=S=0
+    L=0
+    S=0
     lr=[]
     sr=[]
 
@@ -143,6 +207,7 @@ def analyze(h1,m15):
         if p.rsi<40:
             L+=8
             lr.append("과매도 반등")
+
     elif m.rsi<p.rsi:
         if 32<=m.rsi<=62:
             S+=15
@@ -176,21 +241,24 @@ def analyze(h1,m15):
 
     if L>=S:
         return "LONG",L,lr
+
     return "SHORT",S,sr
 
 def risk_levels(price,atr,direction):
     risk=max(atr*1.25,price*0.008)
 
     if direction=="LONG":
-        sl=price-risk
-        tp1=price+risk*1.5
-        tp2=price+risk*2.5
-    else:
-        sl=price+risk
-        tp1=price-risk*1.5
-        tp2=price-risk*2.5
+        return (
+            price-risk,
+            price+risk*1.5,
+            price+risk*2.5
+        )
 
-    return sl,tp1,tp2
+    return (
+        price+risk,
+        price-risk*1.5,
+        price-risk*2.5
+    )
 
 def leverage(atr,price):
     v=atr/price*100
@@ -201,6 +269,7 @@ def leverage(atr,price):
         return 5,"고변동"
     if v>=1:
         return 8,"보통"
+
     return 10,"저변동"
 
 def fmt(p):
@@ -208,21 +277,28 @@ def fmt(p):
         return f"{p:,.2f}"
     if p>=1:
         return f"{p:,.4f}"
+
     return f"{p:.8f}".rstrip("0").rstrip(".")
 
 def signal_id(symbol,direction):
     return f"{symbol}_{direction}"
 
 def cooldown_ok(state,symbol,direction):
-    old=state["signals"].get(signal_id(symbol,direction))
+    old=state["signals"].get(
+        signal_id(symbol,direction)
+    )
 
     if not old:
         return True
 
     try:
         t=datetime.fromisoformat(old)
-        age=(datetime.now(timezone.utc)-t).total_seconds()/60
+        age=(
+            datetime.now(timezone.utc)-t
+        ).total_seconds()/60
+
         return age>=COOLDOWN_MIN
+
     except:
         return True
 
@@ -230,10 +306,16 @@ def track_positions(state):
     if not state["positions"]:
         return
 
-    print(f"📌 기존 포지션 {len(state['positions'])}개 추적")
+    print(
+        f"📌 기존 포지션 "
+        f"{len(state['positions'])}개 추적"
+    )
+
     remove=[]
 
-    for symbol,p in list(state["positions"].items()):
+    for symbol,p in list(
+        state["positions"].items()
+    ):
         df=candles(symbol,"15m",40)
 
         if df.empty:
@@ -243,20 +325,29 @@ def track_positions(state):
         direction=p["direction"]
 
         if direction=="LONG":
+
             if price<=p["sl"]:
                 hit="SL"
             elif price>=p["tp2"]:
                 hit="TP2"
-            elif price>=p["tp1"] and not p.get("tp1_hit"):
+            elif (
+                price>=p["tp1"]
+                and not p.get("tp1_hit")
+            ):
                 hit="TP1"
             else:
                 hit=None
+
         else:
+
             if price>=p["sl"]:
                 hit="SL"
             elif price<=p["tp2"]:
                 hit="TP2"
-            elif price<=p["tp1"] and not p.get("tp1_hit"):
+            elif (
+                price<=p["tp1"]
+                and not p.get("tp1_hit")
+            ):
                 hit="TP1"
             else:
                 hit=None
@@ -265,6 +356,7 @@ def track_positions(state):
             continue
 
         if hit=="TP1":
+
             p["tp1_hit"]=True
             p["sl"]=p["entry"]
 
@@ -276,7 +368,9 @@ def track_positions(state):
                 f"• TP1: `${fmt(p['tp1'])}`\n"
                 f"• 🔒 SL → 진입가 이동"
             )
+
         else:
+
             icon="💰" if hit=="TP2" else "🛑"
 
             tg(
@@ -293,15 +387,22 @@ def track_positions(state):
         state["positions"].pop(symbol,None)
 
 def main():
+
     print("="*50)
     print("🚀 BTCC FUTURES QUANT SCANNER")
     print("="*50)
 
     if not TOKEN or not CHAT_ID:
-        print("❌ TELEGRAM_TOKEN / TELEGRAM_CHAT_ID 없음")
+        print(
+            "❌ TELEGRAM_TOKEN / "
+            "TELEGRAM_CHAT_ID 없음"
+        )
         return
 
-    if not tg("🟢 *BTCC 스캐너 실행 확인*\n\nTelegram 연결 정상입니다."):
+    if not tg(
+        "🟢 *BTCC 스캐너 실행 확인*\n\n"
+        "Telegram 연결 정상입니다."
+    ):
         return
 
     state=load_state()
@@ -312,17 +413,44 @@ def main():
     symbols=get_symbols()
 
     if not symbols:
-        tg("❌ Binance 선물 데이터를 가져오지 못했습니다.")
+
+        msg=(
+            "❌ *선물 종목 데이터 수집 실패*\n\n"
+            "Binance Futures API에서 "
+            "정상적인 종목 목록을 받지 못했습니다.\n\n"
+            "GitHub Actions 로그를 확인해주세요."
+        )
+
+        tg(msg)
+
+        print(
+            "❌ 종목이 0개라 스캔을 중단합니다."
+        )
+
         return
 
-    print(f"🔎 전체 {len(symbols)}개 종목 스캔")
+    print(
+        f"🔎 전체 {len(symbols)}개 "
+        f"종목 스캔 시작"
+    )
 
     candidates=[]
 
     for i,symbol in enumerate(symbols,1):
+
         try:
-            h1=candles(symbol,"1h",160)
-            m15=candles(symbol,"15m",160)
+
+            h1=candles(
+                symbol,
+                "1h",
+                160
+            )
+
+            m15=candles(
+                symbol,
+                "15m",
+                160
+            )
 
             if h1.empty or m15.empty:
                 continue
@@ -333,7 +461,10 @@ def main():
             if len(h1)<110 or len(m15)<110:
                 continue
 
-            direction,score,reasons=analyze(h1,m15)
+            direction,score,reasons=analyze(
+                h1,
+                m15
+            )
 
             if score<MIN_SCORE:
                 continue
@@ -341,18 +472,30 @@ def main():
             if symbol in state["positions"]:
                 continue
 
-            if not cooldown_ok(state,symbol,direction):
+            if not cooldown_ok(
+                state,
+                symbol,
+                direction
+            ):
                 continue
 
-            price=float(m15.close.iloc[-1])
-            atr=float(m15.atr.iloc[-1])
+            price=float(
+                m15.close.iloc[-1]
+            )
+
+            atr=float(
+                m15.atr.iloc[-1]
+            )
 
             sl,tp1,tp2=risk_levels(
-                price,atr,direction
+                price,
+                atr,
+                direction
             )
 
             lev,risk_name=leverage(
-                atr,price
+                atr,
+                price
             )
 
             candidates.append({
@@ -375,13 +518,18 @@ def main():
             )
 
         except Exception as e:
-            print(f"⚠️ {symbol}: {e}")
+
+            print(
+                f"⚠️ {symbol}: {e}"
+            )
 
         time.sleep(0.12)
 
         if i%50==0:
+
             print(
-                f"진행률 {i}/{len(symbols)}"
+                f"진행률 "
+                f"{i}/{len(symbols)}"
             )
 
     candidates.sort(
@@ -390,33 +538,48 @@ def main():
     )
 
     print("="*50)
-    print(f"🎯 시그널 {len(candidates)}개")
+    print(
+        f"🎯 후보 시그널 "
+        f"{len(candidates)}개"
+    )
     print("="*50)
 
     sent=0
 
     for x in candidates:
+
         symbol=x["symbol"]
         direction=x["direction"]
         price=x["price"]
         score=x["score"]
 
-        icon="🟢" if direction=="LONG" else "🔴"
+        icon=(
+            "🟢"
+            if direction=="LONG"
+            else "🔴"
+        )
+
         grade=(
             "🔥 강력"
             if score>=STRONG_SCORE
             else "⚡ 유효"
         )
 
-        risk=abs(price-x["sl"])
-        rr2=abs(x["tp2"]-price)/risk
+        risk=abs(
+            price-x["sl"]
+        )
+
+        rr2=abs(
+            x["tp2"]-price
+        )/risk
 
         reasons=" · ".join(
             x["reasons"][:6]
         )
 
         msg=(
-            f"{icon} *BTCC 선물 {direction} 시그널*\n"
+            f"{icon} *BTCC 선물 "
+            f"{direction} 시그널*\n"
             f"━━━━━━━━━━━━━━━━━━\n"
             f"• 종목: `#{symbol}`\n"
             f"• 등급: `{grade}`\n"
@@ -424,15 +587,22 @@ def main():
             f"• 분석: `1H + 15M`\n"
             f"━━━━━━━━━━━━━━━━━━\n"
             f"💰 *진입*\n"
-            f"• 진입가: `${fmt(price)}`\n"
-            f"• 레버리지: `{x['leverage']}x`\n"
-            f"• 변동성: `{x['risk_name']}`\n"
+            f"• 진입가: "
+            f"`${fmt(price)}`\n"
+            f"• 레버리지: "
+            f"`{x['leverage']}x`\n"
+            f"• 변동성: "
+            f"`{x['risk_name']}`\n"
             f"━━━━━━━━━━━━━━━━━━\n"
             f"🎯 *목표 / 손절*\n"
-            f"• TP1: `${fmt(x['tp1'])}`\n"
-            f"• TP2: `${fmt(x['tp2'])}`\n"
-            f"• SL: `${fmt(x['sl'])}`\n"
-            f"• R:R: `1:{rr2:.1f}`\n"
+            f"• TP1: "
+            f"`${fmt(x['tp1'])}`\n"
+            f"• TP2: "
+            f"`${fmt(x['tp2'])}`\n"
+            f"• SL: "
+            f"`${fmt(x['sl'])}`\n"
+            f"• R:R: "
+            f"`1:{rr2:.1f}`\n"
             f"━━━━━━━━━━━━━━━━━━\n"
             f"📊 *시그널 근거*\n"
             f"{reasons}\n"
@@ -441,12 +611,16 @@ def main():
         )
 
         if tg(msg):
+
             now=datetime.now(
                 timezone.utc
             ).isoformat()
 
             state["signals"][
-                signal_id(symbol,direction)
+                signal_id(
+                    symbol,
+                    direction
+                )
             ]=now
 
             state["positions"][symbol]={
@@ -471,13 +645,16 @@ def main():
         f"✅ *BTCC 스캔 완료*\n\n"
         f"• 전체 종목: `{len(symbols)}`개\n"
         f"• 신규 시그널: `{sent}`개\n"
-        f"• 추적 포지션: `{len(state['positions'])}`개"
+        f"• 추적 포지션: "
+        f"`{len(state['positions'])}`개"
     )
 
     print(
-        f"✅ 완료 | 전체 {len(symbols)} | "
+        f"✅ 완료 | "
+        f"전체 {len(symbols)} | "
         f"신호 {sent} | "
-        f"포지션 {len(state['positions'])}"
+        f"포지션 "
+        f"{len(state['positions'])}"
     )
 
 if __name__=="__main__":
