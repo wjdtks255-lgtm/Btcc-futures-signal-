@@ -1,86 +1,6 @@
 {
     "active_positions": [
         {
-            "symbol": "ATOMUSDT",
-            "type": "SHORT",
-            "entry_price": 1.78,
-            "leverage": 15,
-            "tp1": 1.7533,
-            "tp2": 1.7266,
-            "sl": 1.8066999999999998,
-            "tp1_reached": false
-        },
-        {
-            "symbol": "LINKUSDT",
-            "type": "LONG",
-            "entry_price": 14.01,
-            "leverage": 15,
-            "tp1": 14.220149999999999,
-            "tp2": 14.4303,
-            "sl": 13.79985,
-            "tp1_reached": false
-        },
-        {
-            "symbol": "OPUSDT",
-            "type": "SHORT",
-            "entry_price": 0.12983,
-            "leverage": 15,
-            "tp1": 0.12788255,
-            "tp2": 0.1259351,
-            "sl": 0.13177745,
-            "tp1_reached": true
-        },
-        {
-            "symbol": "ORDIUSDT",
-            "type": "SHORT",
-            "entry_price": 4.577,
-            "leverage": 15,
-            "tp1": 4.508345,
-            "tp2": 4.43969,
-            "sl": 4.645655,
-            "tp1_reached": false
-        },
-        {
-            "symbol": "SUIUSDT",
-            "type": "SHORT",
-            "entry_price": 1.1698,
-            "leverage": 15,
-            "tp1": 1.152253,
-            "tp2": 1.134706,
-            "sl": 1.187347,
-            "tp1_reached": false
-        },
-        {
-            "symbol": "XRPUSDT",
-            "type": "SHORT",
-            "entry_price": 1.4946,
-            "leverage": 15,
-            "tp1": 1.472181,
-            "tp2": 1.449762,
-            "sl": 1.5170189999999997,
-            "tp1_reached": false
-        },
-        {
-            "symbol": "ARBUSDT",
-            "type": "SHORT",
-            "entry_price": 0.19854,
-            "leverage": 15,
-            "tp1": 0.19556189999999998,
-            "tp2": 0.1925838,
-            "sl": 0.20151809999999998,
-            "tp1_reached": true
-        },
-        {
-            "symbol": "BCHUSDT",
-            "type": "SHORT",
-            "entry_price": 310.6,
-            "leverage": 15,
-            "tp1": 305.94100000000003,
-            "tp2": 301.28200000000004,
-            "sl": 315.259,
-            "tp1_reached": false
-        },
-        {
             "symbol": "BTCUSDT",
             "type": "SHORT",
             "entry_price": 85328.4,
@@ -88,37 +8,7 @@
             "tp1": 84048.47399999999,
             "tp2": 82768.548,
             "sl": 86608.32599999999,
-            "tp1_reached": false
-        },
-        {
-            "symbol": "DOTUSDT",
-            "type": "SHORT",
-            "entry_price": 1.1944,
-            "leverage": 15,
-            "tp1": 1.1764839999999999,
-            "tp2": 1.1585679999999998,
-            "sl": 1.2123159999999997,
-            "tp1_reached": false
-        },
-        {
-            "symbol": "ETHUSDT",
-            "type": "SHORT",
-            "entry_price": 2688.77,
-            "leverage": 15,
-            "tp1": 2648.43845,
-            "tp2": 2608.1068999999998,
-            "sl": 2729.10155,
-            "tp1_reached": false
-        },
-        {
-            "symbol": "NOTUSDT",
-            "type": "SHORT",
-            "entry_price": 0.0004888,
-            "leverage": 15,
-            "tp1": 0.0004814679999999999,
-            "tp2": 0.00047413599999999995,
-            "sl": 0.0004961319999999999,
-            "tp1_reached": false
+            "tp1_reached": true
         },
         {
             "symbol": "SOLUSDT",
@@ -128,27 +18,7 @@
             "tp1": 118.3379,
             "tp2": 116.5358,
             "sl": 121.94209999999998,
-            "tp1_reached": false
-        },
-        {
-            "symbol": "1000PEPEUSDT",
-            "type": "SHORT",
-            "entry_price": 4.243e-06,
-            "leverage": 15,
-            "tp1": 4.1793549999999996e-06,
-            "tp2": 4.11571e-06,
-            "sl": 4.306644999999999e-06,
-            "tp1_reached": false
-        },
-        {
-            "symbol": "APTUSDT",
-            "type": "SHORT",
-            "entry_price": 0.8209,
-            "leverage": 15,
-            "tp1": 0.8085865,
-            "tp2": 0.7962729999999999,
-            "sl": 0.8332134999999998,
-            "tp1_reached": false
+            "tp1_reached": true
         }
     ]
 }
