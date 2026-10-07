@@ -4,10 +4,10 @@
       "symbol": "UNITREEUSDT",
       "direction": "SHORT",
       "entry": 67.929,
-      "sl": 68.268645,
+      "sl": 67.929,
       "tp1": 67.4195325,
       "tp2": 67.0798875,
-      "tp1_hit": false,
+      "tp1_hit": true,
       "score": 94,
       "quality": "A+",
       "entry_time": "2026-10-07T17:45:03.964452+09:00"
@@ -48,17 +48,17 @@
       "quality": "A",
       "entry_time": "2026-10-08T02:11:12.796955+09:00"
     },
-    "ARKMUSDT": {
-      "symbol": "ARKMUSDT",
-      "direction": "SHORT",
-      "entry": 0.1253,
-      "sl": 0.1263906239083859,
-      "tp1": 0.12366406413742115,
-      "tp2": 0.12257344022903525,
+    "EDUUSDT": {
+      "symbol": "EDUUSDT",
+      "direction": "LONG",
+      "entry": 0.06354,
+      "sl": 0.06276675034231409,
+      "tp1": 0.06469987448652886,
+      "tp2": 0.06547312414421476,
       "tp1_hit": false,
-      "score": 90,
+      "score": 87,
       "quality": "A",
-      "entry_time": "2026-10-08T03:00:29.691784+09:00"
+      "entry_time": "2026-10-08T07:31:52.074906+09:00"
     }
   },
   "signals": {
@@ -128,7 +128,8 @@
     "HUSDT:SHORT": 1791378499.3573387,
     "BLESSUSDT:SHORT": 1791389337.7101,
     "SKRUSDT:SHORT": 1791393071.0218923,
-    "ARKMUSDT:SHORT": 1791396027.8025534
+    "ARKMUSDT:SHORT": 1791396027.8025534,
+    "EDUUSDT:LONG": 1791412310.2900076
   },
   "sl_penalties": {
     "STXUSDT": 1791380763.6872358,
@@ -141,6 +142,7 @@
     "HEMIUSDT": 1791389332.1497035,
     "METISUSDT": 1791389334.0227375,
     "BANKUSDT": 1791395211.2441027,
-    "UAIUSDT": 1791396024.2866883
+    "UAIUSDT": 1791396024.2866883,
+    "ARKMUSDT": 1791412304.130952
   }
 }
