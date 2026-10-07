@@ -118,18 +118,6 @@
       "quality": "A",
       "entry_time": "2026-10-07T19:53:44.532269+09:00"
     },
-    "MERLUSDT": {
-      "symbol": "MERLUSDT",
-      "direction": "SHORT",
-      "entry": 0.02852,
-      "sl": 0.028805817345422282,
-      "tp1": 0.02809127398186658,
-      "tp2": 0.0278054566364443,
-      "tp1_hit": false,
-      "score": 87,
-      "quality": "A",
-      "entry_time": "2026-10-07T21:28:34.968913+09:00"
-    },
     "NESUSDT": {
       "symbol": "NESUSDT",
       "direction": "SHORT",
@@ -270,6 +258,7 @@
     "HUSDT:SHORT": 1791378499.3573387
   },
   "sl_penalties": {
-    "STXUSDT": 1791380763.6872358
+    "STXUSDT": 1791380763.6872358,
+    "MERLUSDT": 1791381600.5116715
   }
 }
