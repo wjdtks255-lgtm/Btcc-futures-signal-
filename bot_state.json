@@ -13,78 +13,23 @@
     "PYTHUSDT": {
       "direction": "SHORT",
       "entry": 0.07263,
-      "sl": 0.07319159999804682,
+      "sl": 0.07263,
       "tp1": 0.07178760000292977,
       "tp2": 0.07122600000488295,
-      "tp1_hit": false,
+      "tp1_hit": true,
       "created": "2026-10-07T16:42:33.081940+09:00",
       "symbol": "PYTHUSDT"
-    },
-    "MONUSDT": {
-      "symbol": "MONUSDT",
-      "direction": "SHORT",
-      "entry": 0.02687,
-      "sl": 0.02687,
-      "tp1": 0.026520983791635797,
-      "tp2": 0.026288306319392992,
-      "tp1_hit": true,
-      "score": 100,
-      "entry_time": "2026-10-07T16:51:51.517546+09:00"
-    },
-    "GUNUSDT": {
-      "symbol": "GUNUSDT",
-      "direction": "SHORT",
-      "entry": 0.00298,
-      "sl": 0.00298,
-      "tp1": 0.0029503006124535387,
-      "tp2": 0.002930501020755898,
-      "tp1_hit": true,
-      "score": 100,
-      "entry_time": "2026-10-07T16:51:52.894597+09:00"
-    },
-    "ENJUSDT": {
-      "symbol": "ENJUSDT",
-      "direction": "SHORT",
-      "entry": 0.03071,
-      "sl": 0.03071,
-      "tp1": 0.03010867303244229,
-      "tp2": 0.02970778838740382,
-      "tp1_hit": true,
-      "score": 100,
-      "entry_time": "2026-10-07T17:03:05.095159+09:00"
-    },
-    "CRVUSDT": {
-      "symbol": "CRVUSDT",
-      "direction": "SHORT",
-      "entry": 0.3532,
-      "sl": 0.3532,
-      "tp1": 0.35002120000000003,
-      "tp2": 0.347902,
-      "tp1_hit": true,
-      "score": 100,
-      "entry_time": "2026-10-07T17:03:06.443401+09:00"
     },
     "RAVEUSDT": {
       "symbol": "RAVEUSDT",
       "direction": "SHORT",
       "entry": 0.18338,
-      "sl": 0.18471328643498924,
+      "sl": 0.18338,
       "tp1": 0.18138007034751613,
       "tp2": 0.18004678391252688,
-      "tp1_hit": false,
-      "score": 100,
-      "entry_time": "2026-10-07T17:03:07.813983+09:00"
-    },
-    "PIPPINUSDT": {
-      "symbol": "PIPPINUSDT",
-      "direction": "SHORT",
-      "entry": 0.017737,
-      "sl": 0.017737,
-      "tp1": 0.017577367,
-      "tp2": 0.017470944999999998,
       "tp1_hit": true,
       "score": 100,
-      "entry_time": "2026-10-07T17:07:55.290580+09:00"
+      "entry_time": "2026-10-07T17:03:07.813983+09:00"
     },
     "BIOUSDT": {
       "symbol": "BIOUSDT",
@@ -136,10 +81,10 @@
       "symbol": "SOLUSDC",
       "direction": "SHORT",
       "entry": 118.32,
-      "sl": 118.91159999999999,
+      "sl": 118.32,
       "tp1": 117.4326,
       "tp2": 116.841,
-      "tp1_hit": false,
+      "tp1_hit": true,
       "score": 100,
       "quality": "A+",
       "entry_time": "2026-10-07T17:41:24.274264+09:00"
@@ -148,10 +93,10 @@
       "symbol": "SOLUSDT",
       "direction": "SHORT",
       "entry": 118.21,
-      "sl": 118.80104999999999,
+      "sl": 118.21,
       "tp1": 117.323425,
       "tp2": 116.73237499999999,
-      "tp1_hit": false,
+      "tp1_hit": true,
       "score": 100,
       "quality": "A+",
       "entry_time": "2026-10-07T17:41:25.476916+09:00"
@@ -191,18 +136,6 @@
       "score": 94,
       "quality": "A+",
       "entry_time": "2026-10-07T17:45:03.964452+09:00"
-    },
-    "ARCUSDT": {
-      "symbol": "ARCUSDT",
-      "direction": "SHORT",
-      "entry": 0.07007,
-      "sl": 0.07007,
-      "tp1": 0.0694269145929107,
-      "tp2": 0.0689981909881845,
-      "tp1_hit": true,
-      "score": 92,
-      "quality": "A",
-      "entry_time": "2026-10-07T17:45:05.281125+09:00"
     },
     "SLXUSDT": {
       "symbol": "SLXUSDT",
@@ -301,10 +234,10 @@
       "symbol": "TACUSDT",
       "direction": "SHORT",
       "entry": 0.001522,
-      "sl": 0.0015319079525178754,
+      "sl": 0.001522,
       "tp1": 0.0015071380712231865,
       "tp2": 0.001497230118705311,
-      "tp1_hit": false,
+      "tp1_hit": true,
       "score": 87,
       "quality": "A",
       "entry_time": "2026-10-07T18:39:10.910004+09:00"
@@ -349,10 +282,10 @@
       "symbol": "LTCUSDT",
       "direction": "SHORT",
       "entry": 67.59,
-      "sl": 67.894155,
+      "sl": 67.59,
       "tp1": 67.1337675,
       "tp2": 66.82961250000001,
-      "tp1_hit": false,
+      "tp1_hit": true,
       "score": 90,
       "quality": "A",
       "entry_time": "2026-10-07T19:21:36.635075+09:00"
