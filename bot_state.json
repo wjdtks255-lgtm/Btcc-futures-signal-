@@ -70,16 +70,6 @@
       "created": "2026-10-07T16:42:33.081348+09:00",
       "symbol": "FOGOUSDT"
     },
-    "BTWUSDT": {
-      "direction": "LONG",
-      "entry": 1.24939,
-      "sl": 1.235737342961574,
-      "tp1": 1.2698689855576393,
-      "tp2": 1.2835216425960654,
-      "tp1_hit": false,
-      "created": "2026-10-07T16:42:33.081444+09:00",
-      "symbol": "BTWUSDT"
-    },
     "AVNTUSDT": {
       "direction": "SHORT",
       "entry": 0.12412,
@@ -198,6 +188,39 @@
       "tp1_hit": false,
       "score": 100,
       "entry_time": "2026-10-07T17:07:56.641994+09:00"
+    },
+    "BIOUSDT": {
+      "symbol": "BIOUSDT",
+      "direction": "SHORT",
+      "entry": 0.02914,
+      "sl": 0.02941428457129262,
+      "tp1": 0.02872857314306107,
+      "tp2": 0.028454288571768453,
+      "tp1_hit": false,
+      "score": 94,
+      "entry_time": "2026-10-07T17:15:18.967765+09:00"
+    },
+    "BUSDT": {
+      "symbol": "BUSDT",
+      "direction": "SHORT",
+      "entry": 0.16895,
+      "sl": 0.1699241757112431,
+      "tp1": 0.1674887364331353,
+      "tp2": 0.1665145607218922,
+      "tp1_hit": false,
+      "score": 90,
+      "entry_time": "2026-10-07T17:15:20.330213+09:00"
+    },
+    "XLMUSDT": {
+      "symbol": "XLMUSDT",
+      "direction": "SHORT",
+      "entry": 0.20575,
+      "sl": 0.20688162499999999,
+      "tp1": 0.20405256249999998,
+      "tp2": 0.20292093749999998,
+      "tp1_hit": false,
+      "score": 86,
+      "entry_time": "2026-10-07T17:15:21.633624+09:00"
     }
   },
   "signals": {
@@ -219,6 +242,9 @@
     "RAVEUSDT:SHORT": 1791360184.5480165,
     "JASMYUSDT:SHORT": 1791360473.4529753,
     "PIPPINUSDT:SHORT": 1791360473.4529753,
-    "HOMEUSDT:SHORT": 1791360473.4529753
+    "HOMEUSDT:SHORT": 1791360473.4529753,
+    "BIOUSDT:SHORT": 1791360918.4161968,
+    "BUSDT:SHORT": 1791360918.4161968,
+    "XLMUSDT:SHORT": 1791360918.4161968
   }
 }
