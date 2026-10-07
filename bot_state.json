@@ -76,10 +76,10 @@
       "symbol": "CRVUSDT",
       "direction": "SHORT",
       "entry": 0.3508,
-      "sl": 0.353067229524091,
+      "sl": 0.3508,
       "tp1": 0.34739915571386354,
       "tp2": 0.34513192618977256,
-      "tp1_hit": false,
+      "tp1_hit": true,
       "score": 90,
       "quality": "A",
       "entry_time": "2026-10-07T21:52:06.620107+09:00"
