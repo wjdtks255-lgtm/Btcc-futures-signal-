@@ -7,9 +7,9 @@ STATE_FILE="bot_state.json"
 KST=timezone(timedelta(hours=9))
 TV="https://scanner.tradingview.com/crypto/scan"
 
-MIN_SCORE=76
-A_SCORE=84
-AP_SCORE=91
+MIN_SCORE=78
+A_SCORE=85
+AP_SCORE=92
 MAX_ALERTS=3
 COOLDOWN=180
 
@@ -44,19 +44,47 @@ def save(s):
         json.dump(s,f,ensure_ascii=False,indent=2)
     os.replace(STATE_FILE+".tmp",STATE_FILE)
 
-def tg(msg):
-    if not TOKEN or not CHAT_ID:return False
-    try:
-        r=requests.post(
-            f"https://api.telegram.org/bot{TOKEN}/sendMessage",
-            json={"chat_id":CHAT_ID,"text":msg,"disable_web_page_preview":True},
-            timeout=15
-        )
-        print("TG:",r.status_code)
-        return r.ok
-    except Exception as e:
-        print("TG ERROR:",e)
+def tg(msg,label="MESSAGE"):
+    if not TOKEN or not CHAT_ID:
+        print("TG CONFIG ERROR")
         return False
+
+    url=f"https://api.telegram.org/bot{TOKEN}/sendMessage"
+    payload={
+        "chat_id":CHAT_ID,
+        "text":msg,
+        "disable_web_page_preview":True,
+        "disable_notification":False
+    }
+
+    for attempt in range(2):
+        try:
+            print(f"TG SEND: {label} attempt={attempt+1}")
+            r=requests.post(url,json=payload,timeout=20)
+
+            try:
+                data=r.json()
+            except:
+                data={}
+
+            print(
+                "TG RESULT:",
+                f"http={r.status_code}",
+                f"ok={data.get('ok')}",
+                f"message_id={data.get('result',{}).get('message_id')}",
+                f"description={data.get('description','')}"
+            )
+
+            if r.status_code==200 and data.get("ok") is True:
+                return True
+
+        except Exception as e:
+            print("TG ERROR:",e)
+
+        if attempt==0:
+            time.sleep(1)
+
+    return False
 
 def get_rows():
     payload={
@@ -67,6 +95,7 @@ def get_rows():
         "sort":{"sortBy":"volume|15","sortOrder":"desc"},
         "range":[0,500]
     }
+
     try:
         r=requests.post(TV,json=payload,headers=HEAD,timeout=25)
         print("TV:",r.status_code)
@@ -125,182 +154,145 @@ def analyze(r,stats):
         stats["trend"]+=1
         return None
 
-    # -------------------------
-    # 1. TREND QUALITY / 25
-    # -------------------------
-    trend=0
-
+    # TREND 25
+    trend=10
     if direction=="LONG":
-        trend+=10
-        if ph>e20h:trend+=5
-        if p>e20:trend+=5
-        if e20>e50>e100:trend+=5
+        if ph>e20h:trend+=4
+        if p>e20:trend+=4
+        if e20>e50>e100:trend+=7
     else:
-        trend+=10
-        if ph<e20h:trend+=5
-        if p<e20:trend+=5
-        if e20<e50<e100:trend+=5
+        if ph<e20h:trend+=4
+        if p<e20:trend+=4
+        if e20<e50<e100:trend+=7
 
-    # -------------------------
-    # 2. LOCATION / 20
-    # -------------------------
-    location=0
-
+    # LOCATION 20
     if direction=="LONG":
-        if -.45<=d20<=.35:
-            location=20
-        elif -.75<=d20<=.70:
-            location=16
-        elif -1.10<=d20<=1.10:
-            location=9
+        if -.45<=d20<=.35:location=18
+        elif -.75<=d20<=.70:location=14
+        elif -1.10<=d20<=1.10:location=8
         else:
             stats["location"]+=1
             return None
     else:
-        if -.35<=d20<=.45:
-            location=20
-        elif -.70<=d20<=.75:
-            location=16
-        elif -1.10<=d20<=1.10:
-            location=9
+        if -.35<=d20<=.45:location=18
+        elif -.70<=d20<=.75:location=14
+        elif -1.10<=d20<=1.10:location=8
         else:
             stats["location"]+=1
             return None
 
-    # -------------------------
-    # 3. TIMING / 25
-    # -------------------------
+    # TIMING 25
     timing=0
     timing_reasons=[]
 
     if direction=="LONG":
         if p>o:
-            timing+=8
+            timing+=7
             timing_reasons.append("현재봉 상승")
         if lower>=.12:
-            timing+=6
+            timing+=5
             timing_reasons.append("하단 매수 반응")
-        if body_ratio>=.30:
-            timing+=4
-        if p>=e20 and lower>=.15:
-            timing+=4
-        if ch15>=0:
-            timing+=3
+        if body_ratio>=.30:timing+=4
+        if p>=e20 and lower>=.15:timing+=4
+        if ch15>=0:timing+=3
+        if ch15<-.50:timing-=3
     else:
         if p<o:
-            timing+=8
+            timing+=7
             timing_reasons.append("현재봉 하락")
         if upper>=.12:
-            timing+=6
+            timing+=5
             timing_reasons.append("상단 매도 반응")
-        if body_ratio>=.30:
-            timing+=4
-        if p<=e20 and upper>=.15:
-            timing+=4
-        if ch15<=0:
-            timing+=3
+        if body_ratio>=.30:timing+=4
+        if p<=e20 and upper>=.15:timing+=4
+        if ch15<=0:timing+=3
+        if ch15<-.60:timing-=3
 
-    if timing<14:
+    timing=max(0,min(25,timing))
+
+    if timing<13:
         stats["timing"]+=1
         return None
 
-    # -------------------------
-    # 4. RSI / 10
-    # -------------------------
+    # RSI 10
     rscore=0
-    rsi_state="NORMAL"
 
     if direction=="LONG":
-        if 42<=rsi<=62:rscore+=6
-        elif 36<=rsi<42 or 62<rsi<=67:rscore+=4
-        elif 31<=rsi<36 or 67<rsi<=71:rscore+=1
+        if 42<=rsi<=60:rscore+=5
+        elif 37<=rsi<42 or 60<rsi<=66:rscore+=3
+        elif 32<=rsi<37 or 66<rsi<=70:rscore+=1
 
-        if 40<=rsih<=64:rscore+=4
-        elif 35<=rsih<40 or 64<rsih<=68:rscore+=2
-
-        if rsi>67 or rsih>64:rsi_state="HOT"
-        if rsi<36 or rsih<35:rsi_state="WEAK"
+        if 40<=rsih<=62:rscore+=5
+        elif 35<=rsih<40 or 62<rsih<=67:rscore+=3
+        elif 32<=rsih<35 or 67<rsih<=70:rscore+=1
     else:
-        if 38<=rsi<=57:rscore+=6
-        elif 34<=rsi<38 or 57<rsi<=63:rscore+=4
-        elif 29<=rsi<34 or 63<rsi<=68:rscore+=1
+        if 38<=rsi<=56:rscore+=5
+        elif 34<=rsi<38 or 56<rsi<=62:rscore+=3
+        elif 29<=rsi<34 or 62<rsi<=68:rscore+=1
 
-        if 35<=rsih<=60:rscore+=4
-        elif 31<=rsih<35 or 60<rsih<=66:rscore+=2
+        if 36<=rsih<=58:rscore+=5
+        elif 33<=rsih<36 or 58<rsih<=64:rscore+=3
+        elif 30<=rsih<33 or 64<rsih<=68:rscore+=1
 
-        if rsi<34 or rsih<34:rsi_state="OVERSOLD"
-        if rsi>63 or rsih>63:rsi_state="HOT"
-
-    # -------------------------
-    # 5. ADX / 10
-    # -------------------------
+    # ADX 10
     adx_score=0
 
-    if adx>=35:adx_score+=6
-    elif adx>=28:adx_score+=5
-    elif adx>=23:adx_score+=4
+    if adx>=35:adx_score+=5
+    elif adx>=29:adx_score+=4
+    elif adx>=24:adx_score+=3
     elif adx>=18:adx_score+=2
 
-    if adxh>=32:adx_score+=4
-    elif adxh>=25:adx_score+=3
-    elif adxh>=20:adx_score+=2
+    if adxh>=32:adx_score+=5
+    elif adxh>=26:adx_score+=4
+    elif adxh>=21:adx_score+=3
     elif adxh>=16:adx_score+=1
 
     if adx<18 or adxh<16:
         stats["adx"]+=1
         return None
 
-    # -------------------------
-    # 6. MOMENTUM / 10
-    # -------------------------
+    # MOMENTUM 10
     momentum=0
 
     if direction=="LONG":
-        if .00<=ch15<=.60:momentum+=5
+        if 0<=ch15<=.50:momentum+=5
         elif -.20<=ch15<0:momentum+=3
         elif ch15<-.50:momentum+=1
 
-        if .00<=ch60<=1.00:momentum+=5
+        if 0<=ch60<=.90:momentum+=5
         elif -.30<=ch60<0:momentum+=3
         elif ch60<-.80:momentum+=1
     else:
-        if -.60<=ch15<=0:momentum+=5
+        if -.50<=ch15<=0:momentum+=5
         elif 0<ch15<=.20:momentum+=3
-        elif ch15<-.60:momentum+=2
+        elif ch15<-.50:momentum+=2
 
-        if -1.00<=ch60<=0:momentum+=5
+        if -.90<=ch60<=0:momentum+=5
         elif 0<ch60<=.30:momentum+=3
-        elif ch60<-1.00:momentum+=2
+        elif ch60<-.90:momentum+=2
 
-    # -------------------------
-    # 7. VOLATILITY / 5
-    # -------------------------
-    if .20<=atr_pct<=1.50:
-        volatility=5
-    elif .15<=atr_pct<=2.20:
-        volatility=3
-    elif atr_pct<=3:
-        volatility=1
+    # VOLATILITY 5
+    if .20<=atr_pct<=1.50:volatility=5
+    elif .15<=atr_pct<=2.20:volatility=3
+    elif atr_pct<=3:volatility=1
     else:
         stats["volatility"]+=1
         return None
 
-    raw=trend+location+min(timing,25)+rscore+adx_score+momentum+volatility
+    raw=trend+location+timing+rscore+adx_score+momentum+volatility
 
-    # -------------------------
-    # ANTI-CHASE PENALTY
-    # -------------------------
+    # ANTI-CHASE
     penalty=0
     warnings=[]
 
     if direction=="SHORT":
         if rsih<35:
-            penalty+=7
-            warnings.append("1H RSI 과매도권")
-        if rsi<34:
             penalty+=5
-            warnings.append("15M RSI 과매도권")
-        if ch15<-0.60:
+            warnings.append("1H RSI 낮음")
+        if rsi<34:
+            penalty+=4
+            warnings.append("15M RSI 낮음")
+        if ch15<-.60:
             penalty+=6
             warnings.append("15M 급락 추격 위험")
         if d20<-.70:
@@ -311,11 +303,11 @@ def analyze(r,stats):
             warnings.append("1H 급락 진행")
     else:
         if rsih>65:
-            penalty+=7
-            warnings.append("1H RSI 과매수권")
-        if rsi>67:
             penalty+=5
-            warnings.append("15M RSI 과매수권")
+            warnings.append("1H RSI 높음")
+        if rsi>67:
+            penalty+=4
+            warnings.append("15M RSI 높음")
         if ch15>.60:
             penalty+=6
             warnings.append("15M 급등 추격 위험")
@@ -328,54 +320,45 @@ def analyze(r,stats):
 
     score=max(0,min(100,int(raw-penalty)))
 
-    # 극단적인 추격은 B 이하로 강등
+    # 100점 방지: 실제 진입 품질이 완벽하지 않으면 상한 적용
+    if timing<21:score=min(score,94)
+    if location<18:score=min(score,92)
+    if rscore<8:score=min(score,90)
+    if momentum<8:score=min(score,91)
+    if penalty>=5:score=min(score,89)
+
+    # 강한 추세라도 극단 추격이면 A+ 금지
     chase=False
 
     if direction=="SHORT":
-        if rsih<32 and ch15<-.25:
-            chase=True
-        if d20<-.90:
-            chase=True
+        if rsih<33 and ch15<-.20:chase=True
+        if d20<-.85:chase=True
+        if ch15<-.80:chase=True
     else:
-        if rsih>68 and ch15>.25:
-            chase=True
-        if d20>.90:
-            chase=True
+        if rsih>67 and ch15>.20:chase=True
+        if d20>.85:chase=True
+        if ch15>.80:chase=True
 
     if chase:
-        score=min(score,82)
+        score=min(score,84)
         stats["chase"]+=1
 
     if score<MIN_SCORE:
         stats["score"]+=1
         return None
 
-    # -------------------------
-    # QUALITY
-    # -------------------------
-    if score>=AP_SCORE and timing>=20 and location>=16 and penalty<=4:
+    if score>=AP_SCORE and timing>=20 and location>=16 and penalty<=4 and not chase:
         quality="A+"
-    elif score>=A_SCORE and timing>=17 and location>=13 and penalty<=8:
+    elif score>=A_SCORE and timing>=16 and location>=13:
         quality="A"
     else:
-        quality="B"
-
-    # B는 후보로만 계산, 알림은 하지 않음
-    if quality=="B":
         stats["b_grade"]+=1
         return None
-
-    # A+ 조건 추가
-    if quality=="A+":
-        if direction=="SHORT" and rsih<34:
-            quality="A"
-        elif direction=="LONG" and rsih>66:
-            quality="A"
 
     risk=max(atr*1.15,p*.005)
     risk_pct=risk/p*100
 
-    if risk_pct>3.0:
+    if risk_pct>3:
         stats["risk"]+=1
         return None
 
@@ -383,22 +366,17 @@ def analyze(r,stats):
         sl=p-risk
         tp1=p+risk*1.5
         tp2=p+risk*2.5
+        setup="EMA20 눌림 후 반등" if d20<=.35 else "상승 추세 재개"
     else:
         sl=p+risk
         tp1=p-risk*1.5
         tp2=p-risk*2.5
+        setup="EMA20 반등 후 재하락" if d20>=-.35 else "하락 추세 재개"
 
-    if atr_pct>=2.0:lev=3
+    if atr_pct>=2:lev=3
     elif atr_pct>=1.4:lev=5
     elif atr_pct>=.8:lev=7
     else:lev=8
-
-    if direction=="LONG":
-        setup="EMA20 눌림 후 반등"
-        if d20>.35:setup="상승 추세 재개"
-    else:
-        setup="EMA20 반등 후 재하락"
-        if d20<-.35:setup="하락 추세 재개"
 
     reasons=[]
     reasons.append("1H EMA 상승 배열" if direction=="LONG" else "1H EMA 하락 배열")
@@ -408,17 +386,15 @@ def analyze(r,stats):
 
     reasons.extend(timing_reasons)
 
-    if adx>=28 and adxh>=25:
+    if adx>=29 and adxh>=26:
         reasons.append("상·하위 추세 강도 확인")
-    elif adx>=23:
+    elif adx>=24:
         reasons.append("15M 추세 강도 확인")
 
-    if rsi_state=="NORMAL":
-        reasons.append("RSI 과열 없는 진입")
-    elif rsi_state=="OVERSOLD":
-        reasons.append("강한 하락 추세지만 과매도 주의")
-    elif rsi_state=="HOT":
-        reasons.append("강한 상승 추세지만 과매수 주의")
+    if 8<=rscore:
+        reasons.append("RSI 진입 상태 양호")
+    elif rscore>=5:
+        reasons.append("RSI 중립권 접근")
 
     return {
         "symbol":sym(r),
@@ -451,18 +427,14 @@ def analyze(r,stats):
     }
 
 def signal_msg(s):
-    if s["quality"]=="A+":
-        title="🔥 A+ HIGH QUALITY ENTRY"
-    else:
-        title="⚡ A QUALITY ENTRY"
-
     icon="🟢" if s["direction"]=="LONG" else "🔴"
+    title="🔥 A+ HIGH QUALITY ENTRY" if s["quality"]=="A+" else "⚡ A QUALITY ENTRY"
 
-    lines=[]
+    rr=[]
     seen=set()
     for x in s["reasons"]:
         if x not in seen:
-            lines.append(f"• {x}")
+            rr.append(x)
             seen.add(x)
 
     warning=""
@@ -503,8 +475,8 @@ def signal_msg(s):
         f"└ Volatility : {s['volatility']}/5\n"
         f"Penalty : -{s['penalty']}\n\n"
         "🧠 ENTRY REASONS\n"
-        +"\n".join(lines[:6])+
-        warning+
+        +"\n".join(rr[:6])
+        +warning+
         "\n\n⚙️ RISK\n"
         f"├ Leverage : {s['lev']}x\n"
         "├ TP1 → SL = ENTRY\n"
@@ -570,30 +542,35 @@ def check_positions(state,rs):
 
         if d=="LONG":
             if price>=p["tp2"]:
-                tg(position_msg(p,"TP2"))
+                tg(position_msg(p,"TP2"),f"{p['symbol']} TP2")
                 remove.append(key)
                 continue
+
             if price<=p["sl"]:
-                tg(position_msg(p,"SL"))
+                tg(position_msg(p,"SL"),f"{p['symbol']} SL")
                 remove.append(key)
                 continue
+
             if not p["tp1_hit"] and price>=p["tp1"]:
                 p["tp1_hit"]=True
                 p["sl"]=p["entry"]
-                tg(position_msg(p,"TP1"))
+                tg(position_msg(p,"TP1"),f"{p['symbol']} TP1")
+
         else:
             if price<=p["tp2"]:
-                tg(position_msg(p,"TP2"))
+                tg(position_msg(p,"TP2"),f"{p['symbol']} TP2")
                 remove.append(key)
                 continue
+
             if price>=p["sl"]:
-                tg(position_msg(p,"SL"))
+                tg(position_msg(p,"SL"),f"{p['symbol']} SL")
                 remove.append(key)
                 continue
+
             if not p["tp1_hit"] and price<=p["tp1"]:
                 p["tp1_hit"]=True
                 p["sl"]=p["entry"]
-                tg(position_msg(p,"TP1"))
+                tg(position_msg(p,"TP1"),f"{p['symbol']} TP1")
 
     for x in remove:
         state["positions"].pop(x,None)
@@ -612,11 +589,19 @@ def main():
     print("BTCC REAL ROWS:",len(rs))
 
     if not rs:
-        tg("⚠️ BTCC DATA ERROR\n\nBTCC TradingView 데이터 조회 실패")
+        tg(
+            "⚠️ BTCC DATA ERROR\n\nBTCC TradingView 데이터 조회 실패",
+            "DATA ERROR"
+        )
         return
 
     state=load()
+    before=len(state["positions"])
     check_positions(state,rs)
+    after=len(state["positions"])
+
+    if before!=after:
+        print("ACTIVE CHANGE:",before,"->",after)
 
     stats={
         "data":0,
@@ -673,32 +658,41 @@ def main():
     print("A+/A QUALIFIED:",len(candidates))
     print("FILTER STATS:",stats)
 
+    print("TOP CANDIDATES:")
     for i,s in enumerate(candidates[:10],1):
         print(
             f"#{i} {s['symbol']} {s['direction']} "
             f"{s['quality']} SCORE={s['score']} "
             f"T={s['trend']} L={s['location']} "
-            f"TIME={s['timing']} RSI1H={s['rsih']:.1f}"
+            f"TIME={s['timing']} "
+            f"RSI1H={s['rsih']:.1f} "
+            f"PENALTY={s['penalty']}"
         )
 
     sent=0
     ts=time.time()
 
     for s in candidates:
-        if sent>=MAX_ALERTS:break
+        if sent>=MAX_ALERTS:
+            break
 
         key=s["symbol"]
 
         if key in state["positions"]:
+            print("SKIP ACTIVE:",key)
             continue
 
         sid=f"{key}:{s['direction']}"
         last=float(state["signals"].get(sid,0) or 0)
 
         if ts-last<COOLDOWN*60:
+            print("SKIP COOLDOWN:",key)
             continue
 
-        if not tg(signal_msg(s)):
+        msg=signal_msg(s)
+
+        if not tg(msg,f"{key} {s['direction']} {s['quality']}"):
+            print("SEND FAILED:",key)
             continue
 
         state["signals"][sid]=ts
@@ -718,6 +712,15 @@ def main():
 
         save(state)
         sent+=1
+
+        print(
+            "SIGNAL SENT:",
+            key,
+            s["direction"],
+            s["quality"],
+            s["score"]
+        )
+
         time.sleep(.7)
 
     save(state)
