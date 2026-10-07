@@ -5,25 +5,34 @@ TOKEN=os.getenv("TELEGRAM_TOKEN","").strip()
 CHAT_ID=os.getenv("TELEGRAM_CHAT_ID","").strip()
 STATE_FILE="bot_state.json"
 
-BASE="https://api.bybit.com"
+TV="https://scanner.tradingview.com/crypto/scan"
 MIN_SCORE=68
 STRONG_SCORE=80
 COOLDOWN=180
-MAX_SCAN=120
-MIN_VALUE=1_000_000
-TIMEOUT=12
+MIN_VOLUME=100000
+MAX_SYMBOLS=1000
 
-S=requests.Session()
-S.headers.update({"User-Agent":"BTCC-Signal-Scanner/7.0","Accept":"application/json"})
+H=requests.Session()
+H.headers.update({
+    "User-Agent":"Mozilla/5.0",
+    "Content-Type":"application/json",
+    "Origin":"https://www.tradingview.com",
+    "Referer":"https://www.tradingview.com/"
+})
 
 def tg(msg):
     if not TOKEN or not CHAT_ID:
-        print("❌ Telegram Secret 없음")
+        print("Telegram Secret 없음")
         return False
     try:
-        r=S.post(
+        r=H.post(
             f"https://api.telegram.org/bot{TOKEN}/sendMessage",
-            data={"chat_id":CHAT_ID,"text":msg,"parse_mode":"HTML"},
+            data={
+                "chat_id":CHAT_ID,
+                "text":msg,
+                "parse_mode":"HTML",
+                "disable_web_page_preview":True
+            },
             timeout=15
         )
         print("Telegram:",r.status_code)
@@ -32,231 +41,237 @@ def tg(msg):
         print("Telegram error:",e)
         return False
 
-def api(path,params=None,retry=2):
-    for n in range(retry+1):
-        try:
-            r=S.get(BASE+path,params=params,timeout=TIMEOUT)
-            if r.status_code!=200:
-                print("API",path,"HTTP",r.status_code)
-                if n<retry:
-                    time.sleep(1)
-                    continue
-                return None
-            j=r.json()
-            if j.get("retCode")!=0:
-                print("API error:",j.get("retMsg"))
-                return None
-            return j.get("result",{})
-        except Exception as e:
-            print("API error:",e)
-            if n<retry:
-                time.sleep(1)
-    return None
-
-def load_state():
+def load():
     try:
         with open(STATE_FILE,"r",encoding="utf-8") as f:
-            x=json.load(f)
-        x.setdefault("positions",{})
-        x.setdefault("signals",{})
-        return x
+            s=json.load(f)
+        s.setdefault("positions",{})
+        s.setdefault("signals",{})
+        return s
     except:
         return {"positions":{},"signals":{}}
 
-def save_state(x):
+def save(s):
     with open(STATE_FILE,"w",encoding="utf-8") as f:
-        json.dump(x,f,ensure_ascii=False,indent=2)
+        json.dump(s,f,ensure_ascii=False,indent=2)
 
-def symbols():
-    out=[]
-    cursor=""
-    while True:
-        p={"category":"linear","limit":1000}
-        if cursor:p["cursor"]=cursor
-        j=api("/v5/market/instruments-info",p)
-        if not j:break
-        for x in j.get("list",[]):
-            if x.get("status")!="Trading":continue
-            if x.get("quoteCoin")!="USDT":continue
-            if x.get("contractType")!="LinearPerpetual":continue
-            sym=x["symbol"]
-            if sym.endswith("USDT"):
-                out.append(sym)
-        cursor=j.get("nextPageCursor","")
-        if not cursor:break
-    return list(dict.fromkeys(out))
+def tv_scan():
+    cols=[
+        "name","description","close","change","volume",
+        "close|15","volume|15","EMA20|15","EMA50|15",
+        "EMA100|15","RSI|15","ADX|15","ATR|15",
+        "close|60","volume|60","EMA20|60","EMA50|60",
+        "EMA100|60","RSI|60","ADX|60","ATR|60",
+        "change|15","change|60"
+    ]
 
-def ticker_map():
-    j=api("/v5/market/tickers",{"category":"linear"})
-    d={}
-    if not j:return d
-    for x in j.get("list",[]):
-        try:
-            if x.get("symbol","").endswith("USDT"):
-                d[x["symbol"]]={
-                    "price":float(x["lastPrice"]),
-                    "value":float(x.get("turnover24h") or 0),
-                    "change":float(x.get("price24hPcnt") or 0)*100
-                }
-        except:
-            pass
-    return d
+    payload={
+        "filter":[
+            {"left":"exchange","operation":"equal","right":"BTCC"},
+            {"left":"type","operation":"equal","right":"crypto"},
+            {"left":"volume|15","operation":"nempty"}
+        ],
+        "options":{
+            "lang":"en",
+            "active_symbols_only":True
+        },
+        "symbols":{
+            "query":{"types":[]},
+            "tickers":[]
+        },
+        "columns":cols,
+        "sort":{
+            "sortBy":"volume|15",
+            "sortOrder":"desc"
+        },
+        "range":[0,MAX_SYMBOLS]
+    }
 
-def candles(sym,interval,limit=180):
-    j=api("/v5/market/kline",{
-        "category":"linear",
-        "symbol":sym,
-        "interval":interval,
-        "limit":limit
-    })
-    if not j:return None
-    rows=j.get("list",[])
-    if len(rows)<80:return None
-    rows=rows[::-1]
-    df=pd.DataFrame(rows,columns=["time","open","high","low","close","volume","turnover"])
-    for c in ["open","high","low","close","volume","turnover"]:
-        df[c]=pd.to_numeric(df[c],errors="coerce")
-    return df.dropna().reset_index(drop=True)
+    try:
+        r=H.post(TV,json=payload,timeout=20)
+        print("BTCC TradingView:",r.status_code)
 
-def calc(df):
-    c=df["close"]
-    h=df["high"]
-    l=df["low"]
-    v=df["volume"]
+        if r.status_code!=200:
+            print(r.text[:500])
+            return []
 
-    df["ema20"]=c.ewm(span=20,adjust=False).mean()
-    df["ema50"]=c.ewm(span=50,adjust=False).mean()
-    df["ema100"]=c.ewm(span=100,adjust=False).mean()
+        j=r.json()
+        data=j.get("data",[])
+        print("BTCC total:",j.get("totalCount",len(data)))
+        print("BTCC returned:",len(data))
 
-    d=c.diff()
-    gain=d.clip(lower=0)
-    loss=-d.clip(upper=0)
-    ag=gain.ewm(alpha=1/14,adjust=False).mean()
-    al=loss.ewm(alpha=1/14,adjust=False).mean()
-    rs=ag/al.replace(0,float("nan"))
-    df["rsi"]=100-(100/(1+rs))
+        out=[]
+        for x in data:
+            try:
+                d=dict(zip(cols,x["d"]))
+                d["ticker"]=x["s"]
+                out.append(d)
+            except:
+                pass
+        return out
 
-    tr=pd.concat([
-        h-l,
-        (h-c.shift()).abs(),
-        (l-c.shift()).abs()
-    ],axis=1).max(axis=1)
-    df["atr"]=tr.ewm(alpha=1/14,adjust=False).mean()
+    except Exception as e:
+        print("BTCC data error:",e)
+        return []
 
-    plus=(h.diff()).clip(lower=0)
-    minus=(-l.diff()).clip(lower=0)
-    plus[plus<minus]=0
-    minus[minus<plus]=0
-    atr=tr.ewm(alpha=1/14,adjust=False).mean()
-    pdi=100*plus.ewm(alpha=1/14,adjust=False).mean()/atr
-    mdi=100*minus.ewm(alpha=1/14,adjust=False).mean()/atr
-    dx=100*(pdi-mdi).abs()/(pdi+mdi).replace(0,float("nan"))
-    df["adx"]=dx.ewm(alpha=1/14,adjust=False).mean()
+def num(x):
+    try:
+        return float(x)
+    except:
+        return None
 
-    df["vma"]=v.rolling(20).mean()
-    df["mom4"]=c.pct_change(4)*100
-    return df
+def analyze(x):
+    p=x
 
-def analyze(h1,m15):
-    a=calc(h1.copy())
-    b=calc(m15.copy())
+    price=num(p.get("close|15"))
+    ema20=num(p.get("EMA20|15"))
+    ema50=num(p.get("EMA50|15"))
+    ema100=num(p.get("EMA100|15"))
+    rsi=num(p.get("RSI|15"))
+    adx=num(p.get("ADX|15"))
+    atr=num(p.get("ATR|15"))
+    vol=num(p.get("volume|15"))
 
-    x=a.iloc[-1]
-    px=b.iloc[-1]
-    p1=b.iloc[-2]
+    hprice=num(p.get("close|60"))
+    hema20=num(p.get("EMA20|60"))
+    hema50=num(p.get("EMA50|60"))
+    hema100=num(p.get("EMA100|60"))
+    hrsi=num(p.get("RSI|60"))
+    hadx=num(p.get("ADX|60"))
 
-    scoreL=0
-    scoreS=0
-    rl=[]
-    rs=[]
+    ch15=num(p.get("change|15")) or 0
+    ch60=num(p.get("change|60")) or 0
 
-    if x.ema20>x.ema50:
-        scoreL+=18
-        rl.append("1H EMA20 > EMA50 상승추세")
-    elif x.ema20<x.ema50:
-        scoreS+=18
-        rs.append("1H EMA20 < EMA50 하락추세")
+    if None in [price,ema20,ema50,ema100,rsi,adx,atr,
+                hprice,hema20,hema50,hema100,hrsi,hadx]:
+        return None
 
-    if x.close>x.ema100:
-        scoreL+=10
-        rl.append("1H EMA100 위")
-    elif x.close<x.ema100:
-        scoreS+=10
-        rs.append("1H EMA100 아래")
+    if price<=0 or atr<=0:
+        return None
 
-    if px.close>px.ema20>px.ema50:
-        scoreL+=18
-        rl.append("15M EMA 정배열")
-    elif px.close<px.ema20<px.ema50:
-        scoreS+=18
-        rs.append("15M EMA 역배열")
+    L=0
+    S=0
+    lr=[]
+    sr=[]
 
-    if px.rsi>52 and px.rsi<72 and px.rsi>p1.rsi:
-        scoreL+=12
-        rl.append(f"RSI 상승 {px.rsi:.1f}")
-    elif px.rsi<48 and px.rsi>28 and px.rsi<p1.rsi:
-        scoreS+=12
-        rs.append(f"RSI 하락 {px.rsi:.1f}")
+    # 1H trend
+    if hema20>hema50:
+        L+=18
+        lr.append("1H EMA20 > EMA50 상승 추세")
+    elif hema20<hema50:
+        S+=18
+        sr.append("1H EMA20 < EMA50 하락 추세")
 
-    if px.rsi<38 and px.rsi>p1.rsi:
-        scoreL+=8
-        rl.append("RSI 과매도 반등")
-    if px.rsi>62 and px.rsi<p1.rsi:
-        scoreS+=8
-        rs.append("RSI 과매수 하락")
+    if hprice>hema100:
+        L+=10
+        lr.append("1H EMA100 위")
+    elif hprice<hema100:
+        S+=10
+        sr.append("1H EMA100 아래")
 
-    if px.volume>px.vma*1.15:
-        if px.close>p1.close:
-            scoreL+=10
-            rl.append("거래량 증가 + 상승")
-        elif px.close<p1.close:
-            scoreS+=10
-            rs.append("거래량 증가 + 하락")
+    # 15M structure
+    if price>ema20>ema50:
+        L+=18
+        lr.append("15M EMA 정배열")
+    elif price<ema20<ema50:
+        S+=18
+        sr.append("15M EMA 역배열")
 
-    if px.mom4>0.35:
-        scoreL+=10
-        rl.append(f"4봉 모멘텀 +{px.mom4:.2f}%")
-    elif px.mom4<-0.35:
-        scoreS+=10
-        rs.append(f"4봉 모멘텀 {px.mom4:.2f}%")
+    if price>ema100:
+        L+=7
+        lr.append("15M EMA100 위")
+    elif price<ema100:
+        S+=7
+        sr.append("15M EMA100 아래")
 
-    if px.adx>=18:
-        if scoreL>scoreS:
-            scoreL+=7
-            rl.append(f"ADX {px.adx:.1f} 추세확인")
-        elif scoreS>scoreL:
-            scoreS+=7
-            rs.append(f"ADX {px.adx:.1f} 추세확인")
+    # RSI
+    if 52<rsi<72:
+        L+=10
+        lr.append(f"15M RSI {rsi:.1f} 상승권")
+    elif 28<rsi<48:
+        S+=10
+        sr.append(f"15M RSI {rsi:.1f} 하락권")
 
-    if scoreL>=scoreS and scoreL>=MIN_SCORE:
+    if 45<hrsi<70 and hema20>hema50:
+        L+=5
+        lr.append(f"1H RSI {hrsi:.1f}")
+    elif 30<hrsi<55 and hema20<hema50:
+        S+=5
+        sr.append(f"1H RSI {hrsi:.1f}")
+
+    # ADX
+    if adx>=18:
+        if L>S:
+            L+=7
+            lr.append(f"ADX {adx:.1f} 추세 확인")
+        elif S>L:
+            S+=7
+            sr.append(f"ADX {adx:.1f} 추세 확인")
+
+    if hadx>=18:
+        if L>S:
+            L+=5
+            lr.append(f"1H ADX {hadx:.1f}")
+        elif S>L:
+            S+=5
+            sr.append(f"1H ADX {hadx:.1f}")
+
+    # Momentum
+    if ch15>0.35:
+        L+=8
+        lr.append(f"15M 모멘텀 +{ch15:.2f}%")
+    elif ch15<-0.35:
+        S+=8
+        sr.append(f"15M 모멘텀 {ch15:.2f}%")
+
+    if ch60>0.5:
+        L+=5
+        lr.append(f"1H 변화 +{ch60:.2f}%")
+    elif ch60<-0.5:
+        S+=5
+        sr.append(f"1H 변화 {ch60:.2f}%")
+
+    # Volume
+    if vol and vol>=MIN_VOLUME:
+        if L>S and ch15>0:
+            L+=7
+            lr.append("15M 거래량 충분")
+        elif S>L and ch15<0:
+            S+=7
+            sr.append("15M 거래량 충분")
+
+    if L>=S and L>=MIN_SCORE:
         return {
-            "dir":"LONG",
-            "score":scoreL,
-            "reasons":rl,
-            "price":float(px.close),
-            "atr":float(px.atr),
-            "rsi":float(px.rsi),
-            "adx":float(px.adx),
-            "mom":float(px.mom4)
+            "direction":"LONG",
+            "score":L,
+            "price":price,
+            "atr":atr,
+            "rsi":rsi,
+            "adx":adx,
+            "change15":ch15,
+            "change60":ch60,
+            "reasons":lr
         }
 
-    if scoreS>scoreL and scoreS>=MIN_SCORE:
+    if S>L and S>=MIN_SCORE:
         return {
-            "dir":"SHORT",
-            "score":scoreS,
-            "reasons":rs,
-            "price":float(px.close),
-            "atr":float(px.atr),
-            "rsi":float(px.rsi),
-            "adx":float(px.adx),
-            "mom":float(px.mom4)
+            "direction":"SHORT",
+            "score":S,
+            "price":price,
+            "atr":atr,
+            "rsi":rsi,
+            "adx":adx,
+            "change15":ch15,
+            "change60":ch60,
+            "reasons":sr
         }
 
     return None
 
-def levels(price,atr,direction):
+def levels(price,atr,d):
     risk=max(atr*1.25,price*0.008)
-    if direction=="LONG":
+
+    if d=="LONG":
         sl=price-risk
         tp1=price+risk*1.5
         tp2=price+risk*2.5
@@ -264,30 +279,39 @@ def levels(price,atr,direction):
         sl=price+risk
         tp1=price-risk*1.5
         tp2=price-risk*2.5
+
     return sl,tp1,tp2,risk
 
-def lev(price,atr):
-    pct=atr/price*100
-    if pct>=3:return 3
-    if pct>=2:return 5
-    if pct>=1:return 8
+def leverage(price,atr):
+    v=atr/price*100
+    if v>=3:return 3
+    if v>=2:return 5
+    if v>=1:return 8
     return 10
 
-def cooldown_ok(state,sym,direction):
-    k=f"{sym}:{direction}"
-    t=state["signals"].get(k,0)
-    return time.time()-t>=COOLDOWN*60
+def fmt(v):
+    if v>=100:return f"{v:,.2f}"
+    if v>=1:return f"{v:,.4f}"
+    if v>=0.01:return f"{v:,.6f}"
+    return f"{v:.8f}"
 
-def fmt(p):
-    if p>=100:return f"{p:,.2f}"
-    if p>=1:return f"{p:,.4f}"
-    return f"{p:,.6f}"
+def cooldown(s,t,d):
+    k=f"{t}:{d}"
+    last=s["signals"].get(k,0)
+    return time.time()-last>=COOLDOWN*60
 
-def track(state,prices):
+def track(s,data):
     remove=[]
-    for sym,p in state["positions"].items():
-        if sym not in prices:continue
-        q=prices[sym]["price"]
+
+    for sym,p in s["positions"].items():
+        x=data.get(sym)
+        if not x:
+            continue
+
+        q=num(x.get("close|15"))
+        if q is None:
+            continue
+
         d=p["direction"]
         sl=p["sl"]
         tp1=p["tp1"]
@@ -297,31 +321,37 @@ def track(state,prices):
             if not p.get("tp1_hit") and q>=tp1:
                 p["tp1_hit"]=True
                 p["sl"]=p["entry"]
+
                 tg(
-                    f"🎯 <b>TP1 HIT</b>\n\n"
+                    f"🎯 <b>BTCC TP1 HIT</b>\n"
+                    f"━━━━━━━━━━━━━━━━━━\n"
                     f"#{sym}\n"
                     f"📈 LONG\n"
                     f"💰 현재가: <b>{fmt(q)}</b>\n"
                     f"🎯 TP1: <b>{fmt(tp1)}</b>\n"
                     f"🔒 SL → ENTRY\n"
-                    f"✅ 1차 목표 달성"
+                    f"✅ 1차 익절 도달"
                 )
+
             elif q>=tp2:
                 tg(
-                    f"🏆 <b>TP2 HIT</b>\n\n"
+                    f"🏆 <b>BTCC TP2 HIT</b>\n"
+                    f"━━━━━━━━━━━━━━━━━━\n"
                     f"#{sym}\n"
-                    f"📈 LONG\n"
+                    f"📈 LONG 종료\n"
                     f"💰 청산가: <b>{fmt(q)}</b>\n"
                     f"🎯 TP2: <b>{fmt(tp2)}</b>\n"
                     f"🔥 포지션 종료"
                 )
                 remove.append(sym)
+
             elif q<=sl:
                 tg(
-                    f"🛑 <b>STOP LOSS</b>\n\n"
+                    f"🛑 <b>BTCC STOP LOSS</b>\n"
+                    f"━━━━━━━━━━━━━━━━━━\n"
                     f"#{sym}\n"
                     f"📉 LONG 종료\n"
-                    f"💰 가격: <b>{fmt(q)}</b>\n"
+                    f"💰 현재가: <b>{fmt(q)}</b>\n"
                     f"🛑 SL: <b>{fmt(sl)}</b>"
                 )
                 remove.append(sym)
@@ -330,127 +360,135 @@ def track(state,prices):
             if not p.get("tp1_hit") and q<=tp1:
                 p["tp1_hit"]=True
                 p["sl"]=p["entry"]
+
                 tg(
-                    f"🎯 <b>TP1 HIT</b>\n\n"
+                    f"🎯 <b>BTCC TP1 HIT</b>\n"
+                    f"━━━━━━━━━━━━━━━━━━\n"
                     f"#{sym}\n"
                     f"📉 SHORT\n"
                     f"💰 현재가: <b>{fmt(q)}</b>\n"
                     f"🎯 TP1: <b>{fmt(tp1)}</b>\n"
                     f"🔒 SL → ENTRY\n"
-                    f"✅ 1차 목표 달성"
+                    f"✅ 1차 익절 도달"
                 )
+
             elif q<=tp2:
                 tg(
-                    f"🏆 <b>TP2 HIT</b>\n\n"
+                    f"🏆 <b>BTCC TP2 HIT</b>\n"
+                    f"━━━━━━━━━━━━━━━━━━\n"
                     f"#{sym}\n"
-                    f"📉 SHORT\n"
+                    f"📉 SHORT 종료\n"
                     f"💰 청산가: <b>{fmt(q)}</b>\n"
                     f"🎯 TP2: <b>{fmt(tp2)}</b>\n"
                     f"🔥 포지션 종료"
                 )
                 remove.append(sym)
+
             elif q>=sl:
                 tg(
-                    f"🛑 <b>STOP LOSS</b>\n\n"
+                    f"🛑 <b>BTCC STOP LOSS</b>\n"
+                    f"━━━━━━━━━━━━━━━━━━\n"
                     f"#{sym}\n"
                     f"📈 SHORT 종료\n"
-                    f"💰 가격: <b>{fmt(q)}</b>\n"
+                    f"💰 현재가: <b>{fmt(q)}</b>\n"
                     f"🛑 SL: <b>{fmt(sl)}</b>"
                 )
                 remove.append(sym)
 
-    for sym in remove:
-        state["positions"].pop(sym,None)
+    for x in remove:
+        s["positions"].pop(x,None)
 
-def signal_message(sym,x,sl,tp1,tp2,leverage):
-    icon="🟢" if x["dir"]=="LONG" else "🔴"
+def signal(sym,x,sl,tp1,tp2,lev):
+    icon="🟢" if x["direction"]=="LONG" else "🔴"
     strength="🔥 STRONG" if x["score"]>=STRONG_SCORE else "⚡ SIGNAL"
-    reasons="\n".join(f"• {r}" for r in x["reasons"][:6])
+
+    reasons="\n".join(
+        f"• {r}" for r in x["reasons"][:7]
+    )
 
     return (
         f"{icon} <b>BTCC FUTURES {strength}</b>\n"
         f"━━━━━━━━━━━━━━━━━━\n"
         f"#{sym}\n"
-        f"{'📈 LONG' if x['dir']=='LONG' else '📉 SHORT'}\n\n"
-        f"💰 Entry : <b>{fmt(x['price'])}</b>\n"
-        f"🛑 SL : <b>{fmt(sl)}</b>\n"
-        f"🎯 TP1 : <b>{fmt(tp1)}</b>\n"
-        f"🎯 TP2 : <b>{fmt(tp2)}</b>\n"
-        f"⚡ Leverage : <b>{leverage}x</b>\n\n"
-        f"📊 Score : <b>{x['score']}</b>\n"
-        f"RSI : {x['rsi']:.1f}  |  ADX : {x['adx']:.1f}\n"
-        f"Momentum : {x['mom']:+.2f}%\n\n"
-        f"📌 <b>진입 근거</b>\n{reasons}\n\n"
-        f"⚠️ BTCC 거래용 참고 시그널\n"
-        f"📍 Data: Bybit Public Futures"
+        f"{'📈 LONG' if x['direction']=='LONG' else '📉 SHORT'}\n\n"
+        f"💰 ENTRY  <b>{fmt(x['price'])}</b>\n"
+        f"🛑 SL     <b>{fmt(sl)}</b>\n"
+        f"🎯 TP1    <b>{fmt(tp1)}</b>\n"
+        f"🎯 TP2    <b>{fmt(tp2)}</b>\n"
+        f"⚡ LEV    <b>{lev}x</b>\n\n"
+        f"📊 SCORE  <b>{x['score']}</b>\n"
+        f"RSI      {x['rsi']:.1f}\n"
+        f"ADX      {x['adx']:.1f}\n"
+        f"15M      {x['change15']:+.2f}%\n"
+        f"1H       {x['change60']:+.2f}%\n\n"
+        f"📌 <b>진입 근거</b>\n"
+        f"{reasons}\n\n"
+        f"🏦 DATA <b>BTCC Futures</b>\n"
+        f"📊 Feed: TradingView BTCC\n"
+        f"⚠️ 참고용 시그널 / 레버리지 주의"
     )
 
 def main():
-    print("="*52)
-    print("🚀 BTCC FUTURES QUANT SCANNER V7.0")
-    print("Data: Bybit Public Futures")
-    print("="*52)
+    print("="*58)
+    print("🚀 BTCC FUTURES QUANT SCANNER V8.0")
+    print("DATA: BTCC via TradingView")
+    print("="*58)
 
     if not TOKEN or not CHAT_ID:
-        print("❌ Telegram Secret 확인 필요")
+        print("❌ Telegram Secrets 없음")
         return
 
-    state=load_state()
-    prices=ticker_map()
+    state=load()
 
-    if not prices:
-        tg("❌ <b>시장 데이터 오류</b>\nBybit Public Futures API 응답 없음")
+    rows=tv_scan()
+
+    if not rows:
+        tg(
+            "❌ <b>BTCC 시장 데이터 오류</b>\n\n"
+            "BTCC TradingView Market Feed에서 데이터를 가져오지 못했습니다."
+        )
         return
 
-    track(state,prices)
-    save_state(state)
+    data={}
+    for x in rows:
+        t=x.get("ticker","")
+        if t.startswith("BTCC:"):
+            sym=t.split(":",1)[1]
+            sym=sym.replace(".P","")
+            data[sym]=x
 
-    syms=symbols()
-    if not syms:
-        tg("❌ <b>종목 조회 실패</b>\nBybit 선물 종목을 가져오지 못했습니다.")
-        return
+    print("BTCC 종목:",len(data))
 
-    liquid=[
-        s for s in syms
-        if s in prices and prices[s]["value"]>=MIN_VALUE
-    ]
-
-    liquid.sort(
-        key=lambda s:prices[s]["value"],
-        reverse=True
-    )
-
-    liquid=liquid[:MAX_SCAN]
-
-    print("전체 선물:",len(syms))
-    print("유동성 스캔:",len(liquid))
-    print("ACTIVE:",len(state["positions"]))
+    track(state,data)
+    save(state)
 
     candidates=[]
 
-    for i,sym in enumerate(liquid,1):
+    for sym,x in data.items():
         try:
-            h1=candles(sym,"60",160)
-            m15=candles(sym,"15",160)
-            if h1 is None or m15 is None:
-                continue
-
-            x=analyze(h1,m15)
-            if not x:
-                continue
-
             if sym in state["positions"]:
                 continue
 
-            if not cooldown_ok(state,sym,x["dir"]):
+            if not x.get("close|15"):
                 continue
 
-            candidates.append((sym,x))
+            a=analyze(x)
+
+            if not a:
+                continue
+
+            if not cooldown(state,sym,a["direction"]):
+                continue
+
+            candidates.append((sym,a))
+
             print(
-                f"{sym:16} {x['dir']:5} "
-                f"score={x['score']:3} "
-                f"RSI={x['rsi']:.1f}"
+                f"{sym:18} "
+                f"{a['direction']:5} "
+                f"score={a['score']:3} "
+                f"price={fmt(a['price'])}"
             )
+
         except Exception as e:
             print(sym,"ERROR",e)
 
@@ -465,55 +503,48 @@ def main():
         sl,tp1,tp2,risk=levels(
             x["price"],
             x["atr"],
-            x["dir"]
+            x["direction"]
         )
 
-        leverage=lev(x["price"],x["atr"])
+        lev=leverage(x["price"],x["atr"])
 
-        if tg(
-            signal_message(
-                sym,x,sl,tp1,tp2,leverage
-            )
-        ):
+        if tg(signal(sym,x,sl,tp1,tp2,lev)):
             state["positions"][sym]={
-                "direction":x["dir"],
+                "direction":x["direction"],
                 "entry":x["price"],
                 "sl":sl,
                 "tp1":tp1,
                 "tp2":tp2,
                 "tp1_hit":False,
                 "score":x["score"],
-                "leverage":leverage,
+                "leverage":lev,
                 "created":datetime.now(timezone.utc).isoformat()
             }
 
             state["signals"][
-                f"{sym}:{x['dir']}"
+                f"{sym}:{x['direction']}"
             ]=time.time()
 
             sent+=1
 
-    save_state(state)
+    save(state)
 
-    print("="*52)
+    print("="*58)
     print("SCAN COMPLETE")
-    print("Candidates:",len(candidates))
-    print("Sent:",sent)
-    print("Active:",len(state["positions"]))
-    print("="*52)
+    print("BTCC symbols :",len(data))
+    print("Candidates   :",len(candidates))
+    print("New signals  :",sent)
+    print("Active       :",len(state["positions"]))
+    print("="*58)
 
-    summary=(
-        f"📡 <b>BTCC Scanner 완료</b>\n\n"
-        f"🔎 스캔: {len(liquid)}개\n"
-        f"🎯 후보: {len(candidates)}개\n"
-        f"🚨 신규신호: {sent}개\n"
-        f"📌 ACTIVE: {len(state['positions'])}개"
+    tg(
+        f"📡 <b>BTCC SCAN COMPLETE</b>\n\n"
+        f"🏦 BTCC 종목: <b>{len(data)}</b>\n"
+        f"🎯 후보: <b>{len(candidates)}</b>\n"
+        f"🚨 신규신호: <b>{sent}</b>\n"
+        f"📌 ACTIVE: <b>{len(state['positions'])}</b>\n\n"
+        f"{'🔥 강한 진입 후보가 발견되었습니다.' if sent else '⏳ 현재 조건을 만족하는 신규 진입 없음'}"
     )
-
-    if sent==0:
-        summary+="\n\n⏳ 현재 조건을 만족하는 신규 진입 없음"
-
-    tg(summary)
 
 if __name__=="__main__":
     main()
