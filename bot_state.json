@@ -1,17 +1,5 @@
 {
   "positions": {
-    "ALLOUSDT": {
-      "symbol": "ALLOUSDT",
-      "direction": "SHORT",
-      "entry": 0.25172,
-      "sl": 0.25172,
-      "tp1": 0.2495223807664905,
-      "tp2": 0.24805730127748418,
-      "tp1_hit": true,
-      "score": 100,
-      "quality": "A+",
-      "entry_time": "2026-10-07T17:40:40.309371+09:00"
-    },
     "UNITREEUSDT": {
       "symbol": "UNITREEUSDT",
       "direction": "SHORT",
@@ -36,18 +24,6 @@
       "quality": "A+",
       "entry_time": "2026-10-07T17:56:55.882573+09:00"
     },
-    "HEMIUSDT": {
-      "symbol": "HEMIUSDT",
-      "direction": "SHORT",
-      "entry": 0.005755,
-      "sl": 0.00586700921935955,
-      "tp1": 0.005586986170960674,
-      "tp2": 0.005474976951601124,
-      "tp1_hit": false,
-      "score": 90,
-      "quality": "A",
-      "entry_time": "2026-10-07T18:25:42.222678+09:00"
-    },
     "NESUSDT": {
       "symbol": "NESUSDT",
       "direction": "SHORT",
@@ -60,18 +36,6 @@
       "quality": "A",
       "entry_time": "2026-10-07T21:28:36.231225+09:00"
     },
-    "METISUSDT": {
-      "symbol": "METISUSDT",
-      "direction": "SHORT",
-      "entry": 3.234,
-      "sl": 3.234,
-      "tp1": 3.193795682401006,
-      "tp2": 3.166992804001677,
-      "tp1_hit": true,
-      "score": 90,
-      "quality": "A",
-      "entry_time": "2026-10-07T22:08:19.979987+09:00"
-    },
     "BANKUSDT": {
       "symbol": "BANKUSDT",
       "direction": "SHORT",
@@ -83,6 +47,18 @@
       "score": 87,
       "quality": "A",
       "entry_time": "2026-10-07T22:08:21.309103+09:00"
+    },
+    "BLESSUSDT": {
+      "symbol": "BLESSUSDT",
+      "direction": "SHORT",
+      "entry": 0.008372,
+      "sl": 0.008448875879810042,
+      "tp1": 0.008256686180284935,
+      "tp2": 0.008179810300474892,
+      "tp1_hit": false,
+      "score": 90,
+      "quality": "A",
+      "entry_time": "2026-10-08T01:08:59.532460+09:00"
     }
   },
   "signals": {
@@ -149,7 +125,8 @@
     "MANTRAUSDT:SHORT": 1791374596.85774,
     "NESUSDT:SHORT": 1791376111.1684203,
     "METISUSDT:SHORT": 1791378499.3573387,
-    "HUSDT:SHORT": 1791378499.3573387
+    "HUSDT:SHORT": 1791378499.3573387,
+    "BLESSUSDT:SHORT": 1791389337.7101
   },
   "sl_penalties": {
     "STXUSDT": 1791380763.6872358,
@@ -157,6 +134,9 @@
     "TRXUSDT": 1791382640.4783266,
     "BSBUSDT": 1791388482.433071,
     "CRVUSDT": 1791388484.1826649,
-    "BBUSDT": 1791388485.9443974
+    "BBUSDT": 1791388485.9443974,
+    "ALLOUSDT": 1791389330.3138776,
+    "HEMIUSDT": 1791389332.1497035,
+    "METISUSDT": 1791389334.0227375
   }
 }
