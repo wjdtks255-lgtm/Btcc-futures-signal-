@@ -7,8 +7,8 @@ STATE_FILE="bot_state.json"
 KST=timezone(timedelta(hours=9))
 TV="https://scanner.tradingview.com/crypto/scan"
 
-MIN_SCORE=82
-STRONG_SCORE=90
+MIN_SCORE=84
+STRONG_SCORE=91
 MAX_ALERTS=3
 COOLDOWN=180
 
@@ -32,10 +32,8 @@ def now():
 
 def load():
     try:
-        with open(STATE_FILE,encoding="utf-8") as f:
-            s=json.load(f)
-    except:
-        s={"positions":{},"signals":{}}
+        with open(STATE_FILE,encoding="utf-8") as f:s=json.load(f)
+    except:s={"positions":{},"signals":{}}
     s.setdefault("positions",{})
     s.setdefault("signals",{})
     return s
@@ -46,9 +44,7 @@ def save(s):
     os.replace(STATE_FILE+".tmp",STATE_FILE)
 
 def tg(msg):
-    if not TOKEN or not CHAT_ID:
-        print("TELEGRAM CONFIG ERROR")
-        return False
+    if not TOKEN or not CHAT_ID:return False
     try:
         r=requests.post(
             f"https://api.telegram.org/bot{TOKEN}/sendMessage",
@@ -65,377 +61,261 @@ def tv(payload):
     try:
         r=requests.post(TV,json=payload,headers=HEAD,timeout=25)
         print("TV:",r.status_code)
-        if r.status_code!=200:
-            print(r.text[:500])
-            return []
-        return r.json().get("data",[])
+        return r.json().get("data",[]) if r.status_code==200 else []
     except Exception as e:
         print("TV ERROR:",e)
         return []
 
 def rows():
-    payload={
+    return tv({
         "options":{"lang":"en"},
         "markets":["crypto"],
-        "filter":[
-            {"left":"exchange","operation":"equal","right":"BTCC"}
-        ],
+        "filter":[{"left":"exchange","operation":"equal","right":"BTCC"}],
         "columns":COL,
-        "sort":{
-            "sortBy":"volume|15",
-            "sortOrder":"desc"
-        },
+        "sort":{"sortBy":"volume|15","sortOrder":"desc"},
         "range":[0,500]
-    }
-    return tv(payload)
+    })
 
-def val(row,i):
-    try:
-        return float(row["d"][i])
-    except:
-        return 0.0
+def val(r,i):
+    try:return float(r["d"][i])
+    except:return 0.0
 
-def symbol(row):
-    return str(row.get("s","")).split(":")[-1].replace(".P","")
+def symbol(r):
+    return str(r.get("s","")).split(":")[-1].replace(".P","")
 
 def fmt(x):
-    if x>=1000:
-        return f"{x:,.2f}"
-    if x>=1:
-        return f"{x:.4f}"
-    if x>=0.01:
-        return f"{x:.5f}"
+    if x>=1000:return f"{x:,.2f}"
+    if x>=1:return f"{x:.4f}"
+    if x>=.01:return f"{x:.5f}"
     return f"{x:.8f}".rstrip("0").rstrip(".")
 
-def analyze(row):
-    o=val(row,0)
-    h=val(row,1)
-    l=val(row,2)
-    p=val(row,3)
-    v=val(row,4)
-    e20=val(row,5)
-    e50=val(row,6)
-    e100=val(row,7)
-    rsi=val(row,8)
-    adx=val(row,9)
-    atr=val(row,10)
+def analyze(r):
+    o,h,l,p,v=[val(r,i) for i in range(5)]
+    e20,e50,e100=[val(r,i) for i in (5,6,7)]
+    rsi,adx,atr=[val(r,i) for i in (8,9,10)]
 
-    oh=val(row,11)
-    hh=val(row,12)
-    lh=val(row,13)
-    ph=val(row,14)
-    vh=val(row,15)
-    e20h=val(row,16)
-    e50h=val(row,17)
-    e100h=val(row,18)
-    rsih=val(row,19)
-    adxh=val(row,20)
+    oh,hh,lh,ph,vh=[val(r,i) for i in range(11,16)]
+    e20h,e50h,e100h=[val(r,i) for i in (16,17,18)]
+    rsih,adxh=[val(r,i) for i in (19,20)]
+    ch15,ch60=[val(r,i) for i in (21,22)]
 
-    ch15=val(row,21)
-    ch60=val(row,22)
-
-    if min(o,h,l,p,e20,e50,e100,ph,e20h,e50h,e100h,atr)<=0:
-        return None
+    if min(o,h,l,p,e20,e50,e100,ph,e20h,e50h,e100h,atr)<=0:return None
 
     atr_pct=atr/p*100
-    dist20=(p-e20)/e20*100
-    dist50=(p-e50)/e50*100
+    d20=(p-e20)/e20*100
+    d50=(p-e50)/e50*100
 
-    candle_range=h-l
+    rng=h-l
+    if rng<=0:return None
+
     body=abs(p-o)
-
-    if candle_range<=0:
-        return None
-
-    upper_wick=h-max(o,p)
-    lower_wick=min(o,p)-l
-    body_ratio=body/candle_range
-
-    bull_candle=p>o
-    bear_candle=p<o
-
-    upper_rejection=upper_wick/candle_range
-    lower_rejection=lower_wick/candle_range
+    body_ratio=body/rng
+    upper=(h-max(o,p))/rng
+    lower=(min(o,p)-l)/rng
+    bull=p>o
+    bear=p<o
+    vr=v/max(vh,1)
 
     bull_h=e20h>e50h>e100h and ph>e20h
     bear_h=e20h<e50h<e100h and ph<e20h
-
     bull15=e20>e50>e100 and p>e20
     bear15=e20<e50<e100 and p<e20
 
-    if bull_h and bull15:
-        direction="LONG"
-    elif bear_h and bear15:
-        direction="SHORT"
-    else:
-        return None
+    if bull_h and bull15:direction="LONG"
+    elif bear_h and bear15:direction="SHORT"
+    else:return None
 
-    # 기본 시장 품질 필터
-    if adx<22 or adxh<18:
-        return None
+    # 기본 품질
+    if adx<24 or adxh<20:return None
+    if v<100000 or vh<100000:return None
+    if atr_pct<.20 or atr_pct>2.5:return None
 
-    if v<100000 or vh<100000:
-        return None
-
-    if atr_pct<0.20 or atr_pct>2.8:
-        return None
-
-    # 추격 진입 차단
+    # 과열/과매도 추격 차단
     if direction=="LONG":
-        if rsi>=70 or rsih>=73:
-            return None
-        if rsi<=30:
-            return None
-        if dist20>1.35 or dist50>3.0:
-            return None
+        if rsi>=67 or rsih>=68:return None
+        if rsi<=31 or rsih<=34:return None
+        if d20>1.10 or d50>2.8:return None
     else:
-        if rsi<=30 or rsih<=27:
-            return None
-        if rsi>=70:
-            return None
-        if dist20<-1.35 or dist50<-3.0:
-            return None
+        if rsi<=33 or rsih<=32:return None
+        if rsi>=69 or rsih>=68:return None
+        if d20<-1.10 or d50<-2.8:return None
 
     score=0
     reasons=[]
     setup=""
     timing=0
 
-    # ==================================================
-    # 1. 추세 구조 : 25점
-    # ==================================================
+    # 추세 25
     if direction=="LONG":
-        if e20h>e50h>e100h:
-            score+=12
-            reasons.append("1시간 EMA 상승 배열")
+        score+=12
+        reasons.append("1시간 EMA 상승 배열")
         if ph>e20h:
             score+=3
-            reasons.append("1시간 가격이 EMA20 위")
-        if e20>e50>e100:
-            score+=7
-            reasons.append("15분 EMA 상승 배열")
-        if p>e20:
-            score+=3
+            reasons.append("1시간 EMA20 위")
+        score+=7
+        reasons.append("15분 EMA 상승 배열")
+        if p>e20:score+=3
     else:
-        if e20h<e50h<e100h:
-            score+=12
-            reasons.append("1시간 EMA 하락 배열")
+        score+=12
+        reasons.append("1시간 EMA 하락 배열")
         if ph<e20h:
             score+=3
-            reasons.append("1시간 가격이 EMA20 아래")
-        if e20<e50<e100:
-            score+=7
-            reasons.append("15분 EMA 하락 배열")
-        if p<e20:
-            score+=3
+            reasons.append("1시간 EMA20 아래")
+        score+=7
+        reasons.append("15분 EMA 하락 배열")
+        if p<e20:score+=3
 
-    # ==================================================
-    # 2. 실제 진입 위치 : 25점
-    # ==================================================
+    # 진입 위치 25
     if direction=="LONG":
-        # EMA20 근처에서 다시 위로 올라오는 자리
-        if -0.25<=dist20<=0.45:
-            score+=15
+        if -.25<=d20<=.35:
             timing=15
+            score+=15
             setup="EMA20 눌림 후 재상승"
-            reasons.append("EMA20 인근 눌림 진입 위치")
-        elif 0.45<dist20<=0.85:
-            score+=10
-            timing=10
-            setup="추세 재개"
+            reasons.append("EMA20 눌림 구간")
+        elif .35<d20<=.70:
+            timing=12
+            score+=12
+            setup="EMA20 추세 재개"
             reasons.append("EMA20 위 추세 재개")
-        elif -0.45<=dist20<-0.25:
-            score+=8
-            timing=8
-            setup="EMA20 회복 시도"
-            reasons.append("EMA20 회복 구간")
-        else:
-            return None
-
-        # 현재봉 매수 반전 구조
-        if bull_candle and lower_rejection>=0.20 and body_ratio>=0.25:
+        elif -.40<=d20<-.25:
+            timing=10
             score+=10
-            reasons.append("15분봉 하단 매수 반전")
-        elif bull_candle and body_ratio>=0.55:
-            score+=6
-            reasons.append("15분 상승 캔들 확인")
-        elif lower_rejection>=0.28:
-            score+=4
-        else:
-            score-=4
+            setup="EMA20 회복"
+            reasons.append("EMA20 회복 구간")
+        else:return None
 
-        # 너무 강하게 이미 오른 봉은 제외
-        if ch15>1.20:
+        # 반드시 현재봉에서 매수 반전 확인
+        if bull and lower>=.22 and body_ratio>=.28:
+            score+=10
+            reasons.append("하단 매수 반전 확인")
+        elif bull and body_ratio>=.60:
+            score+=7
+            reasons.append("강한 상승 캔들 확인")
+        else:
             return None
+
+        if ch15>1.0:return None
 
     else:
-        # EMA20 근처에서 다시 아래로 내려오는 자리
-        if -0.45<=dist20<=0.25:
-            score+=15
+        if -.35<=d20<=.25:
             timing=15
+            score+=15
             setup="EMA20 반등 후 재하락"
-            reasons.append("EMA20 인근 반등 실패 구간")
-        elif -0.85<=dist20<-0.45:
-            score+=10
-            timing=10
-            setup="추세 재개"
+            reasons.append("EMA20 반등 실패 구간")
+        elif -.70<=d20<-.35:
+            timing=12
+            score+=12
+            setup="EMA20 추세 재개"
             reasons.append("EMA20 아래 추세 재개")
-        elif 0.25<dist20<=0.45:
-            score+=8
-            timing=8
-            setup="EMA20 이탈 시도"
-            reasons.append("EMA20 하향 이탈 구간")
-        else:
-            return None
-
-        # 현재봉 매도 반전 구조
-        if bear_candle and upper_rejection>=0.20 and body_ratio>=0.25:
+        elif .25<d20<=.40:
+            timing=10
             score+=10
-            reasons.append("15분봉 상단 매도 반전")
-        elif bear_candle and body_ratio>=0.55:
-            score+=6
-            reasons.append("15분 하락 캔들 확인")
-        elif upper_rejection>=0.28:
-            score+=4
-        else:
-            score-=4
+            setup="EMA20 이탈"
+            reasons.append("EMA20 하향 이탈 구간")
+        else:return None
 
-        # 이미 급락한 봉 추격 방지
-        if ch15<-1.20:
-            return None
+        # 반드시 현재봉에서 매도 반전 확인
+        if bear and upper>=.22 and body_ratio>=.28:
+            score+=10
+            reasons.append("상단 매도 반전 확인")
+        elif bear and body_ratio>=.60:
+            score+=7
+            reasons.append("강한 하락 캔들 확인")
+        else:return None
 
-    # ==================================================
-    # 3. 모멘텀 : 15점
-    # ==================================================
+        if ch15<-1.0:return None
+
+    # 모멘텀 15
     if direction=="LONG":
-        if 0.05<=ch15<=0.80:
-            score+=6
+        if .03<=ch15<=.70:
+            score+=5
             reasons.append("15분 상승 모멘텀")
-        elif 0<=ch15<0.05:
-            score+=3
+        elif 0<=ch15<.03:score+=2
 
-        if 0.05<=ch60<=1.20:
+        if .03<=ch60<=1.0:
             score+=5
             reasons.append("1시간 상승 모멘텀")
-        elif 0<=ch60<0.05:
-            score+=2
+        elif 0<=ch60<.03:score+=2
 
-        if 0<ch15<ch60+0.8:
-            score+=4
+        if ch15>0:score+=5
     else:
-        if -0.80<=ch15<=-0.05:
-            score+=6
+        if -.70<=ch15<=-.03:
+            score+=5
             reasons.append("15분 하락 모멘텀")
-        elif -0.05<ch15<=0:
-            score+=3
+        elif -.03<ch15<=0:score+=2
 
-        if -1.20<=ch60<=-0.05:
+        if -1.0<=ch60<=-.03:
             score+=5
             reasons.append("1시간 하락 모멘텀")
-        elif -0.05<ch60<=0:
-            score+=2
+        elif -.03<ch60<=0:score+=2
 
-        if ch15<0 and ch15>ch60-0.8:
-            score+=4
+        if ch15<0:score+=5
 
-    # ==================================================
-    # 4. RSI : 10점
-    # ==================================================
+    # RSI 10
     if direction=="LONG":
-        if 45<=rsi<=62:
+        if 43<=rsi<=61:
             score+=6
-            reasons.append("RSI 과열 없는 상승 진입")
-        elif 40<=rsi<45 or 62<rsi<=66:
-            score+=3
+            reasons.append("RSI 과열 없는 진입")
+        elif 38<=rsi<43 or 61<rsi<=64:score+=3
 
-        if 45<=rsih<=65:
-            score+=4
-        elif 40<=rsih<45 or 65<rsih<=68:
-            score+=2
+        if 42<=rsih<=64:score+=4
+        elif 37<=rsih<42 or 64<rsih<=67:score+=2
     else:
-        if 38<=rsi<=55:
+        if 37<=rsi<=55:
             score+=6
-            reasons.append("RSI 과매도 아닌 하락 진입")
-        elif 34<=rsi<38 or 55<rsi<=60:
-            score+=3
+            reasons.append("RSI 과매도 아닌 진입")
+        elif 34<=rsi<37 or 55<rsi<=60:score+=3
 
-        if 30<=rsih<=55:
-            score+=4
-        elif 27<=rsih<30 or 55<rsih<=60:
-            score+=2
+        if 32<=rsih<=55:score+=4
+        elif 32<=rsih<35 or 55<rsih<=60:score+=2
 
-    # ==================================================
-    # 5. 추세 강도 : 10점
-    # ==================================================
+    # 추세 강도 10
     if adx>=32:
         score+=6
-        reasons.append("15분 추세 강도 우수")
-    elif adx>=26:
-        score+=4
-    else:
-        score+=2
+        reasons.append("15분 추세 강도 강함")
+    elif adx>=27:score+=4
+    else:score+=2
 
     if adxh>=30:
         score+=4
-        reasons.append("1시간 추세 강도 우수")
-    elif adxh>=22:
-        score+=2
+        reasons.append("1시간 추세 강도 강함")
+    elif adxh>=23:score+=2
 
-    # ==================================================
-    # 6. 거래량 : 10점
-    # ==================================================
-    volume_ratio=v/max(vh,1)
-
-    if volume_ratio>=1.50:
+    # 거래량 10
+    if vr>=1.50:
         score+=10
-        reasons.append("15분 거래량 급증")
-    elif volume_ratio>=1.15:
+        reasons.append("거래량 급증")
+    elif vr>=1.15:
         score+=7
-        reasons.append("15분 거래량 증가")
-    elif volume_ratio>=0.85:
+        reasons.append("거래량 증가")
+    elif vr>=.90:
         score+=4
     else:
-        score+=1
+        return None
 
-    # ==================================================
-    # 7. 리스크 : 5점
-    # ==================================================
-    if 0.35<=atr_pct<=1.50:
-        score+=5
-    elif 0.20<=atr_pct<0.35 or 1.50<atr_pct<=2.20:
-        score+=3
-    else:
-        score+=1
+    # 변동성 5
+    if .35<=atr_pct<=1.50:score+=5
+    elif .20<=atr_pct<=2.0:score+=3
+    else:score+=1
 
-    # 100점 고정 구조
     score=max(0,min(100,int(score)))
 
-    # 실제 진입 타이밍이 약하면 무조건 제외
-    if timing<10:
-        return None
+    # 진입 타이밍 최소조건
+    if timing<12:return None
+    if score<MIN_SCORE:return None
 
-    # 최소 점수
-    if score<MIN_SCORE:
-        return None
-
-    # 강한 추세라도 RSI가 이미 끝까지 간 경우 점수 제한
+    # 과도하게 진행된 추세는 강제 감점
     if direction=="LONG":
-        if rsih>67:
-            score=min(score,86)
-        if dist20>0.90:
-            score=min(score,87)
+        if rsih>64:score=min(score,88)
+        if d20>.75:score=min(score,87)
     else:
-        if rsih<32:
-            score=min(score,86)
-        if dist20<-0.90:
-            score=min(score,87)
+        if rsih<35:score=min(score,88)
+        if d20<-.75:score=min(score,87)
 
-    # 실제 리스크
-    risk=max(atr*1.15,p*0.0055)
+    # 리스크
+    risk=max(atr*1.15,p*.0055)
     risk_pct=risk/p*100
-
-    if risk_pct>2.8:
-        return None
+    if risk_pct>2.7:return None
 
     if direction=="LONG":
         sl=p-risk
@@ -446,25 +326,21 @@ def analyze(row):
         tp1=p-risk*1.5
         tp2=p-risk*2.5
 
-    if atr_pct>=2.0:
-        lev=3
-    elif atr_pct>=1.50:
-        lev=5
-    elif atr_pct>=0.90:
-        lev=7
-    else:
-        lev=8
+    if atr_pct>=2:lev=3
+    elif atr_pct>=1.5:lev=5
+    elif atr_pct>=.9:lev=7
+    else:lev=8
 
     strong=(
         score>=STRONG_SCORE and
         timing>=15 and
         adx>=28 and
         adxh>=22 and
-        volume_ratio>=0.85
+        vr>=.90
     )
 
     return {
-        "symbol":symbol(row),
+        "symbol":symbol(r),
         "direction":direction,
         "score":score,
         "strong":strong,
@@ -478,9 +354,8 @@ def analyze(row):
         "adxh":adxh,
         "ch15":ch15,
         "ch60":ch60,
-        "atr":atr,
         "atr_pct":atr_pct,
-        "volume_ratio":volume_ratio,
+        "vr":vr,
         "lev":lev,
         "setup":setup,
         "reasons":reasons
@@ -488,7 +363,7 @@ def analyze(row):
 
 def signal_msg(s):
     icon="🟢" if s["direction"]=="LONG" else "🔴"
-    title="🔥 STRONG ENTRY" if s["strong"] else "⚡ ENTRY SIGNAL"
+    title="🔥 A+ STRONG ENTRY" if s["strong"] else "⚡ A ENTRY"
 
     seen=set()
     rr=[]
@@ -496,8 +371,6 @@ def signal_msg(s):
         if x not in seen:
             rr.append(x)
             seen.add(x)
-
-    reason_text="\n".join(f"• {x}" for x in rr[:7])
 
     return (
         f"{icon} {title}\n\n"
@@ -520,9 +393,9 @@ def signal_msg(s):
         f"├ 15M : {s['ch15']:+.2f}%\n"
         f"├ 1H : {s['ch60']:+.2f}%\n"
         f"└ ATR : {s['atr_pct']:.2f}%\n\n"
-        "🧠 WHY NOW?\n"
-        f"{reason_text}\n\n"
-        "⚙️ RISK\n"
+        "🧠 WHY NOW?\n"+
+        "\n".join(f"• {x}" for x in rr[:7])+
+        "\n\n⚙️ RISK\n"
         f"├ Leverage : {s['lev']}x\n"
         "├ TP1 → SL = ENTRY\n"
         "└ TP2 → TRACKING END\n\n"
@@ -532,7 +405,7 @@ def signal_msg(s):
 
 def position_msg(p,kind):
     sym=p.get("symbol","UNKNOWN")
-    direction=p.get("direction","LONG")
+    d=p.get("direction","LONG")
     entry=p.get("entry",0)
     sl=p.get("sl",0)
     tp1=p.get("tp1",0)
@@ -541,38 +414,31 @@ def position_msg(p,kind):
     if kind=="TP1":
         return (
             "🎯 TP1 HIT\n\n"
-            "━━━━━━━━━━━━━━━━━━━━\n"
             f"🪙 #{sym}\n"
-            f"📌 {'LONG 🟢' if direction=='LONG' else 'SHORT 🔴'}\n"
+            f"📌 {'LONG 🟢' if d=='LONG' else 'SHORT 🔴'}\n"
             f"💰 Entry : {fmt(entry)}\n"
             f"🎯 TP1 : {fmt(tp1)}\n\n"
             "🔒 SL → ENTRY\n"
-            "원금 방어 모드로 전환합니다.\n"
-            "━━━━━━━━━━━━━━━━━━━━"
+            "원금 방어 모드로 전환합니다."
         )
 
     if kind=="TP2":
         return (
             "🎯 TP2 HIT\n\n"
-            "━━━━━━━━━━━━━━━━━━━━\n"
             f"🪙 #{sym}\n"
-            f"📌 {'LONG 🟢' if direction=='LONG' else 'SHORT 🔴'}\n"
-            f"💰 Entry : {fmt(entry)}\n"
+            f"📌 {'LONG 🟢' if d=='LONG' else 'SHORT 🔴'}\n"
             f"🎯 TP2 : {fmt(tp2)}\n\n"
             "✅ 목표 구간 도달\n"
-            "포지션 추적 종료.\n"
-            "━━━━━━━━━━━━━━━━━━━━"
+            "포지션 추적 종료."
         )
 
     return (
         "🛑 STOP LOSS\n\n"
-        "━━━━━━━━━━━━━━━━━━━━\n"
         f"🪙 #{sym}\n"
-        f"📌 {'LONG 🟢' if direction=='LONG' else 'SHORT 🔴'}\n"
+        f"📌 {'LONG 🟢' if d=='LONG' else 'SHORT 🔴'}\n"
         f"💰 Entry : {fmt(entry)}\n"
         f"🛑 SL : {fmt(sl)}\n\n"
-        "포지션 추적 종료.\n"
-        "━━━━━━━━━━━━━━━━━━━━"
+        "포지션 추적 종료."
     )
 
 def check_positions(state,rs):
@@ -587,59 +453,50 @@ def check_positions(state,rs):
         p.setdefault("symbol",sym)
         p.setdefault("tp1_hit",False)
 
-        required=("direction","entry","sl","tp1","tp2")
-        if any(k not in p for k in required):
+        if any(k not in p for k in ("direction","entry","sl","tp1","tp2")):
             print("INVALID POSITION:",sym)
             remove.append(sym)
             continue
 
         r=by.get(sym)
-        if not r:
-            continue
+        if not r:continue
 
         price=val(r,3)
-        direction=p["direction"]
+        d=p["direction"]
 
-        if direction=="LONG":
+        if d=="LONG":
             if price>=p["tp2"]:
                 tg(position_msg(p,"TP2"))
                 remove.append(sym)
                 continue
-
             if price<=p["sl"]:
                 tg(position_msg(p,"SL"))
                 remove.append(sym)
                 continue
-
-            if not p.get("tp1_hit") and price>=p["tp1"]:
+            if not p["tp1_hit"] and price>=p["tp1"]:
                 p["tp1_hit"]=True
                 p["sl"]=p["entry"]
                 tg(position_msg(p,"TP1"))
-                time.sleep(.5)
-
         else:
             if price<=p["tp2"]:
                 tg(position_msg(p,"TP2"))
                 remove.append(sym)
                 continue
-
             if price>=p["sl"]:
                 tg(position_msg(p,"SL"))
                 remove.append(sym)
                 continue
-
-            if not p.get("tp1_hit") and price<=p["tp1"]:
+            if not p["tp1_hit"] and price<=p["tp1"]:
                 p["tp1_hit"]=True
                 p["sl"]=p["entry"]
                 tg(position_msg(p,"TP1"))
-                time.sleep(.5)
 
-    for sym in remove:
-        state["positions"].pop(sym,None)
+    for x in remove:
+        state["positions"].pop(x,None)
 
 def main():
     print("====================================")
-    print(" BTCC REAL FUTURES PRECISION BOT")
+    print(" BTCC REAL FUTURES A+ ENTRY BOT")
     print("====================================")
     print("KST:",now().isoformat())
 
@@ -651,16 +508,13 @@ def main():
     print("BTCC REAL ROWS:",len(rs))
 
     if not rs:
-        tg(
-            "⚠️ BTCC DATA ERROR\n\n"
-            "BTCC TradingView 데이터 조회 실패"
-        )
+        tg("⚠️ BTCC DATA ERROR\n\nBTCC TradingView 데이터 조회 실패")
         return
 
     state=load()
     check_positions(state,rs)
 
-    trend_candidates=0
+    trend=0
     qualified=[]
     rejected=0
 
@@ -678,58 +532,42 @@ def main():
             bull=e20h>e50h>e100h and ph>e20h and e20>e50>e100 and p>e20
             bear=e20h<e50h<e100h and ph<e20h and e20<e50<e100 and p<e20
 
-            if bull or bear:
-                trend_candidates+=1
+            if bull or bear:trend+=1
 
             s=analyze(r)
-
-            if s:
-                qualified.append(s)
-            else:
-                rejected+=1
-
+            if s:qualified.append(s)
+            else:rejected+=1
         except Exception as e:
             print("ANALYZE ERROR:",e)
 
-    # 점수뿐 아니라 실제 진입 타이밍과 거래량을 우선
     qualified.sort(
-        key=lambda x:(
-            x["strong"],
-            x["score"],
-            x["volume_ratio"],
-            x["adx"],
-            x["timing"] if "timing" in x else 0
-        ),
+        key=lambda x:(x["strong"],x["score"],x["vr"],x["adx"]),
         reverse=True
     )
 
-    print("TREND CANDIDATES:",trend_candidates)
-    print("ENTRY QUALIFIED:",len(qualified))
+    print("TREND CANDIDATES:",trend)
+    print("A ENTRY QUALIFIED:",len(qualified))
     print("REJECTED:",rejected)
     print("ACTIVE:",len(state["positions"]))
 
     sent=0
-    now_ts=time.time()
+    ts=time.time()
 
     for s in qualified:
-        if sent>=MAX_ALERTS:
-            break
+        if sent>=MAX_ALERTS:break
 
         sym=s["symbol"]
 
-        if sym in state["positions"]:
-            continue
+        if sym in state["positions"]:continue
 
         key=f"{sym}:{s['direction']}"
         last=float(state["signals"].get(key,0) or 0)
 
-        if now_ts-last<COOLDOWN*60:
-            continue
+        if ts-last<COOLDOWN*60:continue
 
-        if not tg(signal_msg(s)):
-            continue
+        if not tg(signal_msg(s)):continue
 
-        state["signals"][key]=now_ts
+        state["signals"][key]=ts
 
         state["positions"][sym]={
             "symbol":sym,
@@ -745,7 +583,7 @@ def main():
 
         save(state)
         sent+=1
-        time.sleep(.8)
+        time.sleep(.7)
 
     save(state)
 
