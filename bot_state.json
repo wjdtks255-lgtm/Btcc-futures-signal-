@@ -36,18 +36,6 @@
       "quality": "A+",
       "entry_time": "2026-10-07T17:56:55.882573+09:00"
     },
-    "FOLKSUSDT": {
-      "symbol": "FOLKSUSDT",
-      "direction": "SHORT",
-      "entry": 2.356,
-      "sl": 2.356,
-      "tp1": 2.307303661674089,
-      "tp2": 2.2748394361234814,
-      "tp1_hit": true,
-      "score": 95,
-      "quality": "A+",
-      "entry_time": "2026-10-07T17:56:57.085425+09:00"
-    },
     "HEMIUSDT": {
       "symbol": "HEMIUSDT",
       "direction": "SHORT",
@@ -112,10 +100,10 @@
       "symbol": "METISUSDT",
       "direction": "SHORT",
       "entry": 3.234,
-      "sl": 3.2608028783993293,
+      "sl": 3.234,
       "tp1": 3.193795682401006,
       "tp2": 3.166992804001677,
-      "tp1_hit": false,
+      "tp1_hit": true,
       "score": 90,
       "quality": "A",
       "entry_time": "2026-10-07T22:08:19.979987+09:00"
