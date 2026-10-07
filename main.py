@@ -6,7 +6,7 @@ import pandas as pd
 import ta
 
 # ==========================================
-# 텔레그램 인증 및 설정
+# 텔레그램 인증 및 기본 설정
 # ==========================================
 TELEGRAM_BOT_TOKEN = "8913250892:AAEQxGKfFC1ru9oJyacy6cdUllER2K0UbiY"
 TELEGRAM_CHAT_ID = "-1004443428081"
@@ -14,12 +14,17 @@ TELEGRAM_CHAT_ID = "-1004443428081"
 STATE_FILE = "bot_state.json"
 MAX_POSITIONS = 15
 
-# True 설정 시 기존 포지션 내역을 초기화하고 다시 스캔합니다.
+# 테스트 시 True로 변경하면 이전 포지션 기록을 초기화하여 시그널을 다시 수신할 수 있습니다.
 FORCE_RESET_STATE = False
+
+HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+    "Accept": "application/json"
+}
 
 def send_telegram_message(message):
     if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
-        print("❌ 텔레그램 토큰 또는 Chat ID가 설정되지 않았습니다.")
+        print("❌ 텔레그램 토큰 또는 Chat ID 설정 누락")
         return False
 
     url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
@@ -29,15 +34,10 @@ def send_telegram_message(message):
         "parse_mode": "Markdown"
     }
     try:
-        response = requests.post(url, json=payload, timeout=10)
-        if response.status_code == 200:
-            print("📱 텔레그램 메시지 전송 성공!")
-            return True
-        else:
-            print(f"❌ 텔레그램 전송 실패 ({response.status_code}): {response.text}")
-            return False
+        res = requests.post(url, json=payload, timeout=10)
+        return res.status_code == 200
     except Exception as e:
-        print(f"❌ 텔레그램 전송 중 예외 발생: {e}")
+        print(f"❌ 텔레그램 전송 실패: {e}")
         return False
 
 def format_price(price):
@@ -61,24 +61,22 @@ def load_state():
                 if isinstance(data, dict) and "active_positions" in data:
                     return data
         except Exception as e:
-            print(f"⚠️ 상태 로드 중 에러: {e}")
+            print(f"⚠️ 상태 로드 에러: {e}")
     return {"active_positions": []}
 
 def save_state(state):
     try:
         with open(STATE_FILE, "w", encoding="utf-8") as f:
             json.dump(state, f, ensure_ascii=False, indent=4)
-        print("💾 bot_state.json 업데이트 완료")
+        print("💾 bot_state.json 저장 완료")
     except Exception as e:
-        print(f"⚠️ 상태 저장 중 에러: {e}")
+        print(f"⚠️ 상태 저장 에러: {e}")
 
-def get_all_futures_symbols():
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-    }
+# 바이낸스 선물 시장 전체 종목 수집
+def get_binance_futures_symbols():
     url = "https://fapi.binance.com/fapi/v1/exchangeInfo"
     try:
-        res = requests.get(url, headers=headers, timeout=10)
+        res = requests.get(url, headers=HEADERS, timeout=8)
         if res.status_code == 200:
             data = res.json()
             symbols = [
@@ -86,31 +84,28 @@ def get_all_futures_symbols():
                 if s["quoteAsset"] == "USDT" and s["status"] == "TRADING" and s["contractType"] == "PERPETUAL"
             ]
             if len(symbols) > 50:
-                print(f"📊 바이낸스 API 성공: 총 {len(symbols)}개 종목 자동 수집 완료")
+                print(f"📊 바이낸스 선물전종목 수집 성공: 총 {len(symbols)}개")
                 return sorted(symbols)
     except Exception as e:
-        print(f"⚠️ 종목 목록 API 수집 실패 ({e}), 백업 종목 리스트 사용")
+        print(f"⚠️ 바이낸스 종목 수집 실패 ({e}), 주요 종목 백업 리스트 사용")
 
-    fallback_symbols = [
-        "1000BONKUSDT", "1000CATUSDT", "1000FLOKIUSDT", "1000PEPEUSDT", "1000SHIBUSDT", "AAVEUSDT", "ADAUSDT",
-        "ALGOUSDT", "APTUSDT", "ARBUSDT", "ATOMUSDT", "AVAXUSDT", "BCHUSDT", "BNBUSDT", "BTCUSDT", "DOGEUSDT",
-        "DOTUSDT", "ENAUSDT", "EOSUSDT", "ETCUSDT", "ETHUSDT", "FETUSDT", "FILUSDT", "GALAUSDT", "INJUSDT",
-        "LINKUSDT", "LTCUSDT", "NEARUSDT", "OPUSDT", "ORDIUSDT", "PEOPLEUSDT", "RENDERUSDT", "SEIUSDT",
-        "SOLUSDT", "SUIUSDT", "TIAUSDT", "TONUSDT", "TRXUSDT", "UNIUSDT", "WLDUSDT", "XRPUSDT"
+    return [
+        "BTCUSDT", "ETHUSDT", "SOLUSDT", "XRPUSDT", "DOGEUSDT", "AVAXUSDT", 
+        "ADAUSDT", "SUIUSDT", "APTUSDT", "NEARUSDT", "LINKUSDT", "BCHUSDT", 
+        "BNBUSDT", "DOTUSDT", "FETUSDT", "FILUSDT", "GALAUSDT", "INJUSDT", 
+        "LTCUSDT", "OPUSDT", "ORDIUSDT", "SEIUSDT", "TIAUSDT", "TONUSDT", "UNIUSDT"
     ]
-    return sorted(list(set(fallback_symbols)))
 
-def fetch_market_data(symbol, interval="15m", limit=100):
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-    }
+# 캔들 데이터 수집 (1차: 바이낸스, 실패 시 2차: 업비트 백업)
+def fetch_candles(symbol, interval="15m", limit=100):
+    # 1. 바이낸스 API 시도
     try:
         url = f"https://fapi.binance.com/fapi/v1/klines?symbol={symbol}&interval={interval}&limit={limit}"
-        res = requests.get(url, headers=headers, timeout=5)
+        res = requests.get(url, headers=HEADERS, timeout=5)
         if res.status_code == 200:
-            candles = res.json()
-            if candles and isinstance(candles, list):
-                df = pd.DataFrame(candles, columns=[
+            data = res.json()
+            if isinstance(data, list) and len(data) > 0:
+                df = pd.DataFrame(data, columns=[
                     'timestamp', 'open', 'high', 'low', 'close', 'volume',
                     'close_time', 'qav', 'num_trades', 'taker_base_vol', 'taker_quote_vol', 'ignore'
                 ])
@@ -119,54 +114,76 @@ def fetch_market_data(symbol, interval="15m", limit=100):
                 return df
     except Exception:
         pass
+
+    # 2. 업비트 API 백업 시도
+    try:
+        base_ticker = symbol.replace("USDT", "")
+        if base_ticker.startswith("1000"):
+            base_ticker = base_ticker.replace("1000", "")
+        
+        upbit_market = f"KRW-{base_ticker}"
+        url = f"https://api.upbit.com/v1/candles/minutes/15?market={upbit_market}&count={limit}"
+        res = requests.get(url, headers=HEADERS, timeout=5)
+        if res.status_code == 200:
+            data = res.json()
+            if isinstance(data, list) and len(data) > 0:
+                df = pd.DataFrame(data)
+                df = df.rename(columns={
+                    'trade_price': 'close',
+                    'high_price': 'high',
+                    'low_price': 'low',
+                    'opening_price': 'open',
+                    'candle_acc_trade_volume': 'volume'
+                })
+                df = df.iloc[::-1].reset_index(drop=True)
+                for col in ['close', 'high', 'low', 'open', 'volume']:
+                    df[col] = df[col].astype(float)
+                return df
+    except Exception:
+        pass
+
     return pd.DataFrame()
 
-def calculate_recommended_leverage(df):
+# ATR 기반 동적 레버리지 산출
+def calculate_leverage(df):
     try:
         atr = ta.volatility.average_true_range(df['high'], df['low'], df['close'], window=14).iloc[-1]
-        latest_price = df.iloc[-1]['close']
-        volatility_pct = (atr / latest_price) * 100
+        price = df.iloc[-1]['close']
+        vol_pct = (atr / price) * 100
 
-        if volatility_pct >= 2.5:
-            rec_lev = 3
-            risk_level = "⚡ 초고변동성 (주의)"
-        elif volatility_pct >= 1.5:
-            rec_lev = 5
-            risk_level = "⚖️ 보통 변동성"
-        elif volatility_pct >= 0.8:
-            rec_lev = 10
-            risk_level = "🟢 저변동성 (안정)"
+        if vol_pct >= 2.5:
+            return 3, "⚡ 초고변동성 (주의)"
+        elif vol_pct >= 1.5:
+            return 5, "⚖️ 보통 변동성"
+        elif vol_pct >= 0.8:
+            return 10, "🟢 저변동성 (안정)"
         else:
-            rec_lev = 15
-            risk_level = "🛡 극저변동성 (매우 안정)"
-
-        return rec_lev, risk_level
+            return 15, "🛡 극저변동성 (매우 안정)"
     except Exception:
         return 5, "⚖️ 보통 변동성"
 
 def main():
-    print("🚀 스캐너 실행 확인 및 텔레그램 테스트 메시지 발송 시작...")
-    send_telegram_message("🔔 **[BTCC 퀀트] 스캐너 정상 작동 중**\n전체 코인 스캔을 시작합니다.")
+    print("🚀 스캐너 실행 확인 및 테스트 메시지 전송...")
+    send_telegram_message("🔔 **BTCC 퀀트 스캐너 정상 작동 중**\n전체 코인 스캔을 시작합니다.")
 
-    all_symbols = get_all_futures_symbols()
     state = load_state()
     active_positions = state.get("active_positions", [])
-
-    current_count = len(active_positions)
-    print(f"🔎 선물 시장 전 코인 총 {len(all_symbols)}개 전수 스캔 시작... (현재 {current_count}/{MAX_POSITIONS} 사용 중)")
     active_symbols = [p["symbol"] for p in active_positions]
+
+    symbols = get_binance_futures_symbols()
+    print(f"🔎 선물 시장 전 코인 스캔 시작... (현재 활성 포지션: {len(active_positions)}/{MAX_POSITIONS})")
 
     detected_signals = 0
 
-    for symbol in all_symbols:
+    for symbol in symbols:
         if symbol in active_symbols:
             continue
 
-        df = fetch_market_data(symbol)
-        if df.empty or len(df) < 60:
+        df = fetch_candles(symbol)
+        if df.empty or len(df) < 50:
             continue
 
-        # 지표 산출 (EMA 50, RSI 14)
+        # 기술적 지표 계산 (EMA 50, RSI 14)
         df['ema50'] = ta.trend.ema_indicator(df['close'], window=50)
         df['rsi'] = ta.momentum.rsi(df['close'], window=14)
 
@@ -180,11 +197,9 @@ def main():
         signal_type = None
         strategy_name = ""
 
-        # ---------------------------------------------------------
-        # 📈 매매 전략 조건
-        # 1) LONG : 가격이 EMA 50 위에 위치 + RSI 35 이하에서 반등 상승 전환 시
-        # 2) SHORT: 가격이 EMA 50 아래에 위치 + RSI 65 이상에서 꺾이는 하락 전환 시
-        # ---------------------------------------------------------
+        # 매매 조건
+        # LONG: 가격 > EMA50 AND 이전 RSI <= 35 AND RSI 반등
+        # SHORT: 가격 < EMA50 AND 이전 RSI >= 65 AND RSI 꺾임
         if entry_price > ema_val and prev['rsi'] <= 35 and rsi_val > prev['rsi']:
             signal_type = "LONG"
             strategy_name = "EMA50 지지 + RSI 과매도 반등"
@@ -192,29 +207,28 @@ def main():
             signal_type = "SHORT"
             strategy_name = "EMA50 저항 + RSI 과매수 이탈"
 
-        # 시그널 발생 처리
         if signal_type:
             detected_signals += 1
-            rec_lev, risk_level = calculate_recommended_leverage(df)
+            rec_lev, risk_level = calculate_leverage(df)
 
             if signal_type == "LONG":
                 tp1 = entry_price * 1.015
                 tp2 = entry_price * 1.030
                 sl = entry_price * 0.985
-                side_header = f"🟢 **[시그널] LONG 진입 포지션**"
+                header = "🟢 **[시그널] LONG 진입 포지션**"
             else:
                 tp1 = entry_price * 0.985
                 tp2 = entry_price * 0.970
                 sl = entry_price * 1.015
-                side_header = f"🔴 **[시그널] SHORT 진입 포지션**"
+                header = "🔴 **[시그널] SHORT 진입 포지션**"
 
             tp1_roe = 1.50 * rec_lev
             tp2_roe = 3.00 * rec_lev
             sl_roe = 1.50 * rec_lev
 
-            current_count += 1
-            message = (
-                f"{side_header}\n"
+            current_count = len(state["active_positions"]) + 1
+            msg = (
+                f"{header}\n"
                 f"──────────────────────\n"
                 f"• **거래소**: BTCC 선물\n"
                 f"• **종목**: #{symbol}\n"
@@ -233,11 +247,11 @@ def main():
                 f"• **2차 목표가 (전량 익절)**: `${format_price(tp2)}` (`+{tp2_roe:.1f}%` ROE)\n"
                 f"• **손절가 (손절)**: `${format_price(sl)}` (`-{sl_roe:.1f}%` ROE)\n"
                 f"──────────────────────\n"
-                f"📌 *멀티 관리 모드: 현재 {current_count}/{MAX_POSITIONS}개 포지션 트래킹 중*"
+                f"📌 *포지션 트래킹 중 ({current_count}/{MAX_POSITIONS})*"
             )
-            
-            print(f"🎯 시그널 포착! #{symbol} ({signal_type}) - 텔레그램 전송 중...")
-            send_telegram_message(message)
+
+            print(f"🎯 시그널 포착! #{symbol} ({signal_type}) -> 전송")
+            send_telegram_message(msg)
 
             new_position = {
                 "symbol": symbol,
@@ -252,6 +266,8 @@ def main():
             state["active_positions"].append(new_position)
             active_symbols.append(symbol)
             save_state(state)
+            
+            time.sleep(1)
 
     print(f"✅ BTCC 전종목 스캔 완료 (포착된 시그널: {detected_signals}개 / 현재 보유 포지션: {len(state['active_positions'])}/{MAX_POSITIONS})")
 
