@@ -91,7 +91,7 @@ def tg(msg, label="MSG"):
         "disable_web_page_preview": True,
         "disable_notification": False,
     }
-    for n in range(2):
+    for n in range(3):
         try:
             r = requests.post(url, json=data, timeout=20)
             j = r.json() if r.status_code == 200 else {}
@@ -100,11 +100,18 @@ def tg(msg, label="MSG"):
                 f"message_id={j.get('result', {}).get('message_id')} desc={j.get('description', '')}"
             )
             if r.status_code == 200 and j.get("ok") is True:
+                # 텔레그램 API 제한(초당 전송 제한) 방지를 위한 안전 간격
+                time.sleep(1.2)
                 return True
+            # Rate Limit(429) 걸린 경우 대기 후 재시도
+            if r.status_code == 429:
+                retry_after = int(r.headers.get("Retry-After", 3))
+                print(f"Rate limited. Waiting {retry_after}s...")
+                time.sleep(retry_after)
         except Exception as e:
             print("TG ERROR:", e)
-        if n == 0:
-            time.sleep(1)
+        if n < 2:
+            time.sleep(1.5)
     return False
 
 
@@ -147,9 +154,7 @@ def fmt(x):
     return f"{x:.8f}".rstrip("0").rstrip(".")
 
 
-# --- [시계열 K라인 수집: 바이낸스 Public API 참조 & 예외 매핑] ---
 def fetch_klines(sym, limit=12):
-    """BTCC 상장 종목을 바이낸스 Public REST API로 참조하여 15분봉 시계열을 수집합니다."""
     try:
         clean_sym = sym.upper().replace(".P", "")
         clean_sym = SYMBOL_MAP.get(clean_sym, clean_sym)
@@ -179,9 +184,7 @@ def fetch_klines(sym, limit=12):
 
 
 def verify_candle_structure(sym, direction, current_p):
-    """시계열 캔들 구조 기반 2차 파동 검증"""
     klines = fetch_klines(sym, limit=12)
-
     if len(klines) < 8:
         return True, "KLINE_FETCH_SKIP"
 
@@ -201,18 +204,15 @@ def verify_candle_structure(sym, direction, current_p):
             curr["close"] > curr["open"]
             and curr["close"] > history[-1]["close"]
         )
-
         if not has_pullback:
             return False, "NO_PULLBACK_WAVE"
         if not is_rebound:
             return False, "NO_REBOUND_TRIGGER"
-
-    else:  # SHORT
+    else:
         has_bounce = any(k["close"] > k["open"] for k in history[-6:-1])
         is_breakdown = (
             curr["close"] < curr["open"] and curr["close"] < history[-1]["low"]
         )
-
         if not has_bounce:
             return False, "NO_BOUNCE_WAVE"
         if not is_breakdown:
@@ -240,7 +240,6 @@ def analyze(r, st):
     if atrp < 0.18 or atrph < 0.15:
         st["dead"] += 1
         return
-
     if atrp > 3.5 or atrph > 4.5:
         st["volatile"] += 1
         return
@@ -532,14 +531,6 @@ def main():
     print("QUALIFIED:", len(candidates))
     print("FILTER STATS:", st)
 
-    for i, s in enumerate(candidates[:10], 1):
-        print(
-            f"#{i} {s['symbol']} {s['direction']} "
-            f"{s['quality']} SCORE={s['score']} "
-            f"T={s['timing']} L={s['location']} "
-            f"ATR={s['atrp']:.2f}%"
-        )
-
     sent = 0
     t = time.time()
 
@@ -577,7 +568,6 @@ def main():
         save(state)
         sent += 1
         print("SIGNAL SENT:", key, s["quality"], s["score"])
-        time.sleep(0.7)
 
     save(state)
     print("FINAL SIGNALS:", sent)
