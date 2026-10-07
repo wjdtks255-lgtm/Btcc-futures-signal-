@@ -7,7 +7,8 @@
       "tp1": 0.0067561712721476395,
       "tp2": 0.006849618786912732,
       "tp1_hit": false,
-      "created": "2026-10-07T16:37:19.520030+09:00"
+      "created": "2026-10-07T16:37:19.520030+09:00",
+      "symbol": "PUMPUSDT"
     },
     "SOPHUSDT": {
       "direction": "SHORT",
@@ -16,7 +17,8 @@
       "tp1": 0.003642756,
       "tp2": 0.00361326,
       "tp1_hit": false,
-      "created": "2026-10-07T16:37:19.520257+09:00"
+      "created": "2026-10-07T16:37:19.520257+09:00",
+      "symbol": "SOPHUSDT"
     },
     "STXUSDT": {
       "direction": "LONG",
@@ -25,7 +27,8 @@
       "tp1": 0.4091354046531328,
       "tp2": 0.414825674421888,
       "tp1_hit": false,
-      "created": "2026-10-07T16:37:19.520825+09:00"
+      "created": "2026-10-07T16:37:19.520825+09:00",
+      "symbol": "STXUSDT"
     },
     "JUPUSDT": {
       "direction": "SHORT",
@@ -34,7 +37,8 @@
       "tp1": 0.32821209631461795,
       "tp2": 0.32515349385769665,
       "tp1_hit": false,
-      "created": "2026-10-07T16:37:19.520951+09:00"
+      "created": "2026-10-07T16:37:19.520951+09:00",
+      "symbol": "JUPUSDT"
     },
     "OUSDT": {
       "direction": "SHORT",
@@ -43,7 +47,8 @@
       "tp1": 0.4749316,
       "tp2": 0.471086,
       "tp1_hit": false,
-      "created": "2026-10-07T16:37:19.521287+09:00"
+      "created": "2026-10-07T16:37:19.521287+09:00",
+      "symbol": "OUSDT"
     },
     "MEMEUSDT": {
       "direction": "SHORT",
@@ -52,7 +57,8 @@
       "tp1": 0.0005760241789830163,
       "tp2": 0.000571906964971694,
       "tp1_hit": false,
-      "created": "2026-10-07T16:42:33.080886+09:00"
+      "created": "2026-10-07T16:42:33.080886+09:00",
+      "symbol": "MEMEUSDT"
     },
     "FOGOUSDT": {
       "direction": "SHORT",
@@ -61,7 +67,8 @@
       "tp1": 0.005082192203123798,
       "tp2": 0.005023653671872997,
       "tp1_hit": false,
-      "created": "2026-10-07T16:42:33.081348+09:00"
+      "created": "2026-10-07T16:42:33.081348+09:00",
+      "symbol": "FOGOUSDT"
     },
     "BTWUSDT": {
       "direction": "LONG",
@@ -70,7 +77,8 @@
       "tp1": 1.2698689855576393,
       "tp2": 1.2835216425960654,
       "tp1_hit": false,
-      "created": "2026-10-07T16:42:33.081444+09:00"
+      "created": "2026-10-07T16:42:33.081444+09:00",
+      "symbol": "BTWUSDT"
     },
     "AVNTUSDT": {
       "direction": "SHORT",
@@ -79,7 +87,8 @@
       "tp1": 0.1226832567476871,
       "tp2": 0.12172542791281184,
       "tp1_hit": false,
-      "created": "2026-10-07T16:42:33.081629+09:00"
+      "created": "2026-10-07T16:42:33.081629+09:00",
+      "symbol": "AVNTUSDT"
     },
     "PYTHUSDT": {
       "direction": "SHORT",
@@ -88,7 +97,8 @@
       "tp1": 0.07178760000292977,
       "tp2": 0.07122600000488295,
       "tp1_hit": false,
-      "created": "2026-10-07T16:42:33.081940+09:00"
+      "created": "2026-10-07T16:42:33.081940+09:00",
+      "symbol": "PYTHUSDT"
     },
     "MONUSDT": {
       "symbol": "MONUSDT",
@@ -155,6 +165,39 @@
       "tp1_hit": false,
       "score": 100,
       "entry_time": "2026-10-07T17:03:07.813983+09:00"
+    },
+    "JASMYUSDT": {
+      "symbol": "JASMYUSDT",
+      "direction": "SHORT",
+      "entry": 0.004954,
+      "sl": 0.004985440291877989,
+      "tp1": 0.004906839562183017,
+      "tp2": 0.004875399270305027,
+      "tp1_hit": false,
+      "score": 100,
+      "entry_time": "2026-10-07T17:07:53.973113+09:00"
+    },
+    "PIPPINUSDT": {
+      "symbol": "PIPPINUSDT",
+      "direction": "SHORT",
+      "entry": 0.017737,
+      "sl": 0.017843421999999998,
+      "tp1": 0.017577367,
+      "tp2": 0.017470944999999998,
+      "tp1_hit": false,
+      "score": 100,
+      "entry_time": "2026-10-07T17:07:55.290580+09:00"
+    },
+    "HOMEUSDT": {
+      "symbol": "HOMEUSDT",
+      "direction": "SHORT",
+      "entry": 0.005642,
+      "sl": 0.005679582912412456,
+      "tp1": 0.005585625631381317,
+      "tp2": 0.005548042718968861,
+      "tp1_hit": false,
+      "score": 100,
+      "entry_time": "2026-10-07T17:07:56.641994+09:00"
     }
   },
   "signals": {
@@ -173,6 +216,9 @@
     "XRPUSDT:SHORT": 1791359510.753104,
     "ENJUSDT:SHORT": 1791360184.5480165,
     "CRVUSDT:SHORT": 1791360184.5480165,
-    "RAVEUSDT:SHORT": 1791360184.5480165
+    "RAVEUSDT:SHORT": 1791360184.5480165,
+    "JASMYUSDT:SHORT": 1791360473.4529753,
+    "PIPPINUSDT:SHORT": 1791360473.4529753,
+    "HOMEUSDT:SHORT": 1791360473.4529753
   }
 }
