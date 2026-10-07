@@ -26,23 +26,32 @@ jobs:
           python-version: "3.11"
           cache: pip
 
-      - name: Install
-        run: pip install -r requirements.txt
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+
+      - name: Verify files
+        run: |
+          echo "===== FILE CHECK ====="
+          test -f main.py
+          test -f requirements.txt
+          echo "===== MAIN IMPORT CHECK ====="
+          python -m py_compile main.py
+          if grep -q "pandas" main.py; then
+            echo "ERROR: pandas import still exists in main.py"
+            exit 1
+          fi
+          echo "main.py OK - pandas 없음"
 
       - name: Check Telegram Secrets
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
-          if [ -z "$TELEGRAM_TOKEN" ]; then
-            echo "❌ TELEGRAM_TOKEN 없음"
-            exit 1
-          fi
-          if [ -z "$TELEGRAM_CHAT_ID" ]; then
-            echo "❌ TELEGRAM_CHAT_ID 없음"
-            exit 1
-          fi
-          echo "✅ Telegram Secrets 정상"
+          test -n "$TELEGRAM_TOKEN"
+          test -n "$TELEGRAM_CHAT_ID"
+          echo "Telegram Secrets OK"
 
       - name: Run BTCC Scanner
         env:
