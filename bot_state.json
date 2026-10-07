@@ -122,6 +122,39 @@
       "tp1_hit": false,
       "score": 100,
       "entry_time": "2026-10-07T16:51:54.284839+09:00"
+    },
+    "ENJUSDT": {
+      "symbol": "ENJUSDT",
+      "direction": "SHORT",
+      "entry": 0.03071,
+      "sl": 0.031110884645038472,
+      "tp1": 0.03010867303244229,
+      "tp2": 0.02970778838740382,
+      "tp1_hit": false,
+      "score": 100,
+      "entry_time": "2026-10-07T17:03:05.095159+09:00"
+    },
+    "CRVUSDT": {
+      "symbol": "CRVUSDT",
+      "direction": "SHORT",
+      "entry": 0.3532,
+      "sl": 0.3553192,
+      "tp1": 0.35002120000000003,
+      "tp2": 0.347902,
+      "tp1_hit": false,
+      "score": 100,
+      "entry_time": "2026-10-07T17:03:06.443401+09:00"
+    },
+    "RAVEUSDT": {
+      "symbol": "RAVEUSDT",
+      "direction": "SHORT",
+      "entry": 0.18338,
+      "sl": 0.18471328643498924,
+      "tp1": 0.18138007034751613,
+      "tp2": 0.18004678391252688,
+      "tp1_hit": false,
+      "score": 100,
+      "entry_time": "2026-10-07T17:03:07.813983+09:00"
     }
   },
   "signals": {
@@ -137,6 +170,9 @@
     "PYTHUSDT:SHORT": 1791358953.0830307,
     "MONUSDT:SHORT": 1791359510.753104,
     "GUNUSDT:SHORT": 1791359510.753104,
-    "XRPUSDT:SHORT": 1791359510.753104
+    "XRPUSDT:SHORT": 1791359510.753104,
+    "ENJUSDT:SHORT": 1791360184.5480165,
+    "CRVUSDT:SHORT": 1791360184.5480165,
+    "RAVEUSDT:SHORT": 1791360184.5480165
   }
 }
