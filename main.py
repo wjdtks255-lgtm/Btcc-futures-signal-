@@ -69,13 +69,12 @@ def save_state(state):
         print(f"상태 저장 중 에러: {e}")
 
 # ---------------------------------------------------------
-# BTCC 거래소 주요 상장 종목 마스터 리스트 (API 차단 대비 내장)
+# BTCC 거래소 주요 상장 종목 마스터 리스트
 # ---------------------------------------------------------
 def get_all_futures_symbols():
     headers = {"User-Agent": "Mozilla/5.0"}
     symbols = []
     
-    # 1. BTCC API 시도
     urls = [
         "https://api.btcc.com/api/v1/market/tickers",
         "https://api.btcc.com/api/v1/market/symbolList"
@@ -96,7 +95,6 @@ def get_all_futures_symbols():
         except Exception:
             pass
 
-    # 2. BTCC API 접속 실패(타임아웃) 시 BTCC 주요 상장 종목 마스터 리스트 사용
     if not symbols:
         symbols = [
             "BTCUSDT", "ETHUSDT", "SOLUSDT", "XRPUSDT", "DOGEUSDT", "PEPEUSDT",
@@ -112,15 +110,13 @@ def get_all_futures_symbols():
     return final_symbols
 
 # ---------------------------------------------------------
-# 시세 데이터 수집 (안정적인 글로벌 시세 API 백업)
+# 시세 데이터 수집 (글로벌 시세 API 백업)
 # ---------------------------------------------------------
 def fetch_market_data(symbol, interval="15m", limit=100):
     headers = {"User-Agent": "Mozilla/5.0"}
-    
-    # symbol 표준화 (예: 1000PEPEUSDT -> PEPEUSDT 처리 대응)
     clean_symbol = symbol.replace("1000", "")
 
-    # 1. 바이낸스 선물 API (GitHub Actions에서 차단 없이 가장 안정적)
+    # 1. 바이낸스 선물 API
     try:
         url = f"https://fapi.binance.com/fapi/v1/klines?symbol={clean_symbol}&interval={interval}&limit={limit}"
         res = requests.get(url, headers=headers, timeout=5)
@@ -139,7 +135,7 @@ def fetch_market_data(symbol, interval="15m", limit=100):
     except Exception:
         pass
 
-    # 2. OKX 선물 API 백업
+    # 2. OKX 선물 API
     try:
         base_asset = clean_symbol.replace("USDT", "")
         okx_symbol = f"{base_asset}-USDT-SWAP"
@@ -159,6 +155,41 @@ def fetch_market_data(symbol, interval="15m", limit=100):
         pass
 
     return pd.DataFrame()
+
+# ---------------------------------------------------------
+# 현재 유지 중인 포지션 요약 텍스트 생성 함수
+# ---------------------------------------------------------
+def generate_active_summary_text(active_positions):
+    if not active_positions:
+        return "📊 **[현재 유지 중인 시그널]**: 없음 (0개)"
+
+    summary_text = f"📊 **[유지 중인 시그널 현황 ({len(active_positions)}/{MAX_POSITIONS}개)]**\n"
+    summary_text += "──────────────────────\n"
+
+    for pos in active_positions:
+        symbol = pos["symbol"]
+        pos_type = pos["type"]
+        entry = pos["entry_price"]
+        rec_lev = pos.get("leverage", 5)
+
+        df = fetch_market_data(symbol)
+        if not df.empty:
+            curr_price = df.iloc[-1]['close']
+            if pos_type == "LONG":
+                pnl = ((curr_price - entry) / entry) * 100
+            else:
+                pnl = ((entry - curr_price) / entry) * 100
+
+            leveraged_pnl = pnl * rec_lev
+            pnl_icon = "🟢" if pnl >= 0 else "🔴"
+            
+            summary_text += f"• #{symbol} (`{pos_type}` {rec_lev}x)\n"
+            summary_text += f"  - 진입가: `${format_price(entry)}` | 현재가: `${format_price(curr_price)}`\n"
+            summary_text += f"  - 수익률: {pnl_icon} `{leveraged_pnl:+.2f}%` (원금 기준 `{pnl:+.2f}%`)\n\n"
+        else:
+            summary_text += f"• #{symbol} (`{pos_type}` {rec_lev}x) - 진입가: `${format_price(entry)}` (시세 조회 대기)\n\n"
+
+    return summary_text.strip()
 
 # ---------------------------------------------------------
 # 레버리지 추천 산출
@@ -266,6 +297,8 @@ def main():
         if is_closed:
             status_icon = "🟢" if pnl_pct > 0 else "🔴"
             leveraged_pnl = pnl_pct * rec_lev
+            
+            # 포지션 종료 알림 작성
             message = (
                 f"{status_icon} **[BTCC 퀀트] 포지션 종료 알림**\n"
                 f"──────────────────────\n"
@@ -275,8 +308,13 @@ def main():
                 f"• **청산가**: `${format_price(latest_price)}`\n"
                 f"• **추정 수익률**: `{leveraged_pnl:+.2f}%` (추천 {rec_lev}배 기준)\n"
                 f"──────────────────────\n"
-                f"📌 *포지션 종료 완료 ({len(remaining_positions)}/{MAX_POSITIONS} 관리 중)*"
             )
+            
+            # 청산 후 남은 포지션 현황 요약 추가 전송
+            temp_remaining = [p for p in remaining_positions if p["symbol"] != symbol]
+            active_summary = generate_active_summary_text(temp_remaining)
+            message += f"\n{active_summary}"
+            
             send_telegram_message(message)
         else:
             remaining_positions.append(pos)
@@ -285,7 +323,7 @@ def main():
     save_state(state)
 
     # ---------------------------------------------------------
-    # 2. 전체 종목 대상 스캔
+    # 2. 전체 종목 대상 스캔 및 신규 시그널 탐색
     # ---------------------------------------------------------
     current_count = len(remaining_positions)
     if current_count >= MAX_POSITIONS:
