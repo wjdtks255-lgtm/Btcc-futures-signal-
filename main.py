@@ -1,5 +1,6 @@
 import os
 import json
+import time
 import requests
 import pandas as pd
 import ta
@@ -12,6 +13,9 @@ TELEGRAM_CHAT_ID = "-1004443428081"
 
 STATE_FILE = "bot_state.json"
 MAX_POSITIONS = 15  # 최대 동시 관리 포지션 수
+
+# [참고] 필요시 True로 바꾸면 기존 포지션 데이터를 1회 강제 초기화합니다.
+FORCE_RESET_STATE = False
 
 def send_telegram_message(message):
     if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
@@ -48,16 +52,20 @@ def format_price(price):
 # 상태 파일(bot_state.json) 관리 함수
 # ---------------------------------------------------------
 def load_state():
+    if FORCE_RESET_STATE:
+        print("🔄 [강제 초기화 실행] 기존 포지션 데이터를 리셋합니다.")
+        initial_state = {"active_positions": []}
+        save_state(initial_state)
+        return initial_state
+
     if os.path.exists(STATE_FILE):
         try:
             with open(STATE_FILE, "r", encoding="utf-8") as f:
                 data = json.load(f)
-                if "active_positions" in data:
+                if isinstance(data, dict) and "active_positions" in data:
                     return data
-                elif "active_position" in data and data["active_position"]:
-                    return {"active_positions": [data["active_position"]]}
         except Exception as e:
-            print(f"상태 로드 중 에러: {e}")
+            print(f"⚠️ 상태 로드 중 에러: {e}")
     return {"active_positions": []}
 
 def save_state(state):
@@ -66,10 +74,10 @@ def save_state(state):
             json.dump(state, f, ensure_ascii=False, indent=4)
         print("💾 bot_state.json 업데이트 완료")
     except Exception as e:
-        print(f"상태 저장 중 에러: {e}")
+        print(f"⚠️ 상태 저장 중 에러: {e}")
 
 # ---------------------------------------------------------
-# BTCC 거래소 전용 선물 코인 리스트 수집
+# BTCC 거래소 전용 선물 종목 수집 (타임아웃 연장 + 알트코인 중심 백업)
 # ---------------------------------------------------------
 def get_all_futures_symbols():
     headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
@@ -81,52 +89,62 @@ def get_all_futures_symbols():
         "https://api.btcc.com/api/v1/market/symbolList"
     ]
 
+    # 타임아웃을 15초로 늘리고 2회 재시도
     for url in urls:
-        try:
-            res = requests.get(url, headers=headers, timeout=5)
-            if res.status_code == 200:
-                raw_data = res.json()
-                items = []
-                
-                if isinstance(raw_data, dict):
-                    items = raw_data.get("data", []) or raw_data.get("result", [])
-                elif isinstance(raw_data, list):
-                    items = raw_data
+        for attempt in range(2):
+            try:
+                res = requests.get(url, headers=headers, timeout=15)
+                if res.status_code == 200:
+                    raw_data = res.json()
+                    items = []
+                    
+                    if isinstance(raw_data, dict):
+                        items = raw_data.get("data", []) or raw_data.get("result", [])
+                    elif isinstance(raw_data, list):
+                        items = raw_data
 
-                if isinstance(items, list):
-                    for item in items:
-                        if isinstance(item, dict):
-                            raw_symbol = item.get("symbol") or item.get("symbolName") or item.get("instrument_id") or ""
-                        else:
-                            raw_symbol = str(item)
+                    if isinstance(items, list):
+                        for item in items:
+                            if isinstance(item, dict):
+                                raw_symbol = item.get("symbol") or item.get("symbolName") or item.get("instrument_id") or ""
+                            else:
+                                raw_symbol = str(item)
 
-                        raw_symbol = raw_symbol.upper().replace("_", "").replace("-", "")
+                            raw_symbol = raw_symbol.upper().replace("_", "").replace("-", "")
 
-                        if "USDT" in raw_symbol:
-                            btcc_symbols.append(raw_symbol)
+                            if "USDT" in raw_symbol:
+                                btcc_symbols.append(raw_symbol)
 
-            if btcc_symbols:
-                break
-        except Exception as e:
-            print(f"BTCC 종목 로드 시도 예외 ({url}): {e}")
+                if btcc_symbols:
+                    break
+            except Exception as e:
+                print(f"BTCC 로드 시도 예외 ({url}, 시도 {attempt+1}): {e}")
+                time.sleep(1)
+        if btcc_symbols:
+            break
 
     final_symbols = sorted(list(set(btcc_symbols)))
 
+    # API 지연 시에도 소액 단타에 최적화된 변동성 높은 주요 알트코인/밈코인 리스트 사용
     if not final_symbols:
-        print("⚠️ BTCC API 응답 없음 - BTCC 실제 상장 주요 선물 목록 사용")
+        print("⚠️ BTCC API 응답 지연 - 소액 단타용 변동성 알트코인 백업 목록 사용")
         final_symbols = [
-            "BTCUSDT", "ETHUSDT", "SOLUSDT", "XRPUSDT", "DOGEUSDT", "PEPEUSDT",
-            "SHIBUSDT", "FLOKIUSDT", "BONKUSDT", "WIFUSDT", "SUIUSDT", "APTUSDT",
-            "AVAXUSDT", "ADAUSDT", "LINKUSDT", "DOTUSDT", "NEARUSDT", "MATICUSDT",
-            "LTCUSDT", "BCHUSDT", "ETCUSDT", "TRXUSDT", "ATOMUSDT", "UNIUSDT",
-            "FILUSDT", "ARBUSDT", "OPUSDT", "INJUSDT", "TIAUSDT", "ORDIUSDT"
+            # 밈코인 & 고변동성
+            "DOGEUSDT", "PEPEUSDT", "SHIBUSDT", "FLOKIUSDT", "BONKUSDT", "WIFUSDT", "POPCATUSDT", "MEMEUSDT",
+            # 인기 알트코인 & 레이어1/2
+            "SOLUSDT", "SUIUSDT", "APTUSDT", "SEIUSDT", "NEARUSDT", "ARBUSDT", "OPUSDT", "INJUSDT",
+            "TIAUSDT", "AVAXUSDT", "LINKUSDT", "MATICUSDT", "STXUSDT", "FETUSDT", "RENDERUSDT", "GALAUSDT",
+            "SANDUSDT", "MANAUSDT", "ORDIUSDT", "SATSUSDT", "PENDLEUSDT", "ENAUSDT", "JUPUSDT", "PYTHUSDT",
+            # 중소형 선물 종목
+            "TRXUSDT", "ADAUSDT", "XRPUSDT", "DOTUSDT", "ATOMUSDT", "UNIUSDT", "FILUSDT", "LTCUSDT",
+            "BCHUSDT", "ETCUSDT", "AAVEUSDT", "CRVUSDT", "DYDXUSDT", "LDOUSDT", "GMXUSDT", "KASUSDT"
         ]
 
-    print(f"📊 스캔 대상 종목 총 {len(final_symbols)}개 로드 완료 (BTCC 전용)")
+    print(f"📊 스캔 대상 종목 총 {len(final_symbols)}개 로드 완료 (알트코인 스캔 최적화)")
     return final_symbols
 
 # ---------------------------------------------------------
-# 시세 데이터 수집
+# 시세 데이터 수집 (15분 봉)
 # ---------------------------------------------------------
 def fetch_market_data(symbol, interval="15m", limit=100):
     headers = {"User-Agent": "Mozilla/5.0"}
@@ -134,7 +152,7 @@ def fetch_market_data(symbol, interval="15m", limit=100):
 
     try:
         url = f"https://fapi.binance.com/fapi/v1/klines?symbol={clean_symbol}&interval={interval}&limit={limit}"
-        res = requests.get(url, headers=headers, timeout=4)
+        res = requests.get(url, headers=headers, timeout=5)
         if res.status_code == 200:
             candles = res.json()
             if candles and isinstance(candles, list):
@@ -215,12 +233,14 @@ def calculate_recommended_leverage(df):
 # 메인 분석 및 포지션 관리 로직
 # ---------------------------------------------------------
 def main():
+    # 0. 알트코인 중심 종목 리스트 로드
+    all_symbols = get_all_futures_symbols()
+
+    # 1. 상태 로드 및 보유 포지션 관리
     state = load_state()
     active_positions = state.get("active_positions", [])
 
-    # 1. 보유 포지션 모니터링 및 청산 체크
     remaining_positions = []
-    
     for pos in active_positions:
         symbol = pos["symbol"]
         print(f"🔍 기존 포지션 ({symbol}) 모니터링 중...")
@@ -312,14 +332,9 @@ def main():
     state["active_positions"] = remaining_positions
     save_state(state)
 
-    # 2. 다중 멀티 전략 BTCC 종목 스캔
+    # 2. 다중 전략 알트코인 종목 스캔
     current_count = len(remaining_positions)
-    if current_count >= MAX_POSITIONS:
-        print(f"⚠️ [최대 포지션 달성] 현재 {current_count}/{MAX_POSITIONS}개 관리 중입니다.")
-        return
-
-    all_symbols = get_all_futures_symbols()
-    print(f"🔎 총 {len(all_symbols)}개 BTCC 코인 스캔 시작... (현재 {current_count}/{MAX_POSITIONS} 사용 중)")
+    print(f"🔎 총 {len(all_symbols)}개 알트코인 스캔 시작... (현재 {current_count}/{MAX_POSITIONS} 사용 중)")
     active_symbols = [p["symbol"] for p in remaining_positions]
 
     for symbol in all_symbols:
