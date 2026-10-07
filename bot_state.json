@@ -24,18 +24,6 @@
       "quality": "A+",
       "entry_time": "2026-10-07T17:56:55.882573+09:00"
     },
-    "NESUSDT": {
-      "symbol": "NESUSDT",
-      "direction": "SHORT",
-      "entry": 0.1372,
-      "sl": 0.1379764570723632,
-      "tp1": 0.1360353143914552,
-      "tp2": 0.13525885731909199,
-      "tp1_hit": false,
-      "score": 87,
-      "quality": "A",
-      "entry_time": "2026-10-07T21:28:36.231225+09:00"
-    },
     "BANKUSDT": {
       "symbol": "BANKUSDT",
       "direction": "SHORT",
@@ -59,6 +47,18 @@
       "score": 90,
       "quality": "A",
       "entry_time": "2026-10-08T01:08:59.532460+09:00"
+    },
+    "SKRUSDT": {
+      "symbol": "SKRUSDT",
+      "direction": "SHORT",
+      "entry": 0.016272,
+      "sl": 0.016372953090052666,
+      "tp1": 0.016120570364920997,
+      "tp2": 0.016019617274868333,
+      "tp1_hit": false,
+      "score": 90,
+      "quality": "A",
+      "entry_time": "2026-10-08T02:11:12.796955+09:00"
     }
   },
   "signals": {
@@ -126,7 +126,8 @@
     "NESUSDT:SHORT": 1791376111.1684203,
     "METISUSDT:SHORT": 1791378499.3573387,
     "HUSDT:SHORT": 1791378499.3573387,
-    "BLESSUSDT:SHORT": 1791389337.7101
+    "BLESSUSDT:SHORT": 1791389337.7101,
+    "SKRUSDT:SHORT": 1791393071.0218923
   },
   "sl_penalties": {
     "STXUSDT": 1791380763.6872358,
