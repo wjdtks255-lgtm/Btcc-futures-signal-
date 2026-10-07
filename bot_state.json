@@ -1,38 +1,16 @@
 {
   "positions": {
-    "SOPHUSDT": {
-      "direction": "SHORT",
-      "entry": 0.003687,
-      "sl": 0.003687,
-      "tp1": 0.003642756,
-      "tp2": 0.00361326,
-      "tp1_hit": true,
-      "created": "2026-10-07T16:37:19.520257+09:00",
-      "symbol": "SOPHUSDT"
-    },
     "ALLOUSDT": {
       "symbol": "ALLOUSDT",
       "direction": "SHORT",
       "entry": 0.25172,
-      "sl": 0.2531850794890063,
+      "sl": 0.25172,
       "tp1": 0.2495223807664905,
       "tp2": 0.24805730127748418,
-      "tp1_hit": false,
+      "tp1_hit": true,
       "score": 100,
       "quality": "A+",
       "entry_time": "2026-10-07T17:40:40.309371+09:00"
-    },
-    "TRXUSDT": {
-      "symbol": "TRXUSDT",
-      "direction": "SHORT",
-      "entry": 0.33289,
-      "sl": 0.33455445,
-      "tp1": 0.330393325,
-      "tp2": 0.32872887500000003,
-      "tp1_hit": false,
-      "score": 94,
-      "quality": "A+",
-      "entry_time": "2026-10-07T17:45:02.650937+09:00"
     },
     "UNITREEUSDT": {
       "symbol": "UNITREEUSDT",
@@ -70,18 +48,6 @@
       "quality": "A+",
       "entry_time": "2026-10-07T17:56:57.085425+09:00"
     },
-    "USELESSUSDT": {
-      "symbol": "USELESSUSDT",
-      "direction": "SHORT",
-      "entry": 0.21415,
-      "sl": 0.21415,
-      "tp1": 0.21049751731729527,
-      "tp2": 0.20806252886215876,
-      "tp1_hit": true,
-      "score": 97,
-      "quality": "A+",
-      "entry_time": "2026-10-07T18:11:03.410743+09:00"
-    },
     "HEMIUSDT": {
       "symbol": "HEMIUSDT",
       "direction": "SHORT",
@@ -105,18 +71,6 @@
       "score": 85,
       "quality": "A",
       "entry_time": "2026-10-07T19:38:06.114724+09:00"
-    },
-    "UAIUSDT": {
-      "symbol": "UAIUSDT",
-      "direction": "SHORT",
-      "entry": 0.28253,
-      "sl": 0.2849939433321514,
-      "tp1": 0.2788340850017729,
-      "tp2": 0.2763701416696216,
-      "tp1_hit": false,
-      "score": 87,
-      "quality": "A",
-      "entry_time": "2026-10-07T19:53:44.532269+09:00"
     },
     "NESUSDT": {
       "symbol": "NESUSDT",
@@ -259,6 +213,7 @@
   },
   "sl_penalties": {
     "STXUSDT": 1791380763.6872358,
-    "MERLUSDT": 1791381600.5116715
+    "MERLUSDT": 1791381600.5116715,
+    "TRXUSDT": 1791382640.4783266
   }
 }
