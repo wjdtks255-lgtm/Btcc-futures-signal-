@@ -48,18 +48,6 @@
       "quality": "A",
       "entry_time": "2026-10-07T18:25:42.222678+09:00"
     },
-    "BSBUSDT": {
-      "symbol": "BSBUSDT",
-      "direction": "SHORT",
-      "entry": 0.09632,
-      "sl": 0.09632,
-      "tp1": 0.0952220248384128,
-      "tp2": 0.09449004139735466,
-      "tp1_hit": true,
-      "score": 85,
-      "quality": "A",
-      "entry_time": "2026-10-07T19:38:06.114724+09:00"
-    },
     "NESUSDT": {
       "symbol": "NESUSDT",
       "direction": "SHORT",
@@ -71,30 +59,6 @@
       "score": 87,
       "quality": "A",
       "entry_time": "2026-10-07T21:28:36.231225+09:00"
-    },
-    "CRVUSDT": {
-      "symbol": "CRVUSDT",
-      "direction": "SHORT",
-      "entry": 0.3508,
-      "sl": 0.3508,
-      "tp1": 0.34739915571386354,
-      "tp2": 0.34513192618977256,
-      "tp1_hit": true,
-      "score": 90,
-      "quality": "A",
-      "entry_time": "2026-10-07T21:52:06.620107+09:00"
-    },
-    "BBUSDT": {
-      "symbol": "BBUSDT",
-      "direction": "SHORT",
-      "entry": 0.008955,
-      "sl": 0.009043390745226813,
-      "tp1": 0.00882241388215978,
-      "tp2": 0.008734023136932967,
-      "tp1_hit": false,
-      "score": 85,
-      "quality": "A",
-      "entry_time": "2026-10-07T21:52:07.836201+09:00"
     },
     "METISUSDT": {
       "symbol": "METISUSDT",
@@ -119,18 +83,6 @@
       "score": 87,
       "quality": "A",
       "entry_time": "2026-10-07T22:08:21.309103+09:00"
-    },
-    "HUSDT": {
-      "symbol": "HUSDT",
-      "direction": "SHORT",
-      "entry": 0.0679332,
-      "sl": 0.0679332,
-      "tp1": 0.06729021725044224,
-      "tp2": 0.06686156208407039,
-      "tp1_hit": true,
-      "score": 87,
-      "quality": "A",
-      "entry_time": "2026-10-07T22:08:22.613007+09:00"
     }
   },
   "signals": {
@@ -202,6 +154,9 @@
   "sl_penalties": {
     "STXUSDT": 1791380763.6872358,
     "MERLUSDT": 1791381600.5116715,
-    "TRXUSDT": 1791382640.4783266
+    "TRXUSDT": 1791382640.4783266,
+    "BSBUSDT": 1791388482.433071,
+    "CRVUSDT": 1791388484.1826649,
+    "BBUSDT": 1791388485.9443974
   }
 }
