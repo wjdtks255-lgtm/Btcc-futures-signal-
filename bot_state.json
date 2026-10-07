@@ -221,6 +221,39 @@
       "tp1_hit": false,
       "score": 86,
       "entry_time": "2026-10-07T17:15:21.633624+09:00"
+    },
+    "MERLUSDT": {
+      "symbol": "MERLUSDT",
+      "direction": "SHORT",
+      "entry": 0.029,
+      "sl": 0.029289039320106368,
+      "tp1": 0.02856644101984045,
+      "tp2": 0.028277401699734084,
+      "tp1_hit": false,
+      "score": 95,
+      "entry_time": "2026-10-07T17:27:15.991240+09:00"
+    },
+    "BBUSDT": {
+      "symbol": "BBUSDT",
+      "direction": "SHORT",
+      "entry": 0.009033,
+      "sl": 0.009110571651415595,
+      "tp1": 0.008916642522876607,
+      "tp2": 0.008839070871461014,
+      "tp1_hit": false,
+      "score": 94,
+      "entry_time": "2026-10-07T17:27:17.374886+09:00"
+    },
+    "SFPUSDT": {
+      "symbol": "SFPUSDT",
+      "direction": "SHORT",
+      "entry": 0.2864,
+      "sl": 0.287832,
+      "tp1": 0.284252,
+      "tp2": 0.28281999999999996,
+      "tp1_hit": false,
+      "score": 94,
+      "entry_time": "2026-10-07T17:27:18.742283+09:00"
     }
   },
   "signals": {
@@ -245,6 +278,9 @@
     "HOMEUSDT:SHORT": 1791360473.4529753,
     "BIOUSDT:SHORT": 1791360918.4161968,
     "BUSDT:SHORT": 1791360918.4161968,
-    "XLMUSDT:SHORT": 1791360918.4161968
+    "XLMUSDT:SHORT": 1791360918.4161968,
+    "MERLUSDT:SHORT": 1791361635.0496378,
+    "BBUSDT:SHORT": 1791361635.0496378,
+    "SFPUSDT:SHORT": 1791361635.0496378
   }
 }
