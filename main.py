@@ -14,7 +14,7 @@ TELEGRAM_CHAT_ID = "-1004443428081"
 STATE_FILE = "bot_state.json"
 MAX_POSITIONS = 15  # 최대 동시 관리 포지션 수
 
-# [참고] 필요시 True로 바꾸면 기존 포지션 데이터를 1회 강제 초기화합니다.
+# 필요시 True로 설정하면 포지션 상태를 리셋합니다.
 FORCE_RESET_STATE = False
 
 def send_telegram_message(message):
@@ -77,81 +77,34 @@ def save_state(state):
         print(f"⚠️ 상태 저장 중 에러: {e}")
 
 # ---------------------------------------------------------
-# BTCC 거래소 전용 선물 종목 수집 (타임아웃 연장 + 알트코인 중심 백업)
+# 선물 시장 전체 종목 자동 로드 (약 350~400개 전수 조사)
 # ---------------------------------------------------------
 def get_all_futures_symbols():
-    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
-    btcc_symbols = []
-
-    urls = [
-        "https://api.btcc.com/v1/market/getTickers",
-        "https://api.btcc.com/api/v1/market/tickers",
-        "https://api.btcc.com/api/v1/market/symbolList"
-    ]
-
-    # 타임아웃을 15초로 늘리고 2회 재시도
-    for url in urls:
-        for attempt in range(2):
-            try:
-                res = requests.get(url, headers=headers, timeout=15)
-                if res.status_code == 200:
-                    raw_data = res.json()
-                    items = []
-                    
-                    if isinstance(raw_data, dict):
-                        items = raw_data.get("data", []) or raw_data.get("result", [])
-                    elif isinstance(raw_data, list):
-                        items = raw_data
-
-                    if isinstance(items, list):
-                        for item in items:
-                            if isinstance(item, dict):
-                                raw_symbol = item.get("symbol") or item.get("symbolName") or item.get("instrument_id") or ""
-                            else:
-                                raw_symbol = str(item)
-
-                            raw_symbol = raw_symbol.upper().replace("_", "").replace("-", "")
-
-                            if "USDT" in raw_symbol:
-                                btcc_symbols.append(raw_symbol)
-
-                if btcc_symbols:
-                    break
-            except Exception as e:
-                print(f"BTCC 로드 시도 예외 ({url}, 시도 {attempt+1}): {e}")
-                time.sleep(1)
-        if btcc_symbols:
-            break
-
-    final_symbols = sorted(list(set(btcc_symbols)))
-
-    # API 지연 시에도 소액 단타에 최적화된 변동성 높은 주요 알트코인/밈코인 리스트 사용
-    if not final_symbols:
-        print("⚠️ BTCC API 응답 지연 - 소액 단타용 변동성 알트코인 백업 목록 사용")
-        final_symbols = [
-            # 밈코인 & 고변동성
-            "DOGEUSDT", "PEPEUSDT", "SHIBUSDT", "FLOKIUSDT", "BONKUSDT", "WIFUSDT", "POPCATUSDT", "MEMEUSDT",
-            # 인기 알트코인 & 레이어1/2
-            "SOLUSDT", "SUIUSDT", "APTUSDT", "SEIUSDT", "NEARUSDT", "ARBUSDT", "OPUSDT", "INJUSDT",
-            "TIAUSDT", "AVAXUSDT", "LINKUSDT", "MATICUSDT", "STXUSDT", "FETUSDT", "RENDERUSDT", "GALAUSDT",
-            "SANDUSDT", "MANAUSDT", "ORDIUSDT", "SATSUSDT", "PENDLEUSDT", "ENAUSDT", "JUPUSDT", "PYTHUSDT",
-            # 중소형 선물 종목
-            "TRXUSDT", "ADAUSDT", "XRPUSDT", "DOTUSDT", "ATOMUSDT", "UNIUSDT", "FILUSDT", "LTCUSDT",
-            "BCHUSDT", "ETCUSDT", "AAVEUSDT", "CRVUSDT", "DYDXUSDT", "LDOUSDT", "GMXUSDT", "KASUSDT"
-        ]
-
-    print(f"📊 스캔 대상 종목 총 {len(final_symbols)}개 로드 완료 (알트코인 스캔 최적화)")
-    return final_symbols
+    headers = {"User-Agent": "Mozilla/5.0"}
+    url = "https://fapi.binance.com/fapi/v1/exchangeInfo"
+    try:
+        res = requests.get(url, headers=headers, timeout=10)
+        if res.status_code == 200:
+            data = res.json()
+            symbols = [
+                s["symbol"] for s in data["symbols"]
+                if s["quoteAsset"] == "USDT" and s["status"] == "TRADING" and s["contractType"] == "PERPETUAL"
+            ]
+            print(f"📊 BTCC 매칭 가능 전 종목 총 {len(symbols)}개 자동 수집 완료")
+            return sorted(symbols)
+    except Exception as e:
+        print(f"⚠️ 종목 목록 수집 중 에러 발생: {e}")
+    
+    # 실패 시 기본 메이저/알트 백업
+    return ["BTCUSDT", "ETHUSDT", "SOLUSDT", "XRPUSDT", "DOGEUSDT"]
 
 # ---------------------------------------------------------
 # 시세 데이터 수집 (15분 봉)
 # ---------------------------------------------------------
 def fetch_market_data(symbol, interval="15m", limit=100):
     headers = {"User-Agent": "Mozilla/5.0"}
-    clean_symbol = symbol.replace("1000", "")
-
     try:
-        url = f"https://fapi.binance.com/fapi/v1/klines?symbol={clean_symbol}&interval={interval}&limit={limit}"
+        url = f"https://fapi.binance.com/fapi/v1/klines?symbol={symbol}&interval={interval}&limit={limit}"
         res = requests.get(url, headers=headers, timeout=5)
         if res.status_code == 200:
             candles = res.json()
@@ -233,7 +186,7 @@ def calculate_recommended_leverage(df):
 # 메인 분석 및 포지션 관리 로직
 # ---------------------------------------------------------
 def main():
-    # 0. 알트코인 중심 종목 리스트 로드
+    # 0. 선물 시장 상장 전체 종목 수집 (350개 이상)
     all_symbols = get_all_futures_symbols()
 
     # 1. 상태 로드 및 보유 포지션 관리
@@ -332,9 +285,9 @@ def main():
     state["active_positions"] = remaining_positions
     save_state(state)
 
-    # 2. 다중 전략 알트코인 종목 스캔
+    # 2. BTCC 전체 코인 스캔 (350개+)
     current_count = len(remaining_positions)
-    print(f"🔎 총 {len(all_symbols)}개 알트코인 스캔 시작... (현재 {current_count}/{MAX_POSITIONS} 사용 중)")
+    print(f"🔎 선물 시장 전 코인 총 {len(all_symbols)}개 전수 스캔 시작... (현재 {current_count}/{MAX_POSITIONS} 사용 중)")
     active_symbols = [p["symbol"] for p in remaining_positions]
 
     for symbol in all_symbols:
@@ -382,7 +335,6 @@ def main():
         strategy_name = ""
 
         # 5대 다중 전략 조건
-        # [전략 1] 볼린저 반등
         if prev['rsi'] <= 40 and latest['rsi'] > 40 and prev['low'] <= prev['bb_lband']:
             signal_type = "LONG"
             strategy_name = "볼린저 하단 반등 + RSI 과매도 회복"
@@ -391,7 +343,6 @@ def main():
             signal_type = "SHORT"
             strategy_name = "볼린저 상단 반전 + RSI 과매수 이탈"
 
-        # [전략 2] EMA + MACD 수급 돌파
         elif latest['ema_short'] > latest['ema_long'] and prev['macd_diff'] < latest['macd_diff'] and latest['macd_diff'] > 0:
             if 38 <= latest['rsi'] <= 68 and vol_confirmed and latest['close'] > latest['ema_trend']:
                 signal_type = "LONG"
@@ -402,7 +353,6 @@ def main():
                 signal_type = "SHORT"
                 strategy_name = "200 EMA 역배열 + MACD 이탈 모멘텀"
 
-        # [전략 3] Stoch RSI 눌림목
         elif latest['close'] > latest['ema_short'] and latest['ema_short'] > latest['ema_long']:
             if prev['stoch_k'] <= 25 and latest['stoch_k'] > 25 and latest['stoch_k'] > latest['stoch_d']:
                 signal_type = "LONG"
@@ -413,7 +363,6 @@ def main():
                 signal_type = "SHORT"
                 strategy_name = "스토캐스틱 RSI 과매수 + EMA 역배열 반락"
 
-        # [전략 4] 켈트너 채널 돌파
         elif latest['close'] > latest['kc_hband'] and prev['close'] <= prev['kc_hband'] and vol_confirmed:
             if latest['rsi'] >= 50:
                 signal_type = "LONG"
@@ -424,7 +373,6 @@ def main():
                 signal_type = "SHORT"
                 strategy_name = "켈트너 채널 하단 이탈 + 하락 변동성 폭발"
 
-        # [전략 5] MACD 제로라인 돌파
         elif prev['macd'] < 0 and latest['macd'] >= 0 and latest['macd'] > latest['macd_signal']:
             if latest['close'] > latest['ema_short']:
                 signal_type = "LONG"
@@ -497,7 +445,7 @@ def main():
                 print("🏁 최대 포지션 15개가 채워져 스캔을 완료합니다.")
                 break
 
-    print(f"✅ BTCC 다중 스캔 완료 (현재 보유 포지션: {len(state['active_positions'])}/{MAX_POSITIONS})")
+    print(f"✅ BTCC 전종목 스캔 완료 (현재 보유 포지션: {len(state['active_positions'])}/{MAX_POSITIONS})")
 
 if __name__ == "__main__":
     main()
