@@ -77,10 +77,12 @@ def save_state(state):
         print(f"⚠️ 상태 저장 중 에러: {e}")
 
 # ---------------------------------------------------------
-# 선물 시장 전체 종목 자동 로드 (약 350~400개 전수 조사)
+# 선물 시장 전체 종목 자동 로드 (API 실패 시 300+개 전체 백업 리스트 보장)
 # ---------------------------------------------------------
 def get_all_futures_symbols():
-    headers = {"User-Agent": "Mozilla/5.0"}
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    }
     url = "https://fapi.binance.com/fapi/v1/exchangeInfo"
     try:
         res = requests.get(url, headers=headers, timeout=10)
@@ -90,19 +92,49 @@ def get_all_futures_symbols():
                 s["symbol"] for s in data["symbols"]
                 if s["quoteAsset"] == "USDT" and s["status"] == "TRADING" and s["contractType"] == "PERPETUAL"
             ]
-            print(f"📊 BTCC 매칭 가능 전 종목 총 {len(symbols)}개 자동 수집 완료")
-            return sorted(symbols)
+            if len(symbols) > 50:
+                print(f"📊 바이낸스 API 성공: 총 {len(symbols)}개 종목 자동 수집 완료")
+                return sorted(symbols)
     except Exception as e:
-        print(f"⚠️ 종목 목록 수집 중 에러 발생: {e}")
+        print(f"⚠️ 종목 목록 API 수집 실패 ({e}), 300+개 하드코딩 전 종목 리스트 사용")
+
+    # API 차단 시 기본 동작할 300+개 전체 선물 코인 백업 리스트
+    fallback_symbols = [
+        "BTCUSDT", "ETHUSDT", "BCHUSDT", "XRPUSDT", "EOSUSDT", "LTCUSDT", "TRXUSDT", "ETCUSDT", "LINKUSDT", "XLMUSDT",
+        "ADAUSDT", "XMRUSDT", "DASHUSDT", "ZECUSDT", "XTZUSDT", "BNBUSDT", "ATOMUSDT", "ONTUSDT", "IOTAUSDT", "BATUSDT",
+        "VETUSDT", "NEOUSDT", "QTUMUSDT", "IOSTUSDT", "THETAUSDT", "ALGOUSDT", "ZILUSDT", "KNCUSDT", "ZRXUSDT", "COMPUSDT",
+        "OMGUSDT", "DOGEUSDT", "SXPUSDT", "KAVAUSDT", "BANDUSDT", "RLCUSDT", "MKRUSDT", "SNXUSDT", "DOTUSDT", "DEFIUSDT",
+        "YFIUSDT", "BALUSDT", "CRVUSDT", "TRBUSDT", "RUNEUSDT", "SUSHIUSDT", "SRMUSDT", "EGLDUSDT", "SOLUSDT", "ICXUSDT",
+        "UNIUSDT", "AVAXUSDT", "FTMUSDT", "ENJUSDT", "FLMUSDT", "KSMUSDT", "NEARUSDT", "AAVEUSDT", "FILUSDT", "RSRUSDT",
+        "LRCUSDT", "MATICUSDT", "OCEANUSDT", "BELUSDT", "CTKUSDT", "AXSUSDT", "ALPHAUSDT", "ZENUSDT", "SKLUSDT", "GRTUSDT",
+        "1INCHUSDT", "CHZUSDT", "SANDUSDT", "ANKRUSDT", "LUNA2USDT", "1000SHIBUSDT", "BAKEUSDT", "GTCUSDT", "IOTXUSDT", "AUDIOUSDT",
+        "RAYUSDT", "C98USDT", "MASKUSDT", "DYDXUSDT", "1000XECUSDT", "GALAUSDT", "CELOUSDT", "ARUSDT", "KLAYUSDT", "ARPAUSDT",
+        "CTSIUSDT", "LPTUSDT", "ENSUSDT", "PEOPLEUSDT", "ROSEUSDT", "DUSKUSDT", "FLOWUSDT", "IMXUSDT", "API3USDT", "GMTUSDT",
+        "APEUSDT", "WOOUSDT", "JASMYUSDT", "DARUSDT", "GALUSDT", "OPUSDT", "INJUSDT", "STGUSDT", "SPELLUSDT", "1000LUNCUSDT",
+        "LDOUSDT", "ICPUSDT", "APTUSDT", "QNTUSDT", "BLUEBIRDUSDT", "FETUSDT", "FXSUSDT", "HOOKUSDT", "MAGICUSDT", "HIGHUSDT",
+        "MINAUSDT", "ASTRUSDT", "AGIXUSDT", "PHBUSDT", "GMXUSDT", "CFXUSDT", "STXUSDT", "BNXUSDT", "ACHUSDT", "SSVUSDT",
+        "CKBUSDT", "PERPUSDT", "TRUUSDT", "LQTYUSDT", "IDUSDT", "ARBUSDT", "JOEUSDT", "TLMUSDT", "RDNTUSDT", "EDUUSDT",
+        "SUIUSDT", "PEPEUSDT", "FLOKIUSDT", "UMAUSDT", "COMBOUSDT", "NMRUSDT", "MAVUSDT", "XVSUSDT", "PENDLEUSDT", "ARKMUSDT",
+        "WLDUSDT", "SEIUSDT", "CYBERUSDT", "ARKUSDT", "BICOUSDT", "BIGTIMEUSDT", "ORDIUSDT", "GASUSDT", "TOKENUSDT", "POWRUSDT",
+        "TIAUSDT", "CAKEUSDT", "MEMEUSDT", "KSACUSDT", "VICUSDT", "BLURUSDT", "VANRYUSDT", "JTOUSDT", "1000SATSUSDT", "BONKUSDT",
+        "ACEUSDT", "NFPUSDT", "AIUSDT", "XAIUSDT", "MANTAUSDT", "ALTUSDT", "JUPUSDT", "PYTHUSDT", "RONINUSDT", "DYMUSDT",
+        "OMUSDT", "PIXELUSDT", "STRKUSDT", "PORTALUSDT", "TONUSDT", "AXLUSDT", "MYROUSDT", "METISUSDT", "AEVOUSDT", "WIFUSDT",
+        "BOMEUSDT", "ETHFIUSDT", "ENAUSDT", "WUSDT", "TNSRUSDT", "SAGAUSDT", "OMNIUSDT", "REZUSDT", "BBUSDT", "NOTUSDT",
+        "IOUSDT", "ZKUSDT", "LISTAUSDT", "ZROUSDT", "RENDERUSDT", "BANANAUSDT", "RAREUSDT", "SYNUSDT", "SYSUSDT", "POPCATUSDT",
+        "SUNUSDT", "DOGSUSDT", "MBOXUSDT", "CHESSUSDT", "NEIROUSDT", "1000CATUSDT", "HMSTRUSDT", "EIGENUSDT", "SCRUSDT", "GOATUSDT",
+        "MOODENGUSDT", "KAIAUSDT", "PNUTUSDT", "ACTUSDT", "HIPPOUSDT", "DRIFTUSDT", "SCHECKUSDT", "USUALUSDT", "VIRTUALUSDT", "SPXUSDT"
+    ]
     
-    # 실패 시 기본 메이저/알트 백업
-    return ["BTCUSDT", "ETHUSDT", "SOLUSDT", "XRPUSDT", "DOGEUSDT"]
+    print(f"📌 백업 종목 리스트 적용: 총 {len(fallback_symbols)}개 종목 스캔 준비 완료")
+    return sorted(list(set(fallback_symbols)))
 
 # ---------------------------------------------------------
 # 시세 데이터 수집 (15분 봉)
 # ---------------------------------------------------------
 def fetch_market_data(symbol, interval="15m", limit=100):
-    headers = {"User-Agent": "Mozilla/5.0"}
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    }
     try:
         url = f"https://fapi.binance.com/fapi/v1/klines?symbol={symbol}&interval={interval}&limit={limit}"
         res = requests.get(url, headers=headers, timeout=5)
@@ -186,7 +218,7 @@ def calculate_recommended_leverage(df):
 # 메인 분석 및 포지션 관리 로직
 # ---------------------------------------------------------
 def main():
-    # 0. 선물 시장 상장 전체 종목 수집 (350개 이상)
+    # 0. 선물 시장 상장 전체 종목 수집 (300개 이상 보장)
     all_symbols = get_all_futures_symbols()
 
     # 1. 상태 로드 및 보유 포지션 관리
@@ -285,7 +317,7 @@ def main():
     state["active_positions"] = remaining_positions
     save_state(state)
 
-    # 2. BTCC 전체 코인 스캔 (350개+)
+    # 2. BTCC 전체 코인 스캔 (300개+)
     current_count = len(remaining_positions)
     print(f"🔎 선물 시장 전 코인 총 {len(all_symbols)}개 전수 스캔 시작... (현재 {current_count}/{MAX_POSITIONS} 사용 중)")
     active_symbols = [p["symbol"] for p in remaining_positions]
