@@ -1,36 +1,42 @@
-name: Run Signal Bot
+name: BTCC Futures Quant Scanner
 
 on:
+  workflow_dispatch:
   schedule:
-    - cron: '*/5 * * * *'  # 5분마다 자동 실행
-  workflow_dispatch:       # 수동 실행 버튼 활성화
+    - cron: "*/5 * * * *"
 
 permissions:
-  contents: write          # bot_state.json 상태 저장을 위한 repository 쓰기 권한
+  contents: write
+
+concurrency:
+  group: btcc-futures-scanner
+  cancel-in-progress: false
 
 jobs:
-  run-bot:
+  scan:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: "3.11"
+          cache: "pip"
 
-      - name: Install Dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install requests pandas ta
+      - name: Install dependencies
+        run: pip install -r requirements.txt
 
-      - name: Run Main Script
+      - name: Run BTCC Scanner
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: python main.py
 
-      - name: Commit and Push Updated State
-        run: |
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
-          git add bot_state.json
-          git diff --quiet && git diff --staged --quiet || (git commit -m "chore: update bot_state.json [skip ci]" && git push)
+      - name: Save bot state
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Update BTCC scanner state"
+          file_pattern: bot_state.json
