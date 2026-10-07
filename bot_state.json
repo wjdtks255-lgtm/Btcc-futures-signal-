@@ -12,18 +12,6 @@
       "quality": "A+",
       "entry_time": "2026-10-07T17:45:03.964452+09:00"
     },
-    "BNBUSDT": {
-      "symbol": "BNBUSDT",
-      "direction": "SHORT",
-      "entry": 772.96,
-      "sl": 772.96,
-      "tp1": 767.74252,
-      "tp2": 764.2642000000001,
-      "tp1_hit": true,
-      "score": 97,
-      "quality": "A+",
-      "entry_time": "2026-10-07T17:56:55.882573+09:00"
-    },
     "BLESSUSDT": {
       "symbol": "BLESSUSDT",
       "direction": "SHORT",
@@ -48,17 +36,29 @@
       "quality": "A",
       "entry_time": "2026-10-08T02:11:12.796955+09:00"
     },
-    "EDUUSDT": {
-      "symbol": "EDUUSDT",
-      "direction": "LONG",
-      "entry": 0.06354,
-      "sl": 0.06276675034231409,
-      "tp1": 0.06469987448652886,
-      "tp2": 0.06547312414421476,
+    "JASMYUSDT": {
+      "symbol": "JASMYUSDT",
+      "direction": "SHORT",
+      "entry": 0.004854,
+      "sl": 0.0048813976533235975,
+      "tp1": 0.004812903520014604,
+      "tp2": 0.004785505866691006,
       "tp1_hit": false,
       "score": 87,
       "quality": "A",
-      "entry_time": "2026-10-08T07:31:52.074906+09:00"
+      "entry_time": "2026-10-08T08:26:39.161251+09:00"
+    },
+    "VETUSDT": {
+      "symbol": "VETUSDT",
+      "direction": "SHORT",
+      "entry": 0.008065,
+      "sl": 0.008101368934204255,
+      "tp1": 0.008010446598693615,
+      "tp2": 0.007974077664489359,
+      "tp1_hit": false,
+      "score": 87,
+      "quality": "A",
+      "entry_time": "2026-10-08T08:26:40.947247+09:00"
     }
   },
   "signals": {
@@ -78,7 +78,7 @@
     "ENJUSDT:SHORT": 1791360184.5480165,
     "CRVUSDT:SHORT": 1791377526.1091416,
     "RAVEUSDT:SHORT": 1791360184.5480165,
-    "JASMYUSDT:SHORT": 1791360473.4529753,
+    "JASMYUSDT:SHORT": 1791415597.4020784,
     "PIPPINUSDT:SHORT": 1791360473.4529753,
     "HOMEUSDT:SHORT": 1791360473.4529753,
     "BIOUSDT:SHORT": 1791360918.4161968,
@@ -129,7 +129,8 @@
     "BLESSUSDT:SHORT": 1791389337.7101,
     "SKRUSDT:SHORT": 1791393071.0218923,
     "ARKMUSDT:SHORT": 1791396027.8025534,
-    "EDUUSDT:LONG": 1791412310.2900076
+    "EDUUSDT:LONG": 1791412310.2900076,
+    "VETUSDT:SHORT": 1791415597.4020784
   },
   "sl_penalties": {
     "STXUSDT": 1791380763.6872358,
@@ -143,6 +144,8 @@
     "METISUSDT": 1791389334.0227375,
     "BANKUSDT": 1791395211.2441027,
     "UAIUSDT": 1791396024.2866883,
-    "ARKMUSDT": 1791412304.130952
+    "ARKMUSDT": 1791412304.130952,
+    "BNBUSDT": 1791415591.1778738,
+    "EDUUSDT": 1791415592.9258506
   }
 }
