@@ -20,26 +20,6 @@
       "created": "2026-10-07T16:37:19.520825+09:00",
       "symbol": "STXUSDT"
     },
-    "JUPUSDT": {
-      "direction": "SHORT",
-      "entry": 0.3328,
-      "sl": 0.3328,
-      "tp1": 0.32821209631461795,
-      "tp2": 0.32515349385769665,
-      "tp1_hit": true,
-      "created": "2026-10-07T16:37:19.520951+09:00",
-      "symbol": "JUPUSDT"
-    },
-    "MEMEUSDT": {
-      "direction": "SHORT",
-      "entry": 0.0005822,
-      "sl": 0.0005822,
-      "tp1": 0.0005760241789830163,
-      "tp2": 0.000571906964971694,
-      "tp1_hit": true,
-      "created": "2026-10-07T16:42:33.080886+09:00",
-      "symbol": "MEMEUSDT"
-    },
     "FOGOUSDT": {
       "direction": "SHORT",
       "entry": 0.00517,
@@ -152,10 +132,10 @@
       "symbol": "BIOUSDT",
       "direction": "SHORT",
       "entry": 0.02914,
-      "sl": 0.02941428457129262,
+      "sl": 0.02914,
       "tp1": 0.02872857314306107,
       "tp2": 0.028454288571768453,
-      "tp1_hit": false,
+      "tp1_hit": true,
       "score": 94,
       "entry_time": "2026-10-07T17:15:18.967765+09:00"
     },
@@ -381,18 +361,6 @@
       "quality": "A",
       "entry_time": "2026-10-07T18:25:42.222678+09:00"
     },
-    "AEROUSDT": {
-      "symbol": "AEROUSDT",
-      "direction": "SHORT",
-      "entry": 0.7908,
-      "sl": 0.794948854562249,
-      "tp1": 0.7845767181566263,
-      "tp2": 0.7804278635943773,
-      "tp1_hit": false,
-      "score": 90,
-      "quality": "A",
-      "entry_time": "2026-10-07T18:25:43.590556+09:00"
-    },
     "SANDUSDT": {
       "symbol": "SANDUSDT",
       "direction": "LONG",
@@ -464,6 +432,30 @@
       "score": 90,
       "quality": "A",
       "entry_time": "2026-10-07T19:02:20.354370+09:00"
+    },
+    "PTBUSDT": {
+      "symbol": "PTBUSDT",
+      "direction": "SHORT",
+      "entry": 0.0008766,
+      "sl": 0.0008864870462507268,
+      "tp1": 0.0008617694306239097,
+      "tp2": 0.0008518823843731828,
+      "tp1_hit": false,
+      "score": 90,
+      "quality": "A",
+      "entry_time": "2026-10-07T19:21:35.358732+09:00"
+    },
+    "LTCUSDT": {
+      "symbol": "LTCUSDT",
+      "direction": "SHORT",
+      "entry": 67.59,
+      "sl": 67.894155,
+      "tp1": 67.1337675,
+      "tp2": 66.82961250000001,
+      "tp1_hit": false,
+      "score": 90,
+      "quality": "A",
+      "entry_time": "2026-10-07T19:21:36.635075+09:00"
     }
   },
   "signals": {
@@ -518,6 +510,8 @@
     "GRASSUSDT:SHORT": 1791365406.144873,
     "TACUSDT:SHORT": 1791365950.2822497,
     "APRUSDT:SHORT": 1791366517.1654694,
-    "4STOCKUSDT:SHORT": 1791367339.6996117
+    "4STOCKUSDT:SHORT": 1791367339.6996117,
+    "PTBUSDT:SHORT": 1791368494.7645488,
+    "LTCUSDT:SHORT": 1791368494.7645488
   }
 }
