@@ -5,6 +5,14 @@ import requests
 import pandas as pd
 import ta
 
+def main():
+    # 텔레그램 전송 테스트용 (실행 확인 후 삭제)
+    send_telegram_message("🔔 [BTCC 퀀트] 스캐너 실행 완료 (텔레그램 연동 정상)")
+
+    # 0. 선물 시장 상장 전체 종목 수집
+    all_symbols = get_all_futures_symbols()
+    ...
+
 # ==========================================
 # 텔레그램 인증 및 기본 설정
 # ==========================================
