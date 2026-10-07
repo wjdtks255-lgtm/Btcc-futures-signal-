@@ -33,10 +33,10 @@
     "JUPUSDT": {
       "direction": "SHORT",
       "entry": 0.3328,
-      "sl": 0.33585860245692134,
+      "sl": 0.3328,
       "tp1": 0.32821209631461795,
       "tp2": 0.32515349385769665,
-      "tp1_hit": false,
+      "tp1_hit": true,
       "created": "2026-10-07T16:37:19.520951+09:00",
       "symbol": "JUPUSDT"
     },
@@ -73,10 +73,10 @@
     "AVNTUSDT": {
       "direction": "SHORT",
       "entry": 0.12412,
-      "sl": 0.12507782883487525,
+      "sl": 0.12412,
       "tp1": 0.1226832567476871,
       "tp2": 0.12172542791281184,
-      "tp1_hit": false,
+      "tp1_hit": true,
       "created": "2026-10-07T16:42:33.081629+09:00",
       "symbol": "AVNTUSDT"
     },
@@ -376,6 +376,42 @@
       "score": 92,
       "quality": "A+",
       "entry_time": "2026-10-07T17:50:41.219902+09:00"
+    },
+    "BNBUSDT": {
+      "symbol": "BNBUSDT",
+      "direction": "SHORT",
+      "entry": 772.96,
+      "sl": 776.4383200000001,
+      "tp1": 767.74252,
+      "tp2": 764.2642000000001,
+      "tp1_hit": false,
+      "score": 97,
+      "quality": "A+",
+      "entry_time": "2026-10-07T17:56:55.882573+09:00"
+    },
+    "FOLKSUSDT": {
+      "symbol": "FOLKSUSDT",
+      "direction": "SHORT",
+      "entry": 2.356,
+      "sl": 2.3884642255506074,
+      "tp1": 2.307303661674089,
+      "tp2": 2.2748394361234814,
+      "tp1_hit": false,
+      "score": 95,
+      "quality": "A+",
+      "entry_time": "2026-10-07T17:56:57.085425+09:00"
+    },
+    "SKYAIUSDT": {
+      "symbol": "SKYAIUSDT",
+      "direction": "SHORT",
+      "entry": 0.03517,
+      "sl": 0.03540396936204519,
+      "tp1": 0.034819045956932214,
+      "tp2": 0.03458507659488702,
+      "tp1_hit": false,
+      "score": 92,
+      "quality": "A+",
+      "entry_time": "2026-10-07T17:56:58.328254+09:00"
     }
   },
   "signals": {
@@ -415,6 +451,9 @@
     "ARCUSDT:SHORT": 1791362702.0539832,
     "BCHUSDT:SHORT": 1791363037.8301704,
     "SLXUSDT:SHORT": 1791363037.8301704,
-    "EIGENUSDT:SHORT": 1791363037.8301704
+    "EIGENUSDT:SHORT": 1791363037.8301704,
+    "BNBUSDT:SHORT": 1791363415.263516,
+    "FOLKSUSDT:SHORT": 1791363415.263516,
+    "SKYAIUSDT:SHORT": 1791363415.263516
   }
 }
