@@ -1,15 +1,5 @@
 {
   "positions": {
-    "PUMPUSDT": {
-      "direction": "LONG",
-      "entry": 0.006616,
-      "sl": 0.006522552485234908,
-      "tp1": 0.0067561712721476395,
-      "tp2": 0.006849618786912732,
-      "tp1_hit": false,
-      "created": "2026-10-07T16:37:19.520030+09:00",
-      "symbol": "PUMPUSDT"
-    },
     "SOPHUSDT": {
       "direction": "SHORT",
       "entry": 0.003687,
@@ -70,16 +60,6 @@
       "created": "2026-10-07T16:42:33.081348+09:00",
       "symbol": "FOGOUSDT"
     },
-    "AVNTUSDT": {
-      "direction": "SHORT",
-      "entry": 0.12412,
-      "sl": 0.12412,
-      "tp1": 0.1226832567476871,
-      "tp2": 0.12172542791281184,
-      "tp1_hit": true,
-      "created": "2026-10-07T16:42:33.081629+09:00",
-      "symbol": "AVNTUSDT"
-    },
     "PYTHUSDT": {
       "direction": "SHORT",
       "entry": 0.07263,
@@ -94,10 +74,10 @@
       "symbol": "MONUSDT",
       "direction": "SHORT",
       "entry": 0.02687,
-      "sl": 0.027102677472242806,
+      "sl": 0.02687,
       "tp1": 0.026520983791635797,
       "tp2": 0.026288306319392992,
-      "tp1_hit": false,
+      "tp1_hit": true,
       "score": 100,
       "entry_time": "2026-10-07T16:51:51.517546+09:00"
     },
@@ -138,10 +118,10 @@
       "symbol": "CRVUSDT",
       "direction": "SHORT",
       "entry": 0.3532,
-      "sl": 0.3553192,
+      "sl": 0.3532,
       "tp1": 0.35002120000000003,
       "tp2": 0.347902,
-      "tp1_hit": false,
+      "tp1_hit": true,
       "score": 100,
       "entry_time": "2026-10-07T17:03:06.443401+09:00"
     },
@@ -412,6 +392,18 @@
       "score": 92,
       "quality": "A+",
       "entry_time": "2026-10-07T17:56:58.328254+09:00"
+    },
+    "USELESSUSDT": {
+      "symbol": "USELESSUSDT",
+      "direction": "SHORT",
+      "entry": 0.21415,
+      "sl": 0.21658498845513652,
+      "tp1": 0.21049751731729527,
+      "tp2": 0.20806252886215876,
+      "tp1_hit": false,
+      "score": 97,
+      "quality": "A+",
+      "entry_time": "2026-10-07T18:11:03.410743+09:00"
     }
   },
   "signals": {
@@ -454,6 +446,7 @@
     "EIGENUSDT:SHORT": 1791363037.8301704,
     "BNBUSDT:SHORT": 1791363415.263516,
     "FOLKSUSDT:SHORT": 1791363415.263516,
-    "SKYAIUSDT:SHORT": 1791363415.263516
+    "SKYAIUSDT:SHORT": 1791363415.263516,
+    "USELESSUSDT:SHORT": 1791364262.8499057
   }
 }
