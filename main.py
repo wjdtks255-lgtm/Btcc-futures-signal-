@@ -12,11 +12,13 @@ MIN_SCORE=84
 STRONG_SCORE=92
 MAX_ALERTS=3
 COOLDOWN=180
+
 COL=[
 "close|15","volume|15","EMA20|15","EMA50|15","EMA100|15","RSI|15","ADX|15","ATR|15",
 "close|60","volume|60","EMA20|60","EMA50|60","EMA100|60","RSI|60","ADX|60","ATR|60",
 "change|15","change|60"
 ]
+
 HEAD={
     "User-Agent":"Mozilla/5.0",
     "Origin":"https://www.tradingview.com",
@@ -24,9 +26,13 @@ HEAD={
     "Content-Type":"application/json"
 }
 
+def now():
+    return datetime.now(KST)
+
 def load():
     try:
-        with open(STATE_FILE,encoding="utf-8") as f:s=json.load(f)
+        with open(STATE_FILE,encoding="utf-8") as f:
+            s=json.load(f)
     except:
         s={"positions":{},"signals":{}}
     s.setdefault("positions",{})
@@ -45,7 +51,11 @@ def tg(msg):
     try:
         r=requests.post(
             f"https://api.telegram.org/bot{TOKEN}/sendMessage",
-            json={"chat_id":CHAT_ID,"text":msg,"disable_web_page_preview":True},
+            json={
+                "chat_id":CHAT_ID,
+                "text":msg,
+                "disable_web_page_preview":True
+            },
             timeout=15
         )
         print("TG:",r.status_code)
@@ -69,9 +79,14 @@ def rows():
     payload={
         "options":{"lang":"en"},
         "markets":["crypto"],
-        "filter":[{"left":"exchange","operation":"equal","right":"BTCC"}],
+        "filter":[
+            {"left":"exchange","operation":"equal","right":"BTCC"}
+        ],
         "columns":COL,
-        "sort":{"sortBy":"volume|15","sortOrder":"desc"},
+        "sort":{
+            "sortBy":"volume|15",
+            "sortOrder":"desc"
+        },
         "range":[0,500]
     }
     return tv(payload)
@@ -88,9 +103,12 @@ def symbol(row):
     return s.replace(".P","")
 
 def fmt(x):
-    if x>=1000:return f"{x:,.2f}"
-    if x>=1:return f"{x:.4f}"
-    if x>=0.01:return f"{x:.5f}"
+    if x>=1000:
+        return f"{x:,.2f}"
+    if x>=1:
+        return f"{x:.4f}"
+    if x>=0.01:
+        return f"{x:.5f}"
     return f"{x:.8f}".rstrip("0").rstrip(".")
 
 def analyze(row):
@@ -110,14 +128,11 @@ def analyze(row):
     e100h=val(row,12)
     rsih=val(row,13)
     adxh=val(row,14)
-    atrh=val(row,15)
 
     ch15=val(row,16)
     ch60=val(row,17)
 
-    if min(p15,e20,e50,e100,p60,e20h,e50h,e100h,atr)>0:
-        pass
-    else:
+    if min(p15,e20,e50,e100,p60,e20h,e50h,e100h,atr)<=0:
         return None
 
     bull_h=e20h>e50h>e100h and p60>e20h
@@ -136,7 +151,6 @@ def analyze(row):
     dist20=(p15-e20)/e20*100
     dist50=(p15-e50)/e50*100
 
-    # 과도한 추격 진입 차단
     if direction=="LONG":
         if rsi>69 or rsih>72:
             return None
@@ -151,15 +165,12 @@ def analyze(row):
     score=0
     reasons=[]
 
-    # 1H 구조
     score+=22
     reasons.append("1시간 추세 정렬")
 
-    # 15M 구조
     score+=18
     reasons.append("15분 추세 정렬")
 
-    # RSI
     if direction=="LONG":
         if 52<=rsi<=64:
             score+=12
@@ -187,6 +198,7 @@ def analyze(row):
             reasons.append("1시간 상승 모멘텀")
         elif ch60>=0:
             score+=3
+
     else:
         if 36<=rsi<=48:
             score+=12
@@ -215,7 +227,6 @@ def analyze(row):
         elif ch60<=0:
             score+=3
 
-    # ADX
     if adx>=28:
         score+=8
         reasons.append("15분 추세 강도 우수")
@@ -230,7 +241,6 @@ def analyze(row):
     elif adxh>=20:
         score+=4
 
-    # EMA 간격
     spread15=abs(e20-e50)/p15*100
     spreadh=abs(e20h-e50h)/p60*100
 
@@ -246,12 +256,10 @@ def analyze(row):
     elif spreadh>=0.10:
         score+=2
 
-    # 거래량은 절대값보다 현재 유동성 최소조건만 사용
     if v15>100000 and v60>100000:
         score+=2
         reasons.append("BTCC 유동성 확인")
 
-    # 진입 타이밍
     if direction=="LONG":
         pullback=abs(dist20)<=0.65 and rsi>=48 and ch15>=0
         momentum=dist20>0 and dist20<=1.2 and ch15>=0.35 and adx>=25
@@ -259,7 +267,6 @@ def analyze(row):
         pullback=abs(dist20)<=0.65 and rsi<=52 and ch15<=0
         momentum=dist20<0 and dist20>=-1.2 and ch15<=-0.35 and adx>=25
 
-    setup=""
     if pullback:
         score+=9
         setup="눌림 후 재진입"
@@ -271,12 +278,10 @@ def analyze(row):
     else:
         return None
 
-    # 점수 상한은 실제 조건에 따라 자연스럽게 결정
     if score<MIN_SCORE:
         return None
 
-    # 너무 비슷한 고득점 신호가 반복되지 않도록 강도별 차등
-    if score>=95 and not (adx>=28 and adxh>=25):
+    if score>=95 and not(adx>=28 and adxh>=25):
         score=94
 
     risk=max(atr*1.15,p15*0.006)
@@ -291,6 +296,7 @@ def analyze(row):
         tp2=p15-risk*2.5
 
     atr_pct=atr/p15*100
+
     if atr_pct>=3:
         lev=3
     elif atr_pct>=2:
@@ -323,7 +329,6 @@ def analyze(row):
 def signal_msg(s):
     icon="🟢" if s["direction"]=="LONG" else "🔴"
     title="🔥 강한 매매 시그널" if s["score"]>=STRONG_SCORE else "⚡ 매매 시그널"
-
     reason_text="\n".join(f"• {x}" for x in s["reasons"][:5])
 
     return (
@@ -353,13 +358,13 @@ def signal_msg(s):
         "├ TP1 도달 → SL을 진입가로 이동\n"
         "└ TP2 도달 → 추적 종료\n\n"
         f"🔗 BTCC:{s['symbol']}.P\n\n"
-        "⚠️ 자동주문 없음\n"
+        "⚠️ 자동주문 없음"
     )
 
 def position_msg(p,kind):
     if kind=="TP1":
         return (
-            f"🎯 TP1 도달\n\n"
+            "🎯 TP1 도달\n\n"
             "━━━━━━━━━━━━━━━━━━━━\n"
             f"🪙 #{p['symbol']}\n"
             f"📌 방향 : {'롱 (LONG)' if p['direction']=='LONG' else '숏 (SHORT)'}\n"
@@ -370,9 +375,10 @@ def position_msg(p,kind):
             "이제 본절 이하 손실을 차단합니다.\n"
             "━━━━━━━━━━━━━━━━━━━━"
         )
+
     if kind=="TP2":
         return (
-            f"🎯 TP2 도달\n\n"
+            "🎯 TP2 도달\n\n"
             "━━━━━━━━━━━━━━━━━━━━\n"
             f"🪙 #{p['symbol']}\n"
             f"📌 방향 : {'롱 (LONG)' if p['direction']=='LONG' else '숏 (SHORT)'}\n"
@@ -382,8 +388,9 @@ def position_msg(p,kind):
             "포지션 추적을 종료합니다.\n"
             "━━━━━━━━━━━━━━━━━━━━"
         )
+
     return (
-        f"🛑 손절가 도달\n\n"
+        "🛑 손절가 도달\n\n"
         "━━━━━━━━━━━━━━━━━━━━\n"
         f"🪙 #{p['symbol']}\n"
         f"📌 방향 : {'롱 (LONG)' if p['direction']=='LONG' else '숏 (SHORT)'}\n"
@@ -456,13 +463,17 @@ def main():
     print("BTCC REAL ROWS:",len(rs))
 
     if not rs:
-        tg("⚠️ BTCC 데이터 조회 실패\n\nTradingView BTCC 선물 데이터가 응답하지 않았습니다.")
+        tg(
+            "⚠️ BTCC 데이터 조회 실패\n\n"
+            "TradingView BTCC 선물 데이터가 응답하지 않았습니다."
+        )
         return
 
     state=load()
     check_positions(state,rs)
 
     candidates=[]
+
     for r in rs:
         try:
             s=analyze(r)
@@ -473,7 +484,10 @@ def main():
 
     candidates.sort(key=lambda x:x["score"],reverse=True)
 
-    print("QUALIFIED:",len(candidates),"ACTIVE:",len(state["positions"]))
+    print(
+        "QUALIFIED:",len(candidates),
+        "ACTIVE:",len(state["positions"])
+    )
 
     sent=0
     now_ts=time.time()
@@ -484,7 +498,6 @@ def main():
 
         sym=s["symbol"]
 
-        # 동일 종목 활성 포지션 중복 방지
         if sym in state["positions"]:
             continue
 
@@ -498,6 +511,7 @@ def main():
             continue
 
         state["signals"][key]=now_ts
+
         state["positions"][sym]={
             "symbol":sym,
             "direction":s["direction"],
