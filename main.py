@@ -14,7 +14,7 @@ TELEGRAM_CHAT_ID = "-1004443428081"
 STATE_FILE = "bot_state.json"
 MAX_POSITIONS = 15
 
-FORCE_RESET_STATE = False
+FORCE_RESET_STATE = True
 
 def send_telegram_message(message):
     if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
