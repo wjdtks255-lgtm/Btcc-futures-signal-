@@ -1,16 +1,6 @@
 {
     "active_positions": [
         {
-            "symbol": "ADAUSDT",
-            "type": "LONG",
-            "entry_price": 0.2674,
-            "leverage": 15,
-            "tp1": 0.271411,
-            "tp2": 0.27542200000000006,
-            "sl": 0.26338900000000004,
-            "tp1_reached": false
-        },
-        {
             "symbol": "ATOMUSDT",
             "type": "SHORT",
             "entry_price": 1.78,
@@ -78,7 +68,7 @@
             "tp1": 0.19556189999999998,
             "tp2": 0.1925838,
             "sl": 0.20151809999999998,
-            "tp1_reached": false
+            "tp1_reached": true
         },
         {
             "symbol": "BCHUSDT",
@@ -138,6 +128,26 @@
             "tp1": 118.3379,
             "tp2": 116.5358,
             "sl": 121.94209999999998,
+            "tp1_reached": false
+        },
+        {
+            "symbol": "1000PEPEUSDT",
+            "type": "SHORT",
+            "entry_price": 4.243e-06,
+            "leverage": 15,
+            "tp1": 4.1793549999999996e-06,
+            "tp2": 4.11571e-06,
+            "sl": 4.306644999999999e-06,
+            "tp1_reached": false
+        },
+        {
+            "symbol": "APTUSDT",
+            "type": "SHORT",
+            "entry_price": 0.8209,
+            "leverage": 15,
+            "tp1": 0.8085865,
+            "tp2": 0.7962729999999999,
+            "sl": 0.8332134999999998,
             "tp1_reached": false
         }
     ]
