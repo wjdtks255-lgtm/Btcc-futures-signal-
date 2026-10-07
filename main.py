@@ -69,59 +69,49 @@ def save_state(state):
         print(f"상태 저장 중 에러: {e}")
 
 # ---------------------------------------------------------
-# BTCC 거래소 전체 선물 종목 자동 로드 (개편)
+# BTCC 거래소 상장 선물 종목만 수집 (엄격 적용)
 # ---------------------------------------------------------
 def get_all_futures_symbols():
     headers = {"User-Agent": "Mozilla/5.0"}
     symbols = []
     
-    # 1. BTCC Tickers API 로드
-    try:
-        url = "https://api.btcc.com/api/v1/market/tickers"
-        res = requests.get(url, headers=headers, timeout=10)
-        if res.status_code == 200:
-            data = res.json()
-            ticker_list = data.get("data", []) if isinstance(data, dict) else data
-            
-            for item in ticker_list:
-                raw_symbol = item.get("symbol", "")
-                if not raw_symbol:
-                    continue
-                
-                # BTCC API 내부 심볼 정제 (예: BTC_USDT -> BTCUSDT)
-                clean_symbol = raw_symbol.replace("_", "").replace("-", "").upper()
-                if clean_symbol.endswith("USDT"):
-                    symbols.append(clean_symbol)
-    except Exception as e:
-        print(f"⚠️ BTCC 종목 수집 중 예외 발생: {e}")
+    urls = [
+        "https://api.btcc.com/api/v1/market/tickers",
+        "https://api.btcc.com/api/v1/market/symbolList"
+    ]
 
-    # 2. BTCC API 응답이 없거나 예외 발생 시 대체 백업 (OKX/Binance 선물 목록)
-    if not symbols:
-        print("⚠️ BTCC API 종목 로드 실패로 OKX 선물 백업 종목을 수집합니다.")
+    for url in urls:
         try:
-            url = "https://www.okx.com/api/v5/public/instruments?instType=SWAP"
             res = requests.get(url, headers=headers, timeout=8)
             if res.status_code == 200:
-                data = res.json().get("data", [])
-                for item in data:
-                    inst_id = item.get("instId", "")
-                    if inst_id.endswith("-USDT-SWAP"):
-                        clean_symbol = inst_id.replace("-USDT-SWAP", "USDT")
-                        symbols.append(clean_symbol)
-        except Exception:
-            pass
+                raw_data = res.json()
+                items = raw_data.get("data", []) if isinstance(raw_data, dict) else raw_data
+                if isinstance(items, list):
+                    for item in items:
+                        if isinstance(item, dict):
+                            raw_symbol = item.get("symbol", "") or item.get("symbolName", "")
+                        elif isinstance(item, str):
+                            raw_symbol = item
+                        else:
+                            continue
+
+                        if "USDT" in raw_symbol.upper():
+                            clean_symbol = raw_symbol.replace("_", "").replace("-", "").upper()
+                            symbols.append(clean_symbol)
+        except Exception as e:
+            print(f"⚠️ BTCC API ({url}) 로드 예외: {e}")
 
     final_symbols = sorted(list(set(symbols)))
-    print(f"📊 BTCC 및 선물 시장 전체 {len(final_symbols)}개 종목 로드 완료")
+    print(f"📊 BTCC 상장 선물 종목 총 {len(final_symbols)}개 로드 완료")
     return final_symbols if final_symbols else ["BTCUSDT", "ETHUSDT", "XRPUSDT", "SOLUSDT", "DOGEUSDT"]
 
 # ---------------------------------------------------------
-# 시세 데이터 수집 (BTCC / OKX 백업)
+# BTCC 시세 데이터 수집 (BTCC API 우선 + OKX 백업)
 # ---------------------------------------------------------
 def fetch_market_data(symbol, interval="15m", limit=100):
     headers = {"User-Agent": "Mozilla/5.0"}
     
-    # 1. BTCC API 시도
+    # 1. BTCC 공식 K라인 API
     try:
         formatted_symbol = symbol.replace("USDT", "_USDT") if "_" not in symbol else symbol
         url = f"https://api.btcc.com/api/v1/market/kline?symbol={formatted_symbol}&period={interval}&limit={limit}"
@@ -138,11 +128,12 @@ def fetch_market_data(symbol, interval="15m", limit=100):
                 df['close'] = df['close'].astype(float)
                 df['high'] = df['high'].astype(float)
                 df['low'] = df['low'].astype(float)
+                df['open'] = df['open'].astype(float)
                 return df
     except Exception:
         pass
 
-    # 2. OKX API 백업 (BTCC 시세 미제공 시)
+    # 2. BTCC API 차단/타임아웃 시 동일 시세 백업 (OKX)
     try:
         base_asset = symbol.replace("USDT", "").replace("_", "")
         okx_symbol = f"{base_asset}-USDT-SWAP"
@@ -156,6 +147,7 @@ def fetch_market_data(symbol, interval="15m", limit=100):
                 df['close'] = df['close'].astype(float)
                 df['high'] = df['high'].astype(float)
                 df['low'] = df['low'].astype(float)
+                df['open'] = df['open'].astype(float)
                 return df
     except Exception:
         pass
@@ -173,7 +165,7 @@ def calculate_recommended_leverage(df):
 
         if volatility_pct >= 2.5:
             rec_lev = 3
-            risk_level = "⚡ 고변동성 (주의)"
+            risk_level = "⚡ 초고변동성 (주의)"
         elif volatility_pct >= 1.5:
             rec_lev = 5
             risk_level = "⚖️ 보통 변동성"
@@ -287,7 +279,7 @@ def main():
     save_state(state)
 
     # ---------------------------------------------------------
-    # 2. BTCC 전체 종목 대상 신규 시그널 탐색
+    # 2. BTCC 전체 선물 종목 대상 스캔
     # ---------------------------------------------------------
     current_count = len(remaining_positions)
     if current_count >= MAX_POSITIONS:
@@ -295,7 +287,7 @@ def main():
         return
 
     all_symbols = get_all_futures_symbols()
-    print(f"🔎 총 {len(all_symbols)}개 BTCC 종목 대상 신규 시그널 스캔 중... (현재 {current_count}/{MAX_POSITIONS} 슬롯 사용 중)")
+    print(f"🔎 총 {len(all_symbols)}개 BTCC 상장 코인 스캔 시작... (현재 {current_count}/{MAX_POSITIONS} 사용 중)")
     active_symbols = [p["symbol"] for p in remaining_positions]
 
     for symbol in all_symbols:
@@ -323,7 +315,7 @@ def main():
         signal_type = None
         strategy_name = ""
 
-        # 1. RSI 역발상 시그널
+        # 1. RSI 역발상 시그널 (기준: 35 / 65)
         if prev['rsi'] <= 35 and latest['rsi'] > 35:
             signal_type = "LONG"
             strategy_name = "RSI 과매도 반등 추세전환"
@@ -342,7 +334,7 @@ def main():
                 signal_type = "SHORT"
                 strategy_name = "EMA 하락추세 + MACD 모멘텀"
 
-        # 시그널 발생 시 텔레그램 메시지 발송
+        # 시그널 발생 시 텔레그램 알림 발송
         if signal_type:
             rec_lev, risk_level = calculate_recommended_leverage(df)
 
@@ -401,7 +393,7 @@ def main():
             save_state(state)
 
             if current_count >= MAX_POSITIONS:
-                print("🏁 최대 포지션 15개가 채워져 이번 스캔을 종료합니다.")
+                print("🏁 최대 포지션 15개가 채워져 스캔을 완료합니다.")
                 break
 
 if __name__ == "__main__":
