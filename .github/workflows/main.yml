@@ -29,16 +29,22 @@ jobs:
       - name: Install
         run: pip install -r requirements.txt
 
-      - name: Check Secrets
+      - name: Check Telegram Secrets
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
-          test -n "$TELEGRAM_TOKEN" || exit 1
-          test -n "$TELEGRAM_CHAT_ID" || exit 1
-          echo "Telegram Secrets OK"
+          if [ -z "$TELEGRAM_TOKEN" ]; then
+            echo "❌ TELEGRAM_TOKEN 없음"
+            exit 1
+          fi
+          if [ -z "$TELEGRAM_CHAT_ID" ]; then
+            echo "❌ TELEGRAM_CHAT_ID 없음"
+            exit 1
+          fi
+          echo "✅ Telegram Secrets 정상"
 
-      - name: Run Scanner
+      - name: Run BTCC Scanner
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
