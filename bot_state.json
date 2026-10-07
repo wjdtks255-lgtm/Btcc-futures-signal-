@@ -1,3 +1,14 @@
 {
-    "active_positions": []
+    "active_positions": [
+        {
+            "symbol": "XRPUSDT",
+            "type": "SHORT",
+            "entry_price": 1.4959,
+            "leverage": 15,
+            "tp1": 1.4734615,
+            "tp2": 1.451023,
+            "sl": 1.5183384999999998,
+            "tp1_reached": false
+        }
+    ]
 }
