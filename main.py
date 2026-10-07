@@ -1,522 +1,500 @@
 import os,json,time,requests
-from datetime import datetime,timezone
+from datetime import datetime,timezone,timedelta
 
 TOKEN=os.getenv("TELEGRAM_TOKEN","").strip()
-CHAT_ID=os.getenv("TELEGRAM_CHAT_ID","").strip()
+CHAT_ID=(os.getenv("TELEGRAM_CHAT_ID") or os.getenv("CHAT_ID") or "").strip()
+
 STATE_FILE="bot_state.json"
+TV_URL="https://scanner.tradingview.com/crypto/scan"
 
-URL="https://scanner.tradingview.com/crypto/scan"
-MIN_SCORE=68
-STRONG_SCORE=80
+THRESHOLD=68
+STRONG=80
 COOLDOWN=180
-MAX_SYMBOLS=1000
-MIN_VOLUME=100000
+MAX_ALERTS=5
 
-S=requests.Session()
-S.headers.update({
-    "User-Agent":"Mozilla/5.0",
-    "Accept":"application/json",
-    "Content-Type":"application/json",
-    "Origin":"https://www.tradingview.com",
-    "Referer":"https://www.tradingview.com/"
-})
+KST=timezone(timedelta(hours=9))
 
-def tg(msg):
-    if not TOKEN or not CHAT_ID:
-        print("Telegram Secret missing")
-        return False
-    try:
-        r=S.post(
-            f"https://api.telegram.org/bot{TOKEN}/sendMessage",
-            data={
-                "chat_id":CHAT_ID,
-                "text":msg,
-                "parse_mode":"HTML",
-                "disable_web_page_preview":True
-            },
-            timeout=15
-        )
-        print("Telegram:",r.status_code)
-        return r.ok
-    except Exception as e:
-        print("Telegram error:",e)
-        return False
+COLUMNS=[
+"close|15","volume|15","EMA20|15","EMA50|15","EMA100|15","RSI|15","ADX|15","ATR|15",
+"close|60","volume|60","EMA20|60","EMA50|60","EMA100|60","RSI|60","ADX|60","ATR|60",
+"change|15","change|60"
+]
+
+def now():
+    return datetime.now(KST)
 
 def load_state():
+    if not os.path.exists(STATE_FILE):
+        return {"positions":{},"signals":{}}
     try:
         with open(STATE_FILE,"r",encoding="utf-8") as f:
-            x=json.load(f)
-        x.setdefault("positions",{})
-        x.setdefault("signals",{})
-        return x
-    except:
+            s=json.load(f)
+        s.setdefault("positions",{})
+        s.setdefault("signals",{})
+        return s
+    except Exception:
         return {"positions":{},"signals":{}}
 
-def save_state(x):
-    with open(STATE_FILE,"w",encoding="utf-8") as f:
-        json.dump(x,f,ensure_ascii=False,indent=2)
+def save_state(state):
+    tmp=STATE_FILE+".tmp"
+    with open(tmp,"w",encoding="utf-8") as f:
+        json.dump(state,f,ensure_ascii=False,indent=2)
+    os.replace(tmp,STATE_FILE)
 
-def n(v):
-    try:
-        return float(v)
-    except:
-        return None
-
-def fetch_btcc():
-    cols=[
-        "name","description","close","change","volume",
-        "close|15","volume|15","EMA20|15","EMA50|15",
-        "EMA100|15","RSI|15","ADX|15","ATR|15",
-        "close|60","volume|60","EMA20|60","EMA50|60",
-        "EMA100|60","RSI|60","ADX|60","ATR|60",
-        "change|15","change|60"
-    ]
-
+def tv_scan():
     payload={
         "filter":[
             {"left":"exchange","operation":"equal","right":"BTCC"}
         ],
-        "options":{
-            "lang":"en",
-            "active_symbols_only":True
-        },
-        "symbols":{
-            "query":{"types":[]},
-            "tickers":[]
-        },
-        "columns":cols,
-        "sort":{
-            "sortBy":"volume|15",
-            "sortOrder":"desc"
-        },
-        "range":[0,MAX_SYMBOLS]
+        "options":{"lang":"en"},
+        "markets":["crypto"],
+        "symbols":{"query":{"types":["crypto"]},"tickers":[]},
+        "columns":COLUMNS,
+        "sort":{"sortBy":"volume|15","sortOrder":"desc"},
+        "range":[0,1000]
     }
 
+    r=requests.post(
+        TV_URL,
+        json=payload,
+        headers={
+            "User-Agent":"Mozilla/5.0",
+            "Content-Type":"application/json",
+            "Referer":"https://www.tradingview.com/"
+        },
+        timeout=30
+    )
+    print("TradingView:",r.status_code)
+    r.raise_for_status()
+
+    data=r.json()
+    rows=data.get("data",[])
+    print("TradingView BTCC rows:",len(rows))
+    return rows
+
+def val(row,i,default=0):
     try:
-        r=S.post(URL,json=payload,timeout=20)
-        print("TradingView:",r.status_code)
+        x=row.get("d",[])[i]
+        return float(x) if x is not None else default
+    except:
+        return default
+
+def symbol_name(row):
+    s=str(row.get("s",""))
+    if ":" in s:
+        s=s.split(":",1)[1]
+    return s.replace(".P","")
+
+def analyze(row):
+    p15=val(row,0)
+    v15=val(row,1)
+    e20_15=val(row,2)
+    e50_15=val(row,3)
+    e100_15=val(row,4)
+    rsi15=val(row,5)
+    adx15=val(row,6)
+    atr15=val(row,7)
+
+    p60=val(row,8)
+    v60=val(row,9)
+    e20_60=val(row,10)
+    e50_60=val(row,11)
+    e100_60=val(row,12)
+    rsi60=val(row,13)
+    adx60=val(row,14)
+    atr60=val(row,15)
+
+    ch15=val(row,16)
+    ch60=val(row,17)
+
+    long_score=0
+    short_score=0
+    long_reasons=[]
+    short_reasons=[]
+
+    if e20_60>e50_60:
+        long_score+=18
+        long_reasons.append("1H EMA20 > EMA50")
+    elif e20_60<e50_60:
+        short_score+=18
+        short_reasons.append("1H EMA20 < EMA50")
+
+    if p60>e100_60:
+        long_score+=10
+        long_reasons.append("1H 가격 EMA100 상회")
+    elif p60<e100_60:
+        short_score+=10
+        short_reasons.append("1H 가격 EMA100 하회")
+
+    if p15>e20_15 and p15>e50_15:
+        long_score+=18
+        long_reasons.append("15M EMA20/50 위")
+    elif p15<e20_15 and p15<e50_15:
+        short_score+=18
+        short_reasons.append("15M EMA20/50 아래")
+
+    if p15>e100_15:
+        long_score+=7
+        long_reasons.append("15M EMA100 위")
+    elif p15<e100_15:
+        short_score+=7
+        short_reasons.append("15M EMA100 아래")
+
+    if 52<=rsi15<=72:
+        long_score+=10
+        long_reasons.append(f"RSI {rsi15:.1f} 상승구간")
+    elif 28<=rsi15<=48:
+        short_score+=10
+        short_reasons.append(f"RSI {rsi15:.1f} 하락구간")
+
+    if rsi60>=50:
+        long_score+=5
+        long_reasons.append(f"1H RSI {rsi60:.1f}")
+    elif rsi60<50:
+        short_score+=5
+        short_reasons.append(f"1H RSI {rsi60:.1f}")
+
+    if adx15>=18:
+        if long_score>=short_score:
+            long_score+=7
+            long_reasons.append(f"ADX {adx15:.1f} 추세 확인")
+        else:
+            short_score+=7
+            short_reasons.append(f"ADX {adx15:.1f} 추세 확인")
+
+    if adx60>=18:
+        if e20_60>e50_60:
+            long_score+=5
+            long_reasons.append(f"1H ADX {adx60:.1f}")
+        elif e20_60<e50_60:
+            short_score+=5
+            short_reasons.append(f"1H ADX {adx60:.1f}")
+
+    if ch15>0.35:
+        long_score+=8
+        long_reasons.append(f"15M +{ch15:.2f}%")
+    elif ch15<-0.35:
+        short_score+=8
+        short_reasons.append(f"15M {ch15:.2f}%")
+
+    if ch60>0.5:
+        long_score+=5
+        long_reasons.append(f"1H +{ch60:.2f}%")
+    elif ch60<-0.5:
+        short_score+=5
+        short_reasons.append(f"1H {ch60:.2f}%")
+
+    if v15>100000:
+        if long_score>short_score:
+            long_score+=7
+            long_reasons.append("15M 거래량 증가")
+        elif short_score>long_score:
+            short_score+=7
+            short_reasons.append("15M 거래량 증가")
+
+    if long_score>=short_score:
+        direction="LONG"
+        score=long_score
+        reasons=long_reasons
+    else:
+        direction="SHORT"
+        score=short_score
+        reasons=short_reasons
+
+    if score<THRESHOLD or p15<=0 or atr15<=0:
+        return None
+
+    risk=max(atr15*1.25,p15*0.008)
+
+    if direction=="LONG":
+        sl=p15-risk
+        tp1=p15+risk*1.5
+        tp2=p15+risk*2.5
+    else:
+        sl=p15+risk
+        tp1=p15-risk*1.5
+        tp2=p15-risk*2.5
+
+    atr_pct=(atr15/p15)*100 if p15 else 99
+
+    if atr_pct>=3:
+        lev=3
+    elif atr_pct>=2:
+        lev=5
+    elif atr_pct>=1:
+        lev=8
+    else:
+        lev=10
+
+    return {
+        "symbol":symbol_name(row),
+        "direction":direction,
+        "score":score,
+        "price":p15,
+        "sl":sl,
+        "tp1":tp1,
+        "tp2":tp2,
+        "atr":atr15,
+        "atr_pct":atr_pct,
+        "leverage":lev,
+        "reasons":reasons[:5],
+        "time":now().isoformat()
+    }
+
+def telegram(text):
+    if not TOKEN or not CHAT_ID:
+        print("Telegram secrets missing")
+        return False
+
+    url=f"https://api.telegram.org/bot{TOKEN}/sendMessage"
+
+    try:
+        r=requests.post(
+            url,
+            json={
+                "chat_id":CHAT_ID,
+                "text":text,
+                "disable_web_page_preview":True
+            },
+            timeout=20
+        )
 
         if r.status_code!=200:
-            print(r.text[:1000])
-            return [],cols
+            print("Telegram:",r.status_code,r.text[:500])
+            return False
 
-        j=r.json()
-        rows=j.get("data",[])
-        print("TradingView BTCC rows:",len(rows))
-
-        result=[]
-
-        for row in rows:
-            try:
-                d=dict(zip(cols,row["d"]))
-                ticker=row.get("s","")
-
-                if not ticker.startswith("BTCC:"):
-                    continue
-
-                symbol=ticker.split(":",1)[1]
-                symbol=symbol.replace(".P","")
-
-                d["symbol"]=symbol
-                result.append(d)
-            except:
-                continue
-
-        print("BTCC symbols:",len(result))
-        return result,cols
-
+        print("Telegram: 200")
+        return True
     except Exception as e:
-        print("BTCC data error:",e)
-        return [],cols
+        print("Telegram ERROR:",e)
+        return False
 
-def analyze(x):
-    p=n(x.get("close|15"))
-    e20=n(x.get("EMA20|15"))
-    e50=n(x.get("EMA50|15"))
-    e100=n(x.get("EMA100|15"))
-    rsi=n(x.get("RSI|15"))
-    adx=n(x.get("ADX|15"))
-    atr=n(x.get("ATR|15"))
+def telegram_check():
+    if not TOKEN or not CHAT_ID:
+        print("ERROR: Telegram secrets missing")
+        return False
 
-    hp=n(x.get("close|60"))
-    he20=n(x.get("EMA20|60"))
-    he50=n(x.get("EMA50|60"))
-    he100=n(x.get("EMA100|60"))
-    hrsi=n(x.get("RSI|60"))
-    hadx=n(x.get("ADX|60"))
+    try:
+        r=requests.get(
+            f"https://api.telegram.org/bot{TOKEN}/getChat",
+            params={"chat_id":CHAT_ID},
+            timeout=15
+        )
+        print("Telegram chat check:",r.status_code)
 
-    c15=n(x.get("change|15")) or 0
-    c60=n(x.get("change|60")) or 0
-    vol=n(x.get("volume|15")) or 0
+        if r.status_code!=200:
+            print("Telegram chat error:",r.text[:500])
+            return False
 
-    vals=[p,e20,e50,e100,rsi,adx,atr,hp,he20,he50,he100,hrsi,hadx]
+        return True
+    except Exception as e:
+        print("Telegram check error:",e)
+        return False
 
-    if any(v is None for v in vals):
-        return None
-
-    if p<=0 or atr<=0:
-        return None
-
-    L=SCORE_L=0
-    reasons_l=[]
-    reasons_s=[]
-
-    if he20>he50:
-        L+=18
-        reasons_l.append("1H EMA20 > EMA50")
-    elif he20<he50:
-        SCORE_L=18
-        reasons_s.append("1H EMA20 < EMA50")
-
-    if hp>he100:
-        L+=10
-        reasons_l.append("1H EMA100 위")
-    elif hp<he100:
-        SCORE_L+=10
-        reasons_s.append("1H EMA100 아래")
-
-    if p>e20>e50:
-        L+=18
-        reasons_l.append("15M EMA 정배열")
-    elif p<e20<e50:
-        SCORE_L+=18
-        reasons_s.append("15M EMA 역배열")
-
-    if p>e100:
-        L+=7
-        reasons_l.append("15M EMA100 위")
-    elif p<e100:
-        SCORE_L+=7
-        reasons_s.append("15M EMA100 아래")
-
-    if 52<rsi<72:
-        L+=10
-        reasons_l.append(f"RSI {rsi:.1f} 상승권")
-    elif 28<rsi<48:
-        SCORE_L+=10
-        reasons_s.append(f"RSI {rsi:.1f} 하락권")
-
-    if 45<hrsi<70 and he20>he50:
-        L+=5
-        reasons_l.append(f"1H RSI {hrsi:.1f}")
-    elif 30<hrsi<55 and he20<he50:
-        SCORE_L+=5
-        reasons_s.append(f"1H RSI {hrsi:.1f}")
-
-    if adx>=18:
-        if L>SCORE_L:
-            L+=7
-            reasons_l.append(f"ADX {adx:.1f} 추세 확인")
-        elif SCORE_L>L:
-            SCORE_L+=7
-            reasons_s.append(f"ADX {adx:.1f} 추세 확인")
-
-    if hadx>=18:
-        if L>SCORE_L:
-            L+=5
-            reasons_l.append(f"1H ADX {hadx:.1f}")
-        elif SCORE_L>L:
-            SCORE_L+=5
-            reasons_s.append(f"1H ADX {hadx:.1f}")
-
-    if c15>0.35:
-        L+=8
-        reasons_l.append(f"15M 모멘텀 +{c15:.2f}%")
-    elif c15<-0.35:
-        SCORE_L+=8
-        reasons_s.append(f"15M 모멘텀 {c15:.2f}%")
-
-    if c60>0.5:
-        L+=5
-        reasons_l.append(f"1H 변화 +{c60:.2f}%")
-    elif c60<-0.5:
-        SCORE_L+=5
-        reasons_s.append(f"1H 변화 {c60:.2f}%")
-
-    if vol>=MIN_VOLUME:
-        if L>SCORE_L and c15>0:
-            L+=7
-            reasons_l.append("15M 거래량 확인")
-        elif SCORE_L>L and c15<0:
-            SCORE_L+=7
-            reasons_s.append("15M 거래량 확인")
-
-    if L>=SCORE_L and L>=MIN_SCORE:
-        return {
-            "direction":"LONG",
-            "score":L,
-            "price":p,
-            "atr":atr,
-            "rsi":rsi,
-            "adx":adx,
-            "c15":c15,
-            "c60":c60,
-            "reasons":reasons_l
-        }
-
-    if SCORE_L>L and SCORE_L>=MIN_SCORE:
-        return {
-            "direction":"SHORT",
-            "score":SCORE_L,
-            "price":p,
-            "atr":atr,
-            "rsi":rsi,
-            "adx":adx,
-            "c15":c15,
-            "c60":c60,
-            "reasons":reasons_s
-        }
-
-    return None
-
-def levels(price,atr,d):
-    risk=max(atr*1.25,price*0.008)
-
-    if d=="LONG":
-        return price-risk,price+risk*1.5,price+risk*2.5,risk
-
-    return price+risk,price-risk*1.5,price-risk*2.5,risk
-
-def lev(price,atr):
-    x=atr/price*100
-    if x>=3:return 3
-    if x>=2:return 5
-    if x>=1:return 8
-    return 10
-
-def fmt(x):
-    if x>=100:return f"{x:,.2f}"
-    if x>=1:return f"{x:,.4f}"
-    if x>=0.01:return f"{x:,.6f}"
+def price(x):
+    if x>=1000:
+        return f"{x:,.2f}"
+    if x>=1:
+        return f"{x:,.4f}"
     return f"{x:.8f}"
 
-def cooldown_ok(state,sym,d):
-    key=f"{sym}:{d}"
-    return time.time()-state["signals"].get(key,0)>=COOLDOWN*60
+def new_signal_message(signals):
+    lines=[
+        "🚨 BTCC FUTURES SIGNAL",
+        "━━━━━━━━━━━━━━━━━━",
+        "📡 DATA : BTCC / TradingView",
+        f"🕒 KST : {now().strftime('%Y-%m-%d %H:%M')}",
+        ""
+    ]
 
-def track(state,data):
-    remove=[]
+    for i,s in enumerate(signals,1):
+        icon="🟢" if s["direction"]=="LONG" else "🔴"
+        reason=" · ".join(s["reasons"])
 
-    for sym,p in state["positions"].items():
-        x=data.get(sym)
-        if not x:
+        lines += [
+            f"{icon} #{i} {s['symbol']}  {s['direction']}",
+            f"⭐ SCORE : {s['score']}/100",
+            f"💰 ENTRY : {price(s['price'])}",
+            f"🛑 SL : {price(s['sl'])}",
+            f"🎯 TP1 : {price(s['tp1'])}",
+            f"🎯 TP2 : {price(s['tp2'])}",
+            f"⚡ LEVERAGE : {s['leverage']}x",
+            f"📊 ATR : {s['atr_pct']:.2f}%",
+            f"🧠 REASON : {reason}",
+            "━━━━━━━━━━━━━━━━━━"
+        ]
+
+    lines.append("⚠️ 신호는 기술적 조건 기반이며 실제 주문은 실행하지 않습니다.")
+    return "\n".join(lines)
+
+def check_positions(state,rows):
+    if not state["positions"]:
+        return
+
+    latest={}
+    for row in rows:
+        latest[symbol_name(row)]=val(row,0)
+
+    finished=[]
+
+    for symbol,pos in list(state["positions"].items()):
+        p=latest.get(symbol)
+        if not p:
             continue
 
-        price=n(x.get("close|15"))
-        if price is None:
-            continue
+        direction=pos["direction"]
+        entry=pos["entry"]
+        sl=pos["sl"]
+        tp1=pos["tp1"]
+        tp2=pos["tp2"]
 
-        d=p["direction"]
-        sl=p["sl"]
-        tp1=p["tp1"]
-        tp2=p["tp2"]
+        if direction=="LONG":
+            if p>=tp2:
+                telegram(
+                    f"🎯 BTCC TP2 HIT\n\n"
+                    f"#{symbol} LONG\n"
+                    f"Entry : {price(entry)}\n"
+                    f"TP2 : {price(tp2)}\n"
+                    f"Current : {price(p)}"
+                )
+                finished.append(symbol)
+                continue
 
-        if d=="LONG":
-            if not p.get("tp1_hit") and price>=tp1:
-                p["tp1_hit"]=True
-                p["sl"]=p["entry"]
+            if p<=sl:
+                telegram(
+                    f"🛑 BTCC STOP LOSS\n\n"
+                    f"#{symbol} LONG\n"
+                    f"Entry : {price(entry)}\n"
+                    f"SL : {price(sl)}\n"
+                    f"Current : {price(p)}"
+                )
+                finished.append(symbol)
+                continue
 
-                tg(
-                    f"🎯 <b>BTCC TP1 HIT</b>\n"
-                    f"━━━━━━━━━━━━━━\n"
-                    f"#{sym}\n"
-                    f"📈 LONG\n"
-                    f"💰 {fmt(price)}\n"
-                    f"🎯 TP1 {fmt(tp1)}\n"
+            if not pos.get("tp1_hit") and p>=tp1:
+                pos["tp1_hit"]=True
+                pos["sl"]=entry
+                telegram(
+                    f"🎯 BTCC TP1 HIT\n\n"
+                    f"#{symbol} LONG\n"
+                    f"Entry : {price(entry)}\n"
+                    f"TP1 : {price(tp1)}\n"
+                    f"Current : {price(p)}\n\n"
                     f"🔒 SL → ENTRY"
                 )
-
-            elif price>=tp2:
-                tg(
-                    f"🏆 <b>BTCC TP2 HIT</b>\n"
-                    f"━━━━━━━━━━━━━━\n"
-                    f"#{sym}\n"
-                    f"📈 LONG 종료\n"
-                    f"💰 {fmt(price)}\n"
-                    f"🎯 TP2 {fmt(tp2)}"
-                )
-                remove.append(sym)
-
-            elif price<=sl:
-                tg(
-                    f"🛑 <b>BTCC STOP LOSS</b>\n"
-                    f"━━━━━━━━━━━━━━\n"
-                    f"#{sym}\n"
-                    f"📉 LONG 종료\n"
-                    f"💰 {fmt(price)}\n"
-                    f"🛑 SL {fmt(sl)}"
-                )
-                remove.append(sym)
 
         else:
-            if not p.get("tp1_hit") and price<=tp1:
-                p["tp1_hit"]=True
-                p["sl"]=p["entry"]
+            if p<=tp2:
+                telegram(
+                    f"🎯 BTCC TP2 HIT\n\n"
+                    f"#{symbol} SHORT\n"
+                    f"Entry : {price(entry)}\n"
+                    f"TP2 : {price(tp2)}\n"
+                    f"Current : {price(p)}"
+                )
+                finished.append(symbol)
+                continue
 
-                tg(
-                    f"🎯 <b>BTCC TP1 HIT</b>\n"
-                    f"━━━━━━━━━━━━━━\n"
-                    f"#{sym}\n"
-                    f"📉 SHORT\n"
-                    f"💰 {fmt(price)}\n"
-                    f"🎯 TP1 {fmt(tp1)}\n"
+            if p>=sl:
+                telegram(
+                    f"🛑 BTCC STOP LOSS\n\n"
+                    f"#{symbol} SHORT\n"
+                    f"Entry : {price(entry)}\n"
+                    f"SL : {price(sl)}\n"
+                    f"Current : {price(p)}"
+                )
+                finished.append(symbol)
+                continue
+
+            if not pos.get("tp1_hit") and p<=tp1:
+                pos["tp1_hit"]=True
+                pos["sl"]=entry
+                telegram(
+                    f"🎯 BTCC TP1 HIT\n\n"
+                    f"#{symbol} SHORT\n"
+                    f"Entry : {price(entry)}\n"
+                    f"TP1 : {price(tp1)}\n"
+                    f"Current : {price(p)}\n\n"
                     f"🔒 SL → ENTRY"
                 )
 
-            elif price<=tp2:
-                tg(
-                    f"🏆 <b>BTCC TP2 HIT</b>\n"
-                    f"━━━━━━━━━━━━━━\n"
-                    f"#{sym}\n"
-                    f"📉 SHORT 종료\n"
-                    f"💰 {fmt(price)}\n"
-                    f"🎯 TP2 {fmt(tp2)}"
-                )
-                remove.append(sym)
+    for symbol in finished:
+        state["positions"].pop(symbol,None)
 
-            elif price>=sl:
-                tg(
-                    f"🛑 <b>BTCC STOP LOSS</b>\n"
-                    f"━━━━━━━━━━━━━━\n"
-                    f"#{sym}\n"
-                    f"📈 SHORT 종료\n"
-                    f"💰 {fmt(price)}\n"
-                    f"🛑 SL {fmt(sl)}"
-                )
-                remove.append(sym)
+def add_signals(state,signals):
+    t=time.time()
+    new=[]
 
-    for sym in remove:
-        state["positions"].pop(sym,None)
+    for s in signals:
+        key=f"{s['symbol']}:{s['direction']}"
+        old=state["signals"].get(key,0)
 
-def message(sym,x,sl,tp1,tp2,leverage):
-    icon="🟢" if x["direction"]=="LONG" else "🔴"
-    level="🔥 STRONG" if x["score"]>=STRONG_SCORE else "⚡ SIGNAL"
-    reasons="\n".join("• "+r for r in x["reasons"][:7])
+        if t-old<COOLDOWN*60:
+            continue
 
-    return (
-        f"{icon} <b>BTCC FUTURES {level}</b>\n"
-        f"━━━━━━━━━━━━━━━━━━\n"
-        f"#{sym}\n"
-        f"{'📈 LONG' if x['direction']=='LONG' else '📉 SHORT'}\n\n"
-        f"💰 ENTRY  <b>{fmt(x['price'])}</b>\n"
-        f"🛑 SL     <b>{fmt(sl)}</b>\n"
-        f"🎯 TP1    <b>{fmt(tp1)}</b>\n"
-        f"🎯 TP2    <b>{fmt(tp2)}</b>\n"
-        f"⚡ LEV    <b>{leverage}x</b>\n\n"
-        f"📊 SCORE  <b>{x['score']}</b>\n"
-        f"RSI {x['rsi']:.1f} | ADX {x['adx']:.1f}\n"
-        f"15M {x['c15']:+.2f}% | 1H {x['c60']:+.2f}%\n\n"
-        f"📌 <b>진입 근거</b>\n{reasons}\n\n"
-        f"🏦 DATA: <b>BTCC Futures</b>\n"
-        f"📊 Feed: TradingView BTCC\n"
-        f"⚠️ 참고용 시그널"
-    )
+        state["signals"][key]=t
+        new.append(s)
+
+        state["positions"][s["symbol"]]={
+            "direction":s["direction"],
+            "entry":s["price"],
+            "sl":s["sl"],
+            "tp1":s["tp1"],
+            "tp2":s["tp2"],
+            "tp1_hit":False,
+            "created":s["time"]
+        }
+
+    return new
 
 def main():
     print("="*55)
-    print("🚀 BTCC FUTURES QUANT SCANNER V9.0")
+    print("🚀 BTCC FUTURES QUANT SCANNER V10.0")
     print("DATA: BTCC / TradingView")
     print("="*55)
 
-    if not TOKEN or not CHAT_ID:
-        print("❌ Telegram Secrets 없음")
+    if not telegram_check():
+        print("Telegram 연결 실패")
         return
 
     state=load_state()
 
-    rows,_=fetch_btcc()
+    rows=tv_scan()
+    print("BTCC symbols:",len(rows))
 
-    if not rows:
-        tg(
-            "❌ <b>BTCC 시장 데이터 오류</b>\n\n"
-            "TradingView BTCC Feed에서 데이터를 가져오지 못했습니다."
-        )
-        return
+    results=[]
 
-    data={x["symbol"]:x for x in rows if x.get("symbol")}
-
-    print("BTCC symbols:",len(data))
-
-    track(state,data)
-
-    candidates=[]
-
-    for sym,x in data.items():
-        if sym in state["positions"]:
-            continue
-
+    for row in rows:
         try:
-            a=analyze(x)
-
-            if not a:
-                continue
-
-            if not cooldown_ok(state,sym,a["direction"]):
-                continue
-
-            candidates.append((sym,a))
-
-            print(
-                f"{sym:18} "
-                f"{a['direction']:5} "
-                f"score={a['score']:3}"
-            )
-
+            s=analyze(row)
+            if s:
+                results.append(s)
+                print(
+                    f"{s['symbol']:<18} "
+                    f"{s['direction']:<5} "
+                    f"score={s['score']:>3}"
+                )
         except Exception as e:
-            print(sym,"ERROR",e)
+            print("Analyze error:",e)
 
-    candidates.sort(
-        key=lambda z:z[1]["score"],
-        reverse=True
-    )
+    results.sort(key=lambda x:x["score"],reverse=True)
 
-    sent=0
+    check_positions(state,rows)
 
-    for sym,x in candidates:
-        sl,tp1,tp2,risk=levels(
-            x["price"],
-            x["atr"],
-            x["direction"]
-        )
+    new=add_signals(state,results[:MAX_ALERTS])
 
-        leverage=lev(x["price"],x["atr"])
+    if new:
+        print("NEW SIGNALS:",len(new))
+        telegram(new_signal_message(new))
+    else:
+        print("No new BTCC signals")
 
-        if tg(message(sym,x,sl,tp1,tp2,leverage)):
-            state["positions"][sym]={
-                "direction":x["direction"],
-                "entry":x["price"],
-                "sl":sl,
-                "tp1":tp1,
-                "tp2":tp2,
-                "tp1_hit":False,
-                "score":x["score"],
-                "leverage":leverage,
-                "created":datetime.now(timezone.utc).isoformat()
-            }
-
-            state["signals"][
-                f"{sym}:{x['direction']}"
-            ]=time.time()
-
-            sent+=1
-
-    save(state)
+    save_state(state)
 
     print("="*55)
-    print("SCAN COMPLETE")
-    print("BTCC:",len(data))
-    print("Candidates:",len(candidates))
-    print("Signals:",sent)
-    print("Active:",len(state["positions"]))
+    print("ACTIVE POSITIONS:",len(state["positions"]))
+    print("TOTAL SIGNAL HISTORY:",len(state["signals"]))
     print("="*55)
-
-    tg(
-        f"📡 <b>BTCC SCAN COMPLETE</b>\n\n"
-        f"🏦 BTCC 종목: <b>{len(data)}</b>\n"
-        f"🎯 후보: <b>{len(candidates)}</b>\n"
-        f"🚨 신규: <b>{sent}</b>\n"
-        f"📌 ACTIVE: <b>{len(state['positions'])}</b>"
-    )
 
 if __name__=="__main__":
     main()
