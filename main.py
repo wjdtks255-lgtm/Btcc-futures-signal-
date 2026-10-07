@@ -50,7 +50,11 @@ def tg(msg):
     try:
         r=requests.post(
             f"https://api.telegram.org/bot{TOKEN}/sendMessage",
-            json={"chat_id":CHAT_ID,"text":msg,"disable_web_page_preview":True},
+            json={
+                "chat_id":CHAT_ID,
+                "text":msg,
+                "disable_web_page_preview":True
+            },
             timeout=15
         )
         print("TG:",r.status_code)
@@ -74,9 +78,14 @@ def rows():
     payload={
         "options":{"lang":"en"},
         "markets":["crypto"],
-        "filter":[{"left":"exchange","operation":"equal","right":"BTCC"}],
+        "filter":[
+            {"left":"exchange","operation":"equal","right":"BTCC"}
+        ],
         "columns":COL,
-        "sort":{"sortBy":"volume|15","sortOrder":"desc"},
+        "sort":{
+            "sortBy":"volume|15",
+            "sortOrder":"desc"
+        },
         "range":[0,500]
     }
     return tv(payload)
@@ -139,11 +148,9 @@ def analyze(row):
     else:
         return None
 
-    # 추세가 너무 약하면 진입 후보에서 제외
     if adx<20 or adxh<17:
         return None
 
-    # 극단적 과매수/과매도는 신규 진입 차단
     if direction=="LONG":
         if rsi>=73 or rsih>=75:
             return None
@@ -164,9 +171,7 @@ def analyze(row):
     setup=""
     timing=0
 
-    # ─────────────────────
     # 1H TREND 20
-    # ─────────────────────
     if direction=="LONG":
         if e20h>e50h>e100h:
             score+=12
@@ -184,9 +189,7 @@ def analyze(row):
             score+=3
         reasons.append("1시간 하락 추세 정렬")
 
-    # ─────────────────────
     # 15M TREND 15
-    # ─────────────────────
     if direction=="LONG":
         if e20>e50:
             score+=6
@@ -204,9 +207,7 @@ def analyze(row):
             score+=4
         reasons.append("15분 단기 추세 정렬")
 
-    # ─────────────────────
     # RSI 10
-    # ─────────────────────
     if direction=="LONG":
         if 50<=rsi<=63:
             score+=6
@@ -232,9 +233,7 @@ def analyze(row):
         elif 30<=rsih<34 or 52<rsih<=56:
             score+=2
 
-    # ─────────────────────
     # ADX 10
-    # ─────────────────────
     if adx>=30:
         score+=6
         reasons.append("15분 추세 강도 강함")
@@ -249,9 +248,7 @@ def analyze(row):
     elif adxh>=20:
         score+=2
 
-    # ─────────────────────
     # MOMENTUM 10
-    # ─────────────────────
     if direction=="LONG":
         if 0.10<=ch15<=0.90:
             score+=5
@@ -277,12 +274,7 @@ def analyze(row):
         elif -0.05<ch60<=0:
             score+=2
 
-    # ─────────────────────
     # ENTRY TIMING 25
-    # ─────────────────────
-    # EMA20 근처에서 방향성이 유지되는 구간을 가장 높게 평가
-    adist=abs(dist20)
-
     if direction=="LONG":
         if 0.05<=dist20<=0.55 and rsi>=48:
             timing=25
@@ -302,7 +294,6 @@ def analyze(row):
             reasons.append("EMA20 회복 시도")
         else:
             return None
-
     else:
         if -0.55<=dist20<=-0.05 and rsi<=52:
             timing=25
@@ -325,9 +316,7 @@ def analyze(row):
 
     score+=timing
 
-    # ─────────────────────
-    # VOLATILITY / RISK 10
-    # ─────────────────────
+    # VOLATILITY / RISK
     if 0.35<=atr_pct<=2.0:
         score+=10
         reasons.append("변동성 및 손절폭 양호")
@@ -338,32 +327,30 @@ def analyze(row):
     else:
         return None
 
-    # 유동성 최소조건
     if v15<50000 or v60<50000:
         return None
 
-    # 점수는 실제 구성요소만 합산하고 강제 100점 보정 금지
     score=min(score,100)
 
     if score<MIN_SCORE:
         return None
 
-    # 과도한 하락/상승 추격은 고득점 방지
+    # 이미 많이 진행된 방향은 강한 신호가 되지 못하게 제한
     if direction=="SHORT" and rsih<34:
         score=min(score,87)
+
     if direction=="LONG" and rsih>66:
         score=min(score,87)
 
     if direction=="LONG" and dist20>0.9:
         score=min(score,88)
+
     if direction=="SHORT" and dist20<-0.9:
         score=min(score,88)
 
-    # 리스크 계산
     risk=max(atr*1.15,p15*0.006)
-
-    # 손절폭이 너무 크면 진입 제외
     risk_pct=risk/p15*100
+
     if risk_pct>3.0:
         return None
 
@@ -376,7 +363,6 @@ def analyze(row):
         tp1=p15-risk*1.5
         tp2=p15-risk*2.5
 
-    # 변동성 기준 보수적 레버리지
     if atr_pct>=3.0:
         lev=3
     elif atr_pct>=2.0:
@@ -386,7 +372,6 @@ def analyze(row):
     else:
         lev=8
 
-    # 강한 시그널은 정말 좋은 타이밍에서만
     strong=(
         score>=STRONG_SCORE and
         timing>=20 and
@@ -420,9 +405,8 @@ def signal_msg(s):
     icon="🟢" if s["direction"]=="LONG" else "🔴"
     title="🔥 강한 매매 시그널" if s["strong"] else "⚡ 매매 시그널"
 
-    reasons=[]
     seen=set()
-
+    reasons=[]
     for x in s["reasons"]:
         if x not in seen:
             reasons.append(x)
@@ -462,14 +446,21 @@ def signal_msg(s):
     )
 
 def position_msg(p,kind):
+    sym=p.get("symbol","UNKNOWN")
+    direction=p.get("direction","LONG")
+    entry=p.get("entry",0)
+    sl=p.get("sl",0)
+    tp1=p.get("tp1",0)
+    tp2=p.get("tp2",0)
+
     if kind=="TP1":
         return (
             "🎯 TP1 도달\n\n"
             "━━━━━━━━━━━━━━━━━━━━\n"
-            f"🪙 #{p['symbol']}\n"
-            f"📌 방향 : {'롱 (LONG)' if p['direction']=='LONG' else '숏 (SHORT)'}\n"
-            f"💰 진입가 : {fmt(p['entry'])}\n"
-            f"🎯 TP1 : {fmt(p['tp1'])}\n\n"
+            f"🪙 #{sym}\n"
+            f"📌 방향 : {'롱 (LONG)' if direction=='LONG' else '숏 (SHORT)'}\n"
+            f"💰 진입가 : {fmt(entry)}\n"
+            f"🎯 TP1 : {fmt(tp1)}\n\n"
             "🔒 손절가 → 진입가 이동\n"
             "이제 본절 이하 손실을 차단합니다.\n"
             "━━━━━━━━━━━━━━━━━━━━"
@@ -479,10 +470,10 @@ def position_msg(p,kind):
         return (
             "🎯 TP2 도달\n\n"
             "━━━━━━━━━━━━━━━━━━━━\n"
-            f"🪙 #{p['symbol']}\n"
-            f"📌 방향 : {'롱 (LONG)' if p['direction']=='LONG' else '숏 (SHORT)'}\n"
-            f"💰 진입가 : {fmt(p['entry'])}\n"
-            f"🎯 TP2 : {fmt(p['tp2'])}\n\n"
+            f"🪙 #{sym}\n"
+            f"📌 방향 : {'롱 (LONG)' if direction=='LONG' else '숏 (SHORT)'}\n"
+            f"💰 진입가 : {fmt(entry)}\n"
+            f"🎯 TP2 : {fmt(tp2)}\n\n"
             "✅ 목표가 달성\n"
             "포지션 추적을 종료합니다.\n"
             "━━━━━━━━━━━━━━━━━━━━"
@@ -491,10 +482,10 @@ def position_msg(p,kind):
     return (
         "🛑 손절가 도달\n\n"
         "━━━━━━━━━━━━━━━━━━━━\n"
-        f"🪙 #{p['symbol']}\n"
-        f"📌 방향 : {'롱 (LONG)' if p['direction']=='LONG' else '숏 (SHORT)'}\n"
-        f"💰 진입가 : {fmt(p['entry'])}\n"
-        f"🛑 손절가 : {fmt(p['sl'])}\n\n"
+        f"🪙 #{sym}\n"
+        f"📌 방향 : {'롱 (LONG)' if direction=='LONG' else '숏 (SHORT)'}\n"
+        f"💰 진입가 : {fmt(entry)}\n"
+        f"🛑 손절가 : {fmt(sl)}\n\n"
         "포지션 추적을 종료합니다.\n"
         "━━━━━━━━━━━━━━━━━━━━"
     )
@@ -504,7 +495,21 @@ def check_positions(state,rs):
     remove=[]
 
     for sym,p in list(state["positions"].items()):
+        # 구버전 state 호환
+        if not isinstance(p,dict):
+            remove.append(sym)
+            continue
+
+        p.setdefault("symbol",sym)
+        p.setdefault("tp1_hit",False)
+
+        if "direction" not in p or "entry" not in p:
+            print("INVALID POSITION:",sym)
+            remove.append(sym)
+            continue
+
         r=by.get(sym)
+
         if not r:
             continue
 
@@ -512,34 +517,34 @@ def check_positions(state,rs):
         direction=p["direction"]
 
         if direction=="LONG":
-            if price>=p["tp2"]:
+            if price>=p.get("tp2",float("inf")):
                 tg(position_msg(p,"TP2"))
                 remove.append(sym)
                 continue
 
-            if price<=p["sl"]:
+            if price<=p.get("sl",-float("inf")):
                 tg(position_msg(p,"SL"))
                 remove.append(sym)
                 continue
 
-            if not p.get("tp1_hit") and price>=p["tp1"]:
+            if not p.get("tp1_hit") and price>=p.get("tp1",float("inf")):
                 p["tp1_hit"]=True
                 p["sl"]=p["entry"]
                 tg(position_msg(p,"TP1"))
                 time.sleep(.5)
 
         else:
-            if price<=p["tp2"]:
+            if price<=p.get("tp2",-float("inf")):
                 tg(position_msg(p,"TP2"))
                 remove.append(sym)
                 continue
 
-            if price>=p["sl"]:
+            if price>=p.get("sl",float("inf")):
                 tg(position_msg(p,"SL"))
                 remove.append(sym)
                 continue
 
-            if not p.get("tp1_hit") and price<=p["tp1"]:
+            if not p.get("tp1_hit") and price<=p.get("tp1",-float("inf")):
                 p["tp1_hit"]=True
                 p["sl"]=p["entry"]
                 tg(position_msg(p,"TP1"))
@@ -569,7 +574,6 @@ def main():
         return
 
     state=load()
-
     check_positions(state,rs)
 
     trend_candidates=0
@@ -577,7 +581,6 @@ def main():
 
     for r in rs:
         try:
-            # 1차 추세 후보 카운트
             p15=val(r,0)
             e20=val(r,2)
             e50=val(r,3)
@@ -587,8 +590,19 @@ def main():
             e50h=val(r,11)
             e100h=val(r,12)
 
-            bull=e20h>e50h>e100h and p60>e20h and p15>e20>e50 and p15>e100
-            bear=e20h<e50h<e100h and p60<e20h and p15<e20<e50 and p15<e100
+            bull=(
+                e20h>e50h>e100h and
+                p60>e20h and
+                p15>e20>e50 and
+                p15>e100
+            )
+
+            bear=(
+                e20h<e50h<e100h and
+                p60<e20h and
+                p15<e20<e50 and
+                p15<e100
+            )
 
             if bull or bear:
                 trend_candidates+=1
