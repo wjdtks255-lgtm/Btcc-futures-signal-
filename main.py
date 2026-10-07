@@ -131,6 +131,7 @@ def fetch_market_data(symbol, interval="15m", limit=100):
                 df['high'] = df['high'].astype(float)
                 df['low'] = df['low'].astype(float)
                 df['open'] = df['open'].astype(float)
+                df['volume'] = df['volume'].astype(float)
                 return df
     except Exception:
         pass
@@ -150,6 +151,7 @@ def fetch_market_data(symbol, interval="15m", limit=100):
                 df['high'] = df['high'].astype(float)
                 df['low'] = df['low'].astype(float)
                 df['open'] = df['open'].astype(float)
+                df['volume'] = df['volume'].astype(float)
                 return df
     except Exception:
         pass
@@ -187,7 +189,7 @@ def generate_active_summary_text(active_positions):
             summary_text += f"  - 진입가: `${format_price(entry)}` | 현재가: `${format_price(curr_price)}`\n"
             summary_text += f"  - 수익률: {pnl_icon} `{leveraged_pnl:+.2f}%` (원금 기준 `{pnl:+.2f}%`)\n\n"
         else:
-            summary_text += f"• #{symbol} (`{pos_type}` {rec_lev}x) - 진입가: `${format_price(entry)}` (시세 조회 대기)\n\n"
+            summary_text += f"• #{symbol} (`{pos_type}` {rec_lev}x) - 진입가: `${format_price(entry)}`\n\n"
 
     return summary_text.strip()
 
@@ -298,7 +300,6 @@ def main():
             status_icon = "🟢" if pnl_pct > 0 else "🔴"
             leveraged_pnl = pnl_pct * rec_lev
             
-            # 포지션 종료 알림 작성
             message = (
                 f"{status_icon} **[BTCC 퀀트] 포지션 종료 알림**\n"
                 f"──────────────────────\n"
@@ -310,7 +311,6 @@ def main():
                 f"──────────────────────\n"
             )
             
-            # 청산 후 남은 포지션 현황 요약 추가 전송
             temp_remaining = [p for p in remaining_positions if p["symbol"] != symbol]
             active_summary = generate_active_summary_text(temp_remaining)
             message += f"\n{active_summary}"
@@ -323,7 +323,7 @@ def main():
     save_state(state)
 
     # ---------------------------------------------------------
-    # 2. 전체 종목 대상 스캔 및 신규 시그널 탐색
+    # 2. 고정밀 고빈도 정밀 스캔 로직
     # ---------------------------------------------------------
     current_count = len(remaining_positions)
     if current_count >= MAX_POSITIONS:
@@ -342,41 +342,60 @@ def main():
         if df.empty or len(df) < 50:
             continue
 
+        # 지표 산출
         df['rsi'] = ta.momentum.rsi(df['close'], window=14)
         df['ema_short'] = ta.trend.ema_indicator(df['close'], window=20)
         df['ema_long'] = ta.trend.ema_indicator(df['close'], window=50)
+        df['ema_trend'] = ta.trend.ema_indicator(df['close'], window=200)
 
+        # 볼린저 밴드 (20, 2)
+        bb = ta.volatility.BollingerBands(df['close'], window=20, window_dev=2)
+        df['bb_hband'] = bb.bollinger_hband()
+        df['bb_lband'] = bb.bollinger_lband()
+
+        # MACD
         macd_indicator = ta.trend.MACD(df['close'], window_slow=26, window_fast=12, window_sign=9)
-        df['macd'] = macd_indicator.macd()
-        df['macd_signal'] = macd_indicator.macd_signal()
         df['macd_diff'] = macd_indicator.macd_diff()
+
+        # 거래량 이동평균 (5봉 평균)
+        df['vol_ma'] = df['volume'].rolling(window=5).mean()
 
         latest = df.iloc[-1]
         prev = df.iloc[-2]
         entry_price = latest['close']
         rsi_val = latest['rsi']
 
+        # 거래량 증가 조건 (평균 대비 1.15배 이상)
+        vol_confirmed = latest['volume'] > (latest['vol_ma'] * 1.15)
+
         signal_type = None
         strategy_name = ""
 
-        # 1. RSI 역발상 시그널
-        if prev['rsi'] <= 35 and latest['rsi'] > 35:
-            signal_type = "LONG"
-            strategy_name = "RSI 과매도 반등 추세전환"
-        elif prev['rsi'] >= 65 and latest['rsi'] < 65:
-            signal_type = "SHORT"
-            strategy_name = "RSI 과매수 이탈 반전"
+        # =========================================================
+        # 시그널 조건 (완화 + 정확도 검증 필터)
+        # =========================================================
 
-        # 2. EMA 추세 + MACD 모멘텀 시그널
+        # 1. RSI 완화(40/60) + 볼린저밴드 이탈 후 재진입 (고승률 역발상)
+        if prev['rsi'] <= 40 and latest['rsi'] > 40 and prev['low'] <= prev['bb_lband']:
+            signal_type = "LONG"
+            strategy_name = "볼린저 하단 반등 + RSI 과매도 회복"
+
+        elif prev['rsi'] >= 60 and latest['rsi'] < 60 and prev['high'] >= prev['bb_hband']:
+            signal_type = "SHORT"
+            strategy_name = "볼린저 상단 반전 + RSI 과매수 이탈"
+
+        # 2. EMA 추세 정배열 + MACD 모멘텀 + 거래량 수급 (고승률 추세 추종)
         elif latest['ema_short'] > latest['ema_long'] and prev['macd_diff'] < latest['macd_diff'] and latest['macd_diff'] > 0:
-            if 40 <= latest['rsi'] <= 65:
-                signal_type = "LONG"
-                strategy_name = "EMA 상승추세 + MACD 모멘텀"
+            if 38 <= latest['rsi'] <= 68 and vol_confirmed:
+                if latest['close'] > latest['ema_trend']:  # 200 EMA 상승 추세선 위에서만
+                    signal_type = "LONG"
+                    strategy_name = "200 EMA 정배열 + MACD 수급 돌파"
 
         elif latest['ema_short'] < latest['ema_long'] and prev['macd_diff'] > latest['macd_diff'] and latest['macd_diff'] < 0:
-            if 35 <= latest['rsi'] <= 60:
-                signal_type = "SHORT"
-                strategy_name = "EMA 하락추세 + MACD 모멘텀"
+            if 32 <= latest['rsi'] <= 62 and vol_confirmed:
+                if latest['close'] < latest['ema_trend']:  # 200 EMA 하락 추세선 아래서만
+                    signal_type = "SHORT"
+                    strategy_name = "200 EMA 역배열 + MACD 이탈 모멘텀"
 
         # 시그널 발생 시 텔레그램 알림 발송
         if signal_type:
@@ -439,6 +458,8 @@ def main():
             if current_count >= MAX_POSITIONS:
                 print("🏁 최대 포지션 15개가 채워져 스캔을 완료합니다.")
                 break
+
+    print(f"✅ 스캔 종료 (현재 관리 포지션: {len(state['active_positions'])}/{MAX_POSITIONS})")
 
 if __name__ == "__main__":
     main()
