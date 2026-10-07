@@ -14,6 +14,16 @@ MAX_ALERTS = 3
 COOLDOWN = 240
 MIN_SCORE = 82
 
+# 바이낸스와 BTCC 간 티커 명칭 불일치 대응 매핑
+SYMBOL_MAP = {
+    "1000PEPEUSDT": "PEPEUSDT",
+    "1000SHIBUSDT": "SHIBUSDT",
+    "1000BONKUSDT": "BONKUSDT",
+    "1000FLOKIUSDT": "FLOKIUSDT",
+    "1000LUNCUSDT": "LUNCUSDT",
+    "1000SATSUSDT": "1000SATSUSDT",
+}
+
 COL = [
     "open|15",
     "high|15",
@@ -137,62 +147,56 @@ def fmt(x):
     return f"{x:.8f}".rstrip("0").rstrip(".")
 
 
-# --- [시계열 K라인 수집: 바이낸스 Public API 참조] ---
+# --- [시계열 K라인 수집: 바이낸스 Public API 참조 & 예외 매핑] ---
 def fetch_klines(sym, limit=12):
-    """바이낸스 Public REST API를 참조하여 15분봉 시계열을 수집합니다 (API Key 불필요)."""
+    """BTCC 상장 종목을 바이낸스 Public REST API로 참조하여 15분봉 시계열을 수집합니다."""
     try:
-        # BTCC의 선물 심볼(예: BCHUSDT)을 바이낸스 선물/현물 심볼 형식으로 맞춤
         clean_sym = sym.upper().replace(".P", "")
-        url = f"https://fapi.binance.com/fapi/v1/klines?symbol={clean_sym}&interval=15m&limit={limit}"
-        r = requests.get(url, timeout=5)
+        clean_sym = SYMBOL_MAP.get(clean_sym, clean_sym)
 
-        # 선물 API에 없을 경우 현물 API로 Fallback
+        url = f"https://fapi.binance.com/fapi/v1/klines?symbol={clean_sym}&interval=15m&limit={limit}"
+        r = requests.get(url, timeout=4)
+
         if r.status_code != 200:
             url = f"https://api.binance.com/api/v3/klines?symbol={clean_sym}&interval=15m&limit={limit}"
-            r = requests.get(url, timeout=5)
+            r = requests.get(url, timeout=4)
 
         if r.status_code == 200:
             data = r.json()
-            klines = []
-            for item in data:
-                klines.append(
-                    {
-                        "open": float(item[1]),
-                        "high": float(item[2]),
-                        "low": float(item[3]),
-                        "close": float(item[4]),
-                        "vol": float(item[5]),
-                    }
-                )
-            return klines
+            return [
+                {
+                    "open": float(item[1]),
+                    "high": float(item[2]),
+                    "low": float(item[3]),
+                    "close": float(item[4]),
+                    "vol": float(item[5]),
+                }
+                for item in data
+            ]
     except Exception as e:
         print(f"KLINE FETCH ERROR ({sym}):", e)
     return []
 
 
 def verify_candle_structure(sym, direction, current_p):
-    """시계열 캔들 구조 기반 2차 검증"""
+    """시계열 캔들 구조 기반 2차 파동 검증"""
     klines = fetch_klines(sym, limit=12)
 
-    # API 수집 실패 시 통과시키되 경고
     if len(klines) < 8:
         return True, "KLINE_FETCH_SKIP"
 
-    history = klines[:-1]  # 확정된 직전 봉들
-    curr = klines[-1]  # 진행 중인 현재 봉
+    history = klines[:-1]
+    curr = klines[-1]
 
-    # 1. 횡보/죽은 파동 검사: 최근 5개 봉의 고저 변동 폭
     recent_highs = [k["high"] for k in history[-5:]]
     recent_lows = [k["low"] for k in history[-5:]]
     max_range = (max(recent_highs) - min(recent_lows)) / current_p * 100
 
-    if max_range < 0.25:  # 최근 5개 봉 동안 변동폭이 0.25% 미만이면 횡보
+    if max_range < 0.25:
         return False, "FLAT_CONSOLIDATION"
 
     if direction == "LONG":
-        # 최근 3~8봉 내 음봉 눌림 존재 여부
         has_pullback = any(k["close"] < k["open"] for k in history[-6:-1])
-        # 현재 봉 상승 전환 및 직전 봉 고점/종가 돌파
         is_rebound = (
             curr["close"] > curr["open"]
             and curr["close"] > history[-1]["close"]
@@ -204,9 +208,7 @@ def verify_candle_structure(sym, direction, current_p):
             return False, "NO_REBOUND_TRIGGER"
 
     else:  # SHORT
-        # 최근 3~8봉 내 양봉 반등 존재 여부
         has_bounce = any(k["close"] > k["open"] for k in history[-6:-1])
-        # 현재 봉 하락 전환 및 직전 봉 저점 이탈
         is_breakdown = (
             curr["close"] < curr["open"] and curr["close"] < history[-1]["low"]
         )
@@ -235,12 +237,10 @@ def analyze(r, st):
     atrph = atrh / ph * 100
     d20 = (p - e20) / e20 * 100
 
-    # 변동성 없는 종목 제거
     if atrp < 0.18 or atrph < 0.15:
         st["dead"] += 1
         return
 
-    # 과격한 종목 제거
     if atrp > 3.5 or atrph > 4.5:
         st["volatile"] += 1
         return
@@ -254,7 +254,6 @@ def analyze(r, st):
 
     direction = "LONG" if bull else "SHORT"
 
-    # 1차 위치 및 리스크 필터링
     if direction == "LONG":
         pullback = -0.75 <= d20 <= 0.25
         not_chase = rsh < 67 and rs < 68 and ch15 < 0.70 and d20 < 0.65
@@ -277,17 +276,15 @@ def analyze(r, st):
         st["adx"] += 1
         return
 
-    # 2단계: 시계열 캔들 파동 검증
     sym = symbol(r)
     valid_structure, reason = verify_candle_structure(sym, direction, p)
     if not valid_structure:
         st["trigger"] += 1
         return
 
-    # 점수 산정
     trend = 22 + (2 if (ph > e20h if bull else ph < e20h) else 0)
     location = 20 if abs(d20) <= 0.25 else (17 if abs(d20) <= 0.45 else 14)
-    timing = 20 if reason == "STRUCTURE_VALIDATED" else 15
+    timing = 23 if reason == "STRUCTURE_VALIDATED" else 15
 
     rscore = 8 if (40 <= rs <= 60) else 5
     adscore = 10 if adx >= 30 and adxh >= 30 else 7
@@ -316,7 +313,6 @@ def analyze(r, st):
         st["score"] += 1
         return
 
-    # A+ 등급 조건: 캔들 구조 완전 검증 + 실질 모멘텀 존재
     quality = (
         "A+"
         if (
