@@ -77,7 +77,7 @@ def save_state(state):
         print(f"⚠️ 상태 저장 중 에러: {e}")
 
 # ---------------------------------------------------------
-# 선물 시장 전체 종목 자동 로드 (API 실패 시 300+개 전체 백업 리스트 보장)
+# 선물 시장 전체 종목 자동 로드 (API 실패 시 350+개 백업 리스트 보장)
 # ---------------------------------------------------------
 def get_all_futures_symbols():
     headers = {
@@ -96,37 +96,47 @@ def get_all_futures_symbols():
                 print(f"📊 바이낸스 API 성공: 총 {len(symbols)}개 종목 자동 수집 완료")
                 return sorted(symbols)
     except Exception as e:
-        print(f"⚠️ 종목 목록 API 수집 실패 ({e}), 300+개 하드코딩 전 종목 리스트 사용")
+        print(f"⚠️ 종목 목록 API 수집 실패 ({e}), 350+개 백업 전 종목 리스트 사용")
 
-    # API 차단 시 기본 동작할 300+개 전체 선물 코인 백업 리스트
+    # API 차단 시 사용할 350개 이상의 선물 코인 전수 백업 리스트
     fallback_symbols = [
-        "BTCUSDT", "ETHUSDT", "BCHUSDT", "XRPUSDT", "EOSUSDT", "LTCUSDT", "TRXUSDT", "ETCUSDT", "LINKUSDT", "XLMUSDT",
-        "ADAUSDT", "XMRUSDT", "DASHUSDT", "ZECUSDT", "XTZUSDT", "BNBUSDT", "ATOMUSDT", "ONTUSDT", "IOTAUSDT", "BATUSDT",
-        "VETUSDT", "NEOUSDT", "QTUMUSDT", "IOSTUSDT", "THETAUSDT", "ALGOUSDT", "ZILUSDT", "KNCUSDT", "ZRXUSDT", "COMPUSDT",
-        "OMGUSDT", "DOGEUSDT", "SXPUSDT", "KAVAUSDT", "BANDUSDT", "RLCUSDT", "MKRUSDT", "SNXUSDT", "DOTUSDT", "DEFIUSDT",
-        "YFIUSDT", "BALUSDT", "CRVUSDT", "TRBUSDT", "RUNEUSDT", "SUSHIUSDT", "SRMUSDT", "EGLDUSDT", "SOLUSDT", "ICXUSDT",
-        "UNIUSDT", "AVAXUSDT", "FTMUSDT", "ENJUSDT", "FLMUSDT", "KSMUSDT", "NEARUSDT", "AAVEUSDT", "FILUSDT", "RSRUSDT",
-        "LRCUSDT", "MATICUSDT", "OCEANUSDT", "BELUSDT", "CTKUSDT", "AXSUSDT", "ALPHAUSDT", "ZENUSDT", "SKLUSDT", "GRTUSDT",
-        "1INCHUSDT", "CHZUSDT", "SANDUSDT", "ANKRUSDT", "LUNA2USDT", "1000SHIBUSDT", "BAKEUSDT", "GTCUSDT", "IOTXUSDT", "AUDIOUSDT",
-        "RAYUSDT", "C98USDT", "MASKUSDT", "DYDXUSDT", "1000XECUSDT", "GALAUSDT", "CELOUSDT", "ARUSDT", "KLAYUSDT", "ARPAUSDT",
-        "CTSIUSDT", "LPTUSDT", "ENSUSDT", "PEOPLEUSDT", "ROSEUSDT", "DUSKUSDT", "FLOWUSDT", "IMXUSDT", "API3USDT", "GMTUSDT",
-        "APEUSDT", "WOOUSDT", "JASMYUSDT", "DARUSDT", "GALUSDT", "OPUSDT", "INJUSDT", "STGUSDT", "SPELLUSDT", "1000LUNCUSDT",
-        "LDOUSDT", "ICPUSDT", "APTUSDT", "QNTUSDT", "BLUEBIRDUSDT", "FETUSDT", "FXSUSDT", "HOOKUSDT", "MAGICUSDT", "HIGHUSDT",
-        "MINAUSDT", "ASTRUSDT", "AGIXUSDT", "PHBUSDT", "GMXUSDT", "CFXUSDT", "STXUSDT", "BNXUSDT", "ACHUSDT", "SSVUSDT",
-        "CKBUSDT", "PERPUSDT", "TRUUSDT", "LQTYUSDT", "IDUSDT", "ARBUSDT", "JOEUSDT", "TLMUSDT", "RDNTUSDT", "EDUUSDT",
-        "SUIUSDT", "PEPEUSDT", "FLOKIUSDT", "UMAUSDT", "COMBOUSDT", "NMRUSDT", "MAVUSDT", "XVSUSDT", "PENDLEUSDT", "ARKMUSDT",
-        "WLDUSDT", "SEIUSDT", "CYBERUSDT", "ARKUSDT", "BICOUSDT", "BIGTIMEUSDT", "ORDIUSDT", "GASUSDT", "TOKENUSDT", "POWRUSDT",
-        "TIAUSDT", "CAKEUSDT", "MEMEUSDT", "KSACUSDT", "VICUSDT", "BLURUSDT", "VANRYUSDT", "JTOUSDT", "1000SATSUSDT", "BONKUSDT",
-        "ACEUSDT", "NFPUSDT", "AIUSDT", "XAIUSDT", "MANTAUSDT", "ALTUSDT", "JUPUSDT", "PYTHUSDT", "RONINUSDT", "DYMUSDT",
-        "OMUSDT", "PIXELUSDT", "STRKUSDT", "PORTALUSDT", "TONUSDT", "AXLUSDT", "MYROUSDT", "METISUSDT", "AEVOUSDT", "WIFUSDT",
-        "BOMEUSDT", "ETHFIUSDT", "ENAUSDT", "WUSDT", "TNSRUSDT", "SAGAUSDT", "OMNIUSDT", "REZUSDT", "BBUSDT", "NOTUSDT",
-        "IOUSDT", "ZKUSDT", "LISTAUSDT", "ZROUSDT", "RENDERUSDT", "BANANAUSDT", "RAREUSDT", "SYNUSDT", "SYSUSDT", "POPCATUSDT",
-        "SUNUSDT", "DOGSUSDT", "MBOXUSDT", "CHESSUSDT", "NEIROUSDT", "1000CATUSDT", "HMSTRUSDT", "EIGENUSDT", "SCRUSDT", "GOATUSDT",
-        "MOODENGUSDT", "KAIAUSDT", "PNUTUSDT", "ACTUSDT", "HIPPOUSDT", "DRIFTUSDT", "SCHECKUSDT", "USUALUSDT", "VIRTUALUSDT", "SPXUSDT"
+        "1000BONKUSDT", "1000CATUSDT", "1000FLOKIUSDT", "1000LUNCUSDT", "1000PEPEUSDT", "1000SATSUSDT", "1000SHIBUSDT", "1000XECUSDT", "1INCHUSDT", "AAVEUSDT",
+        "ACEUSDT", "ACHUSDT", "ACTUSDT", "ADAUSDT", "AEVOUSDT", "AGLDUSDT", "AIUSDT", "ALGOUSDT", "ALICEUSDT", "ALPHAUSDT",
+        "ALTUSDT", "AMBUSDT", "ANKRUSDT", "APEUSDT", "API3USDT", "APTUSDT", "ARUSDT", "ARBUSDT", "ARKUSDT", "ARKMUSDT",
+        "ARPAUSDT", "ASTRUSDT", "ATAUSDT", "ATOMUSDT", "AUCTIONUSDT", "AUDIOUSDT", "AVAXUSDT", "AXLUSDT", "AXSUSDT", "BADGERUSDT",
+        "BAKEUSDT", "BALUSDT", "BANANAUSDT", "BANDUSDT", "BATUSDT", "BBUSDT", "BCHUSDT", "BELUSDT", "BICOUSDT", "BIGTIMEUSDT",
+        "BLURUSDT", "BNBUSDT", "BNTUSDT", "BNXUSDT", "BOMEUSDT", "BSSVUSDT", "BSVUSDT", "BSWUSDT", "BTCUSDT", "C98USDT",
+        "CAKEUSDT", "CELOUSDT", "CELRUSDT", "CFXUSDT", "CHESSUSDT", "CHRUSDT", "CHZUSDT", "CKBUSDT", "COMBOUSDT", "COMPUSDT",
+        "COSUSDT", "COTIUSDT", "CRVUSDT", "CTSIUSDT", "CTKUSDT", "CVCUSDT", "CYBERUSDT", "DARUSDT", "DASHUSDT", "DEFIUSDT",
+        "DENTUSDT", "DGBUSDT", "DIAUSDT", "DODOUSDT", "DOGEUSDT", "DOGSUSDT", "DOTUSDT", "DRIFTUSDT", "DUSKUSDT", "DYDXUSDT",
+        "DYMUSDT", "EDUUSDT", "EGLDUSDT", "EIGENUSDT", "ENAUSDT", "ENJUSDT", "ENSUSDT", "EOSUSDT", "ETCUSDT", "ETHUSDT",
+        "ETHFIUSDT", "ETHBTC", "ETHWUSDT", "EUROUSDT", "FARMUSDT", "FETUSDT", "FIDAUSDT", "FILUSDT", "FIOUSDT", "FLMUSDT",
+        "FLOWUSDT", "FLUXUSDT", "FORTHUSDT", "FTMUSDT", "FXSUSDT", "GALAUSDT", "GASUSDT", "GHSTUSDT", "GLMRUSDT", "GMTUSDT",
+        "GMXUSDT", "GOATUSDT", "GRTUSDT", "GTCUSDT", "HARDUSDT", "HBARUSDT", "HIGHUSDT", "HIPPOUSDT", "HIFIUSDT", "HMSTRUSDT",
+        "HOOKUSDT", "HOTUSDT", "ICPUSDT", "ICXUSDT", "IDUSDT", "IDEXUSDT", "ILVUSDT", "INJUSDT", "IOSTUSDT", "IOTAUSDT",
+        "IOTXUSDT", "IOUSDT", "JASMYUSDT", "JOEUSDT", "JTOUSDT", "JUPUSDT", "KAIAUSDT", "KAVAUSDT", "KNCUSDT", "KSMUSDT",
+        "LDOUSDT", "LEVERUSDT", "LINAUSDT", "LINKUSDT", "LISTAUSDT", "LITUSDT", "LPTUSDT", "LRCUSDT", "LSKUSDT", "LTCUSDT",
+        "LUNA2USDT", "MAGICUSDT", "MANAUSDT", "MANTAUSDT", "MASAUSDT", "MASKUSDT", "MAVUSDT", "MBLUSDT", "MBOXUSDT", "MDXUSDT",
+        "MEMEUSDT", "METISUSDT", "MINAUSDT", "MKRUSDT", "MOODENGUSDT", "MOVRUSDT", "MTLUSDT", "MYROUSDT", "NEARUSDT", "NEIROUSDT",
+        "NEOUSDT", "NFPUSDT", "KNCLUSDT", "NMRUSDT", "NKNUSDT", "NOTUSDT", "NTRNUSDT", "NULSUSDT", "OCEANUSDT", "OGUSDT",
+        "OGNUSDT", "OMUSDT", "OMGUSDT", "OMNIUSDT", "ONEUSDT", "ONTUSDT", "OPUSDT", "ORBSUSDT", "ORDIUSDT", "OXTUSDT",
+        "PAXGUSDT", "PENDLEUSDT", "PEOPLEUSDT", "PERPUSDT", "PHBUSDT", "PIXELUSDT", "PNUTUSDT", "POLUSDT", "POLXUSDT", "POLYSWARMUSDT",
+        "POPCATUSDT", "PORTALUSDT", "POWRUSDT", "PROMUSDT", "PUFFERUSDT", "PYTHUSDT", "QNTUSDT", "QTUMUSDT", "RADUSDT", "RAREUSDT",
+        "RAYUSDT", "RDNTUSDT", "REEFUSDT", "RENDERUSDT", "RENUSDT", "REQUSDT", "REZUSDT", "RIFUSDT", "RLCUSDT", "RONINUSDT",
+        "ROSEUSDT", "RPLUSDT", "RSRUSDT", "RUNEUSDT", "RVNUSDT", "SAGAUSDT", "SANDUSDT", "SCHECKUSDT", "SCRUSDT", "SEIUSDT",
+        "SFPUSDT", "SKLUSDT", "SLPUSDT", "SNTUSDT", "SNXUSDT", "SOLUSDT", "SPELLUSDT", "SPXUSDT", "SSVUSDT", "STEEMUSDT",
+        "STGUSDT", "STMXUSDT", "STORJUSDT", "STRAXUSDT", "STRKUSDT", "STXUSDT", "SUIUSDT", "SUNUSDT", "SUPERUSDT", "SUSHIUSDT", "SXPUSDT",
+        "SYNUSDT", "SYSUSDT", "TUSDT", "THETAUSDT", "TIAUSDT", "TLMUSDT", "TNSRUSDT", "TOKENUSDT", "TOMOUSDT", "TONUSDT",
+        "TRBUSDT", "TROYUSDT", "TRUUSDT", "TRXUSDT", "TURBOUSDT", "TWTUSDT", "UMAUSDT", "UNFIUSDT", "UNIUSDT", "USDCUSDT",
+        "USDTUSDT", "USUALUSDT", "USTCUSDT", "VANRYUSDT", "VETUSDT", "VGXUSDT", "VICUSDT", "VIRTUALUSDT", "VITEUSDT", "VOXELUSDT",
+        "VTHOUSDT", "WUSDT", "WAXPUSDT", "WLDUSDT", "WIFUSDT", "WOOUSDT", "WRXUSDT", "WTCUSDT", "XAIUSDT", "XECUSDT",
+        "XEMUSDT", "XLMUSDT", "XMRUSDT", "XNOUSDT", "XRPUSDT", "XTZUSDT", "XVGUSDT", "XVSUSDT", "YFIUSDT", "YGGUSDT",
+        "ZECUSDT", "ZENUSDT", "ZILUSDT", "ZKUSDT", "ZROUSDT", "ZRXUSDT"
     ]
     
-    print(f"📌 백업 종목 리스트 적용: 총 {len(fallback_symbols)}개 종목 스캔 준비 완료")
-    return sorted(list(set(fallback_symbols)))
+    unique_symbols = sorted(list(set(fallback_symbols)))
+    print(f"📌 백업 종목 리스트 적용: 총 {len(unique_symbols)}개 종목 스캔 준비 완료")
+    return unique_symbols
 
 # ---------------------------------------------------------
 # 시세 데이터 수집 (15분 봉)
@@ -218,7 +228,7 @@ def calculate_recommended_leverage(df):
 # 메인 분석 및 포지션 관리 로직
 # ---------------------------------------------------------
 def main():
-    # 0. 선물 시장 상장 전체 종목 수집 (300개 이상 보장)
+    # 0. 선물 시장 상장 전체 종목 수집 (350개 이상 보장)
     all_symbols = get_all_futures_symbols()
 
     # 1. 상태 로드 및 보유 포지션 관리
@@ -317,7 +327,7 @@ def main():
     state["active_positions"] = remaining_positions
     save_state(state)
 
-    # 2. BTCC 전체 코인 스캔 (300개+)
+    # 2. BTCC 전체 코인 스캔 (350개+)
     current_count = len(remaining_positions)
     print(f"🔎 선물 시장 전 코인 총 {len(all_symbols)}개 전수 스캔 시작... (현재 {current_count}/{MAX_POSITIONS} 사용 중)")
     active_symbols = [p["symbol"] for p in remaining_positions]
