@@ -140,10 +140,10 @@
       "symbol": "PIPPINUSDT",
       "direction": "SHORT",
       "entry": 0.017737,
-      "sl": 0.017843421999999998,
+      "sl": 0.017737,
       "tp1": 0.017577367,
       "tp2": 0.017470944999999998,
-      "tp1_hit": false,
+      "tp1_hit": true,
       "score": 100,
       "entry_time": "2026-10-07T17:07:55.290580+09:00"
     },
@@ -241,10 +241,10 @@
       "symbol": "ESPORTSUSDT",
       "direction": "SHORT",
       "entry": 0.0111,
-      "sl": 0.0111555,
+      "sl": 0.0111,
       "tp1": 0.01101675,
       "tp2": 0.01096125,
-      "tp1_hit": false,
+      "tp1_hit": true,
       "score": 100,
       "quality": "A+",
       "entry_time": "2026-10-07T17:40:42.731038+09:00"
@@ -405,15 +405,6 @@
       "quality": "A+",
       "entry_time": "2026-10-07T18:11:03.410743+09:00"
     },
-    "CYSUSDT": {
-      "symbol": "CYSUSDT",
-      "direction": "SHORT",
-      "entry": 0.1549,
-      "sl": 0.15577208642378862,
-      "tp1": 0.1535918703643171,
-      "tp2": 0.15271978394052846,
-      "tp1_hit": false
-    },
     "ONEUSDT": {
       "symbol": "ONEUSDT",
       "direction": "SHORT",
@@ -431,6 +422,42 @@
       "tp1": 0.027905470332458975,
       "tp2": 0.027632383887431625,
       "tp1_hit": false
+    },
+    "HEMIUSDT": {
+      "symbol": "HEMIUSDT",
+      "direction": "SHORT",
+      "entry": 0.005755,
+      "sl": 0.00586700921935955,
+      "tp1": 0.005586986170960674,
+      "tp2": 0.005474976951601124,
+      "tp1_hit": false,
+      "score": 90,
+      "quality": "A",
+      "entry_time": "2026-10-07T18:25:42.222678+09:00"
+    },
+    "AEROUSDT": {
+      "symbol": "AEROUSDT",
+      "direction": "SHORT",
+      "entry": 0.7908,
+      "sl": 0.794948854562249,
+      "tp1": 0.7845767181566263,
+      "tp2": 0.7804278635943773,
+      "tp1_hit": false,
+      "score": 90,
+      "quality": "A",
+      "entry_time": "2026-10-07T18:25:43.590556+09:00"
+    },
+    "SANDUSDT": {
+      "symbol": "SANDUSDT",
+      "direction": "LONG",
+      "entry": 0.07186,
+      "sl": 0.07040544571108866,
+      "tp1": 0.074041831433367,
+      "tp2": 0.07549638572227833,
+      "tp1_hit": false,
+      "score": 87,
+      "quality": "A",
+      "entry_time": "2026-10-07T18:25:44.959906+09:00"
     }
   },
   "signals": {
@@ -477,6 +504,9 @@
     "USELESSUSDT:SHORT": 1791364262.8499057,
     "CYSUSDT:SHORT": 1791364574.4470468,
     "ONEUSDT:SHORT": 1791364574.4470468,
-    "AKEUSDT:SHORT": 1791364574.4470468
+    "AKEUSDT:SHORT": 1791364574.4470468,
+    "HEMIUSDT:SHORT": 1791365141.5239792,
+    "AEROUSDT:SHORT": 1791365141.5239792,
+    "SANDUSDT:LONG": 1791365141.5239792
   }
 }
