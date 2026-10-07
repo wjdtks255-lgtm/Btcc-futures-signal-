@@ -24,18 +24,6 @@
       "quality": "A+",
       "entry_time": "2026-10-07T17:56:55.882573+09:00"
     },
-    "BANKUSDT": {
-      "symbol": "BANKUSDT",
-      "direction": "SHORT",
-      "entry": 0.02749,
-      "sl": 0.027648954111927086,
-      "tp1": 0.02725156883210937,
-      "tp2": 0.027092614720182286,
-      "tp1_hit": false,
-      "score": 87,
-      "quality": "A",
-      "entry_time": "2026-10-07T22:08:21.309103+09:00"
-    },
     "BLESSUSDT": {
       "symbol": "BLESSUSDT",
       "direction": "SHORT",
@@ -52,13 +40,25 @@
       "symbol": "SKRUSDT",
       "direction": "SHORT",
       "entry": 0.016272,
-      "sl": 0.016372953090052666,
+      "sl": 0.016272,
       "tp1": 0.016120570364920997,
       "tp2": 0.016019617274868333,
-      "tp1_hit": false,
+      "tp1_hit": true,
       "score": 90,
       "quality": "A",
       "entry_time": "2026-10-08T02:11:12.796955+09:00"
+    },
+    "UAIUSDT": {
+      "symbol": "UAIUSDT",
+      "direction": "SHORT",
+      "entry": 0.27627,
+      "sl": 0.2797812130173222,
+      "tp1": 0.2710031804740168,
+      "tp2": 0.2674919674566947,
+      "tp1_hit": false,
+      "score": 90,
+      "quality": "A",
+      "entry_time": "2026-10-08T02:47:00.849059+09:00"
     }
   },
   "signals": {
@@ -118,7 +118,7 @@
     "LTCUSDT:SHORT": 1791368494.7645488,
     "BSBUSDT:SHORT": 1791369485.414245,
     "FLRUSDT:SHORT": 1791370422.583242,
-    "UAIUSDT:SHORT": 1791370422.583242,
+    "UAIUSDT:SHORT": 1791395219.127907,
     "CVXUSDT:SHORT": 1791370422.583242,
     "BANUSDT:SHORT": 1791373071.86648,
     "ASTERUSDT:SHORT": 1791373071.86648,
@@ -138,6 +138,7 @@
     "BBUSDT": 1791388485.9443974,
     "ALLOUSDT": 1791389330.3138776,
     "HEMIUSDT": 1791389332.1497035,
-    "METISUSDT": 1791389334.0227375
+    "METISUSDT": 1791389334.0227375,
+    "BANKUSDT": 1791395211.2441027
   }
 }
