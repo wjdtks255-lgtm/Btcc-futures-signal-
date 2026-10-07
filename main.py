@@ -12,9 +12,8 @@ TELEGRAM_BOT_TOKEN = "8913250892:AAEQxGKfFC1ru9oJyacy6cdUllER2K0UbiY"
 TELEGRAM_CHAT_ID = "-1004443428081"
 
 STATE_FILE = "bot_state.json"
-MAX_POSITIONS = 15  # 최대 동시 관리 포지션 수
+MAX_POSITIONS = 15
 
-# 필요시 True로 설정하면 포지션 상태를 리셋합니다.
 FORCE_RESET_STATE = False
 
 def send_telegram_message(message):
@@ -40,9 +39,6 @@ def send_telegram_message(message):
         print(f"❌ 텔레그램 전송 중 예외 발생: {e}")
         return False
 
-# ---------------------------------------------------------
-# 가격 포맷팅 함수
-# ---------------------------------------------------------
 def format_price(price):
     if price >= 100:
         return f"{price:,.2f}"
@@ -51,12 +47,8 @@ def format_price(price):
     else:
         return f"{price:.8f}".rstrip('0').rstrip('.')
 
-# ---------------------------------------------------------
-# 상태 파일(bot_state.json) 관리 함수
-# ---------------------------------------------------------
 def load_state():
     if FORCE_RESET_STATE:
-        print("🔄 [강제 초기화 실행] 기존 포지션 데이터를 리셋합니다.")
         initial_state = {"active_positions": []}
         save_state(initial_state)
         return initial_state
@@ -79,9 +71,6 @@ def save_state(state):
     except Exception as e:
         print(f"⚠️ 상태 저장 중 에러: {e}")
 
-# ---------------------------------------------------------
-# 선물 시장 전체 종목 자동 로드 (API 실패 시 350+개 백업 리스트 보장)
-# ---------------------------------------------------------
 def get_all_futures_symbols():
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
@@ -135,14 +124,8 @@ def get_all_futures_symbols():
         "XEMUSDT", "XLMUSDT", "XMRUSDT", "XNOUSDT", "XRPUSDT", "XTZUSDT", "XVGUSDT", "XVSUSDT", "YFIUSDT", "YGGUSDT",
         "ZECUSDT", "ZENUSDT", "ZILUSDT", "ZKUSDT", "ZROUSDT", "ZRXUSDT"
     ]
-    
-    unique_symbols = sorted(list(set(fallback_symbols)))
-    print(f"📌 백업 종목 리스트 적용: 총 {len(unique_symbols)}개 종목 스캔 준비 완료")
-    return unique_symbols
+    return sorted(list(set(fallback_symbols)))
 
-# ---------------------------------------------------------
-# 시세 데이터 수집 (15분 봉)
-# ---------------------------------------------------------
 def fetch_market_data(symbol, interval="15m", limit=100):
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
@@ -162,12 +145,8 @@ def fetch_market_data(symbol, interval="15m", limit=100):
                 return df
     except Exception:
         pass
-
     return pd.DataFrame()
 
-# ---------------------------------------------------------
-# 레버리지 추천 산출
-# ---------------------------------------------------------
 def calculate_recommended_leverage(df):
     try:
         atr = ta.volatility.average_true_range(df['high'], df['low'], df['close'], window=14).iloc[-1]
@@ -191,24 +170,14 @@ def calculate_recommended_leverage(df):
     except Exception:
         return 5, "⚖️ 보통 변동성"
 
-# ---------------------------------------------------------
-# 메인 분석 및 포지션 관리 로직
-# ---------------------------------------------------------
 def main():
-    # 🔥 [수정] 스크립트 실행 직후 텔레그램 상태 알림 강제 테스트
     print("🚀 스캐너 실행 확인 및 텔레그램 테스트 메시지 발송 시작...")
-    test_res = send_telegram_message("🔔 **[BTCC 퀀트] 스캐너 정상 작동 중**\n전체 코인 스캔을 시작합니다.")
-    if not test_res:
-        print("⚠️ 텔레그램 메시지 전송 실패! 토큰과 Chat ID를 확인해주세요.")
+    send_telegram_message("🔔 **[BTCC 퀀트] 스캐너 정상 작동 중**\n전체 코인 스캔을 시작합니다.")
 
-    # 0. 선물 시장 상장 전체 종목 수집
     all_symbols = get_all_futures_symbols()
-
-    # 1. 상태 로드
     state = load_state()
     active_positions = state.get("active_positions", [])
 
-    # 2. BTCC 전체 코인 스캔
     current_count = len(active_positions)
     print(f"🔎 선물 시장 전 코인 총 {len(all_symbols)}개 전수 스캔 시작... (현재 {current_count}/{MAX_POSITIONS} 사용 중)")
     active_symbols = [p["symbol"] for p in active_positions]
@@ -225,58 +194,20 @@ def main():
 
         # 지표 산출
         df['rsi'] = ta.momentum.rsi(df['close'], window=14)
-        df['ema_short'] = ta.trend.ema_indicator(df['close'], window=20)
-        df['ema_long'] = ta.trend.ema_indicator(df['close'], window=50)
-
-        bb = ta.volatility.BollingerBands(df['close'], window=20, window_dev=2)
-        df['bb_hband'] = bb.bollinger_hband()
-        df['bb_lband'] = bb.bollinger_lband()
-
-        macd_indicator = ta.trend.MACD(df['close'], window_slow=26, window_fast=12, window_sign=9)
-        df['macd'] = macd_indicator.macd()
-        df['macd_signal'] = macd_indicator.macd_signal()
-
-        stoch_rsi = ta.momentum.StochRSIIndicator(df['close'], window=14, smooth1=3, smooth2=3)
-        df['stoch_k'] = stoch_rsi.stochrsi_k() * 100
-        df['stoch_d'] = stoch_rsi.stochrsi_d() * 100
-
         latest = df.iloc[-1]
-        prev = df.iloc[-2]
         entry_price = latest['close']
         rsi_val = latest['rsi']
 
         signal_type = None
         strategy_name = ""
 
-        # 🔥 [조건 최적화] 실시간 알림 포착이 쉬운 실전 매매 전략 조건
-        # 1. 볼린저밴드 하단 반등
-        if prev['low'] <= prev['bb_lband'] and latest['close'] > prev['close']:
-            if rsi_val <= 45:
-                signal_type = "LONG"
-                strategy_name = "볼린저 하단 이탈 후 매수세 반등"
-
-        # 2. 볼린저밴드 상단 반락
-        elif prev['high'] >= prev['bb_hband'] and latest['close'] < prev['close']:
-            if rsi_val >= 55:
-                signal_type = "SHORT"
-                strategy_name = "볼린저 상단 터치 후 매도세 반락"
-
-        # 3. MACD 골든크로스 (상승 전환)
-        elif prev['macd'] < prev['macd_signal'] and latest['macd'] >= latest['macd_signal']:
-            if 40 <= rsi_val <= 65:
-                signal_type = "LONG"
-                strategy_name = "MACD 시그널선 골든크로스"
-
-        # 4. MACD 데드크로스 (하락 전환)
-        elif prev['macd'] > prev['macd_signal'] and latest['macd'] <= latest['macd_signal']:
-            if 35 <= rsi_val <= 60:
-                signal_type = "SHORT"
-                strategy_name = "MACD 시그널선 데드크로스"
-
-        # 5. 스토캐스틱 RSI 과매도 골든크로스
-        elif prev['stoch_k'] <= 30 and latest['stoch_k'] > 30 and latest['stoch_k'] > latest['stoch_d']:
+        # 🧪 [테스트 전용 포착 조건] - RSI 지표 범위 기준 유효 시그널 테스트
+        if rsi_val >= 55:
+            signal_type = "SHORT"
+            strategy_name = "RSI 상승 구간 모멘텀 시그널"
+        elif rsi_val <= 45:
             signal_type = "LONG"
-            strategy_name = "StochRSI 과매도 구간 탈출"
+            strategy_name = "RSI 하락 구간 모멘텀 시그널"
 
         # 시그널 발생 처리
         if signal_type:
@@ -339,8 +270,9 @@ def main():
             active_symbols.append(symbol)
             save_state(state)
 
-            if current_count >= MAX_POSITIONS:
-                print("🏁 최대 포지션 15개가 채워져 스캔을 완료합니다.")
+            # 테스트용으로 시그널 3개까지만 전송 후 종료
+            if detected_signals >= 3:
+                print("🧪 테스트용 시그널 3개 포착 완료로 스캔을 종료합니다.")
                 break
 
     print(f"✅ BTCC 전종목 스캔 완료 (포착된 시그널: {detected_signals}개 / 현재 보유 포지션: {len(state['active_positions'])}/{MAX_POSITIONS})")
