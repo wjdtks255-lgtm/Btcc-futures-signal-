@@ -96,10 +96,10 @@
       "symbol": "XRPUSDT",
       "direction": "SHORT",
       "entry": 1.4698,
-      "sl": 1.4786188,
+      "sl": 1.4698,
       "tp1": 1.4565718,
       "tp2": 1.447753,
-      "tp1_hit": false,
+      "tp1_hit": true,
       "score": 100,
       "entry_time": "2026-10-07T16:51:54.284839+09:00"
     },
@@ -173,10 +173,10 @@
       "symbol": "XLMUSDT",
       "direction": "SHORT",
       "entry": 0.20575,
-      "sl": 0.20688162499999999,
+      "sl": 0.20575,
       "tp1": 0.20405256249999998,
       "tp2": 0.20292093749999998,
-      "tp1_hit": false,
+      "tp1_hit": true,
       "score": 86,
       "entry_time": "2026-10-07T17:15:21.633624+09:00"
     },
@@ -458,6 +458,30 @@
       "score": 87,
       "quality": "A",
       "entry_time": "2026-10-07T18:25:44.959906+09:00"
+    },
+    "ALCHUSDT": {
+      "symbol": "ALCHUSDT",
+      "direction": "SHORT",
+      "entry": 0.04645,
+      "sl": 0.04675343191720416,
+      "tp1": 0.045994852124193755,
+      "tp2": 0.045691420206989596,
+      "tp1_hit": false,
+      "score": 90,
+      "quality": "A",
+      "entry_time": "2026-10-07T18:30:06.721018+09:00"
+    },
+    "GRASSUSDT": {
+      "symbol": "GRASSUSDT",
+      "direction": "SHORT",
+      "entry": 0.6695,
+      "sl": 0.6767987126885419,
+      "tp1": 0.6585519309671872,
+      "tp2": 0.6512532182786455,
+      "tp1_hit": false,
+      "score": 87,
+      "quality": "A",
+      "entry_time": "2026-10-07T18:30:07.995172+09:00"
     }
   },
   "signals": {
@@ -507,6 +531,8 @@
     "AKEUSDT:SHORT": 1791364574.4470468,
     "HEMIUSDT:SHORT": 1791365141.5239792,
     "AEROUSDT:SHORT": 1791365141.5239792,
-    "SANDUSDT:LONG": 1791365141.5239792
+    "SANDUSDT:LONG": 1791365141.5239792,
+    "ALCHUSDT:SHORT": 1791365406.144873,
+    "GRASSUSDT:SHORT": 1791365406.144873
   }
 }
