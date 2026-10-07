@@ -279,6 +279,42 @@
       "score": 100,
       "quality": "A+",
       "entry_time": "2026-10-07T17:40:42.731038+09:00"
+    },
+    "SOLUSDC": {
+      "symbol": "SOLUSDC",
+      "direction": "SHORT",
+      "entry": 118.32,
+      "sl": 118.91159999999999,
+      "tp1": 117.4326,
+      "tp2": 116.841,
+      "tp1_hit": false,
+      "score": 100,
+      "quality": "A+",
+      "entry_time": "2026-10-07T17:41:24.274264+09:00"
+    },
+    "SOLUSDT": {
+      "symbol": "SOLUSDT",
+      "direction": "SHORT",
+      "entry": 118.21,
+      "sl": 118.80104999999999,
+      "tp1": 117.323425,
+      "tp2": 116.73237499999999,
+      "tp1_hit": false,
+      "score": 100,
+      "quality": "A+",
+      "entry_time": "2026-10-07T17:41:25.476916+09:00"
+    },
+    "BANKUSDT": {
+      "symbol": "BANKUSDT",
+      "direction": "SHORT",
+      "entry": 0.02772,
+      "sl": 0.027878811564859086,
+      "tp1": 0.027481782652711374,
+      "tp2": 0.027322971087852293,
+      "tp1_hit": false,
+      "score": 99,
+      "quality": "A+",
+      "entry_time": "2026-10-07T17:41:26.749393+09:00"
     }
   },
   "signals": {
@@ -309,6 +345,9 @@
     "SFPUSDT:SHORT": 1791361635.0496378,
     "ALLOUSDT:SHORT": 1791362439.7748892,
     "PIEVERSEUSDT:SHORT": 1791362439.7748892,
-    "ESPORTSUSDT:SHORT": 1791362439.7748892
+    "ESPORTSUSDT:SHORT": 1791362439.7748892,
+    "SOLUSDC:SHORT": 1791362483.706792,
+    "SOLUSDT:SHORT": 1791362483.706792,
+    "BANKUSDT:SHORT": 1791362483.706792
   }
 }
