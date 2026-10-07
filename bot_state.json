@@ -121,16 +121,6 @@
             "tp1_reached": false
         },
         {
-            "symbol": "SENTUSDT",
-            "type": "LONG",
-            "entry_price": 0.02552,
-            "leverage": 10,
-            "tp1": 0.0259028,
-            "tp2": 0.026285600000000003,
-            "sl": 0.025137200000000002,
-            "tp1_reached": false
-        },
-        {
             "symbol": "SHOPUSDT",
             "type": "SHORT",
             "entry_price": 164.96,
@@ -148,6 +138,16 @@
             "tp1": 0.39696649999999994,
             "tp2": 0.402833,
             "sl": 0.3852335,
+            "tp1_reached": false
+        },
+        {
+            "symbol": "ACNUSDT",
+            "type": "SHORT",
+            "entry_price": 193.87,
+            "leverage": 15,
+            "tp1": 190.96195,
+            "tp2": 188.0539,
+            "sl": 196.77804999999998,
             "tp1_reached": false
         }
     ]
