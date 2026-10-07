@@ -69,6 +69,76 @@
             "tp2": 1.449762,
             "sl": 1.5170189999999997,
             "tp1_reached": false
+        },
+        {
+            "symbol": "ARBUSDT",
+            "type": "SHORT",
+            "entry_price": 0.19854,
+            "leverage": 15,
+            "tp1": 0.19556189999999998,
+            "tp2": 0.1925838,
+            "sl": 0.20151809999999998,
+            "tp1_reached": false
+        },
+        {
+            "symbol": "BCHUSDT",
+            "type": "SHORT",
+            "entry_price": 310.6,
+            "leverage": 15,
+            "tp1": 305.94100000000003,
+            "tp2": 301.28200000000004,
+            "sl": 315.259,
+            "tp1_reached": false
+        },
+        {
+            "symbol": "BTCUSDT",
+            "type": "SHORT",
+            "entry_price": 85328.4,
+            "leverage": 15,
+            "tp1": 84048.47399999999,
+            "tp2": 82768.548,
+            "sl": 86608.32599999999,
+            "tp1_reached": false
+        },
+        {
+            "symbol": "DOTUSDT",
+            "type": "SHORT",
+            "entry_price": 1.1944,
+            "leverage": 15,
+            "tp1": 1.1764839999999999,
+            "tp2": 1.1585679999999998,
+            "sl": 1.2123159999999997,
+            "tp1_reached": false
+        },
+        {
+            "symbol": "ETHUSDT",
+            "type": "SHORT",
+            "entry_price": 2688.77,
+            "leverage": 15,
+            "tp1": 2648.43845,
+            "tp2": 2608.1068999999998,
+            "sl": 2729.10155,
+            "tp1_reached": false
+        },
+        {
+            "symbol": "NOTUSDT",
+            "type": "SHORT",
+            "entry_price": 0.0004888,
+            "leverage": 15,
+            "tp1": 0.0004814679999999999,
+            "tp2": 0.00047413599999999995,
+            "sl": 0.0004961319999999999,
+            "tp1_reached": false
+        },
+        {
+            "symbol": "SOLUSDT",
+            "type": "SHORT",
+            "entry_price": 120.14,
+            "leverage": 15,
+            "tp1": 118.3379,
+            "tp2": 116.5358,
+            "sl": 121.94209999999998,
+            "tp1_reached": false
         }
     ]
 }
