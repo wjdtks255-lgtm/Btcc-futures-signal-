@@ -12,18 +12,6 @@
       "quality": "A",
       "entry_time": "2026-10-08T01:08:59.532460+09:00"
     },
-    "SKRUSDT": {
-      "symbol": "SKRUSDT",
-      "direction": "SHORT",
-      "entry": 0.016272,
-      "sl": 0.016272,
-      "tp1": 0.016120570364920997,
-      "tp2": 0.016019617274868333,
-      "tp1_hit": true,
-      "score": 90,
-      "quality": "A",
-      "entry_time": "2026-10-08T02:11:12.796955+09:00"
-    },
     "JASMYUSDT": {
       "symbol": "JASMYUSDT",
       "direction": "SHORT",
@@ -52,13 +40,25 @@
       "symbol": "KASUSDT",
       "direction": "SHORT",
       "entry": 0.04047,
-      "sl": 0.0406614967681838,
+      "sl": 0.04047,
       "tp1": 0.040182754847724295,
       "tp2": 0.039991258079540494,
-      "tp1_hit": false,
+      "tp1_hit": true,
       "score": 90,
       "quality": "A",
       "entry_time": "2026-10-08T10:43:54.518935+09:00"
+    },
+    "UNIUSDT": {
+      "symbol": "UNIUSDT",
+      "direction": "SHORT",
+      "entry": 7.902,
+      "sl": 7.956987986625679,
+      "tp1": 7.819518020061482,
+      "tp2": 7.764530033435803,
+      "tp1_hit": false,
+      "score": 90,
+      "quality": "A",
+      "entry_time": "2026-10-08T11:13:18.494768+09:00"
     }
   },
   "signals": {
@@ -131,7 +131,8 @@
     "ARKMUSDT:SHORT": 1791396027.8025534,
     "EDUUSDT:LONG": 1791412310.2900076,
     "VETUSDT:SHORT": 1791415597.4020784,
-    "KASUSDT:SHORT": 1791423832.7894971
+    "KASUSDT:SHORT": 1791423832.7894971,
+    "UNIUSDT:SHORT": 1791425596.8060849
   },
   "sl_penalties": {
     "STXUSDT": 1791380763.6872358,
