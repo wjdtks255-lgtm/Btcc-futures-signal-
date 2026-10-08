@@ -1,17 +1,5 @@
 {
   "positions": {
-    "OPENAIUSDT": {
-      "symbol": "OPENAIUSDT",
-      "direction": "LONG",
-      "entry": 1707.43,
-      "sl": 1699.7465650000001,
-      "tp1": 1718.9551525000002,
-      "tp2": 1726.6385875,
-      "tp1_hit": false,
-      "score": 85,
-      "quality": "A",
-      "entry_time": "2026-10-08T12:13:47.525405+09:00"
-    },
     "FFUSDT": {
       "symbol": "FFUSDT",
       "direction": "SHORT",
@@ -59,6 +47,18 @@
       "score": 85,
       "quality": "A",
       "entry_time": "2026-10-09T00:25:42.730854+09:00"
+    },
+    "LSKUSDT": {
+      "symbol": "LSKUSDT",
+      "direction": "SHORT",
+      "entry": 0.2373,
+      "sl": 0.2412203374462057,
+      "tp1": 0.2314194938306915,
+      "tp2": 0.2274991563844858,
+      "tp1_hit": false,
+      "score": 87,
+      "quality": "A",
+      "entry_time": "2026-10-09T00:49:15.829948+09:00"
     }
   },
   "signals": {
@@ -149,7 +149,8 @@
     "FFUSDT:SHORT": 1791473135.711636,
     "SOXSUSDT:LONG": 1791473135.711636,
     "SOXLUSDT:SHORT": 1791473135.711636,
-    "TSMUSDT:SHORT": 1791473135.711636
+    "TSMUSDT:SHORT": 1791473135.711636,
+    "LSKUSDT:SHORT": 1791474553.9834852
   },
   "sl_penalties": {
     "STXUSDT": 1791380763.6872358,
@@ -172,6 +173,7 @@
     "METAUSDT": 1791466479.009138,
     "LUNAUSDT": 1791470494.678036,
     "ZESTUSDT": 1791470496.3703535,
-    "CHZUSDT": 1791471677.0755208
+    "CHZUSDT": 1791471677.0755208,
+    "OPENAIUSDT": 1791474553.3191264
   }
 }
