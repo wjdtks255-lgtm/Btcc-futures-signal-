@@ -12,18 +12,6 @@
       "quality": "A",
       "entry_time": "2026-10-08T12:13:47.525405+09:00"
     },
-    "CHZUSDT": {
-      "symbol": "CHZUSDT",
-      "direction": "SHORT",
-      "entry": 0.01554,
-      "sl": 0.015633218164969757,
-      "tp1": 0.015400172752545361,
-      "tp2": 0.015306954587575602,
-      "tp1_hit": false,
-      "score": 87,
-      "quality": "A",
-      "entry_time": "2026-10-08T21:20:40.955198+09:00"
-    },
     "GUSDT": {
       "symbol": "GUSDT",
       "direction": "SHORT",
@@ -59,6 +47,18 @@
       "score": 90,
       "quality": "A",
       "entry_time": "2026-10-08T23:41:45.864054+09:00"
+    },
+    "ENAUSDT": {
+      "symbol": "ENAUSDT",
+      "direction": "SHORT",
+      "entry": 0.21689,
+      "sl": 0.2193057211844506,
+      "tp1": 0.2132664182233241,
+      "tp2": 0.2108506970388735,
+      "tp1_hit": false,
+      "score": 90,
+      "quality": "A",
+      "entry_time": "2026-10-09T00:01:23.088764+09:00"
     }
   },
   "signals": {
@@ -144,7 +144,8 @@
     "GUSDT:SHORT": 1791466483.7131205,
     "ZESTUSDT:LONG": 1791466483.7131205,
     "DOGEUSDT:SHORT": 1791470502.4254556,
-    "TRIAUSDT:SHORT": 1791470502.4254556
+    "TRIAUSDT:SHORT": 1791470502.4254556,
+    "ENAUSDT:SHORT": 1791471681.2186527
   },
   "sl_penalties": {
     "STXUSDT": 1791380763.6872358,
@@ -166,6 +167,7 @@
     "NILUSDT": 1791466477.314854,
     "METAUSDT": 1791466479.009138,
     "LUNAUSDT": 1791470494.678036,
-    "ZESTUSDT": 1791470496.3703535
+    "ZESTUSDT": 1791470496.3703535,
+    "CHZUSDT": 1791471677.0755208
   }
 }
