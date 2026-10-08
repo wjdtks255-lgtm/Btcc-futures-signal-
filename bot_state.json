@@ -16,10 +16,10 @@
       "symbol": "LUNAUSDT",
       "direction": "SHORT",
       "entry": 0.044685,
-      "sl": 0.0450148702486496,
+      "sl": 0.044685,
       "tp1": 0.044190194627025614,
       "tp2": 0.04386032437837602,
-      "tp1_hit": false,
+      "tp1_hit": true,
       "score": 87,
       "quality": "A",
       "entry_time": "2026-10-08T11:29:27.926997+09:00"
