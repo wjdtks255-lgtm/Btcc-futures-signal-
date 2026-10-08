@@ -12,18 +12,6 @@
       "quality": "A",
       "entry_time": "2026-10-08T11:29:27.926997+09:00"
     },
-    "MYXUSDT": {
-      "symbol": "MYXUSDT",
-      "direction": "SHORT",
-      "entry": 0.0689,
-      "sl": 0.0689,
-      "tp1": 0.06835530967469539,
-      "tp2": 0.06799218279115897,
-      "tp1_hit": true,
-      "score": 87,
-      "quality": "A",
-      "entry_time": "2026-10-08T12:13:45.675184+09:00"
-    },
     "OPENAIUSDT": {
       "symbol": "OPENAIUSDT",
       "direction": "LONG",
@@ -59,6 +47,18 @@
       "score": 87,
       "quality": "A",
       "entry_time": "2026-10-08T21:20:42.792956+09:00"
+    },
+    "METAUSDT": {
+      "symbol": "METAUSDT",
+      "direction": "SHORT",
+      "entry": 721.14,
+      "sl": 724.38513,
+      "tp1": 716.272305,
+      "tp2": 713.0271749999999,
+      "tp1_hit": false,
+      "score": 90,
+      "quality": "A",
+      "entry_time": "2026-10-08T21:48:28.837658+09:00"
     }
   },
   "signals": {
@@ -139,7 +139,8 @@
     "MYXUSDT:SHORT": 1791429221.9992118,
     "OPENAIUSDT:LONG": 1791429221.9992118,
     "CHZUSDT:SHORT": 1791462039.1115506,
-    "NILUSDT:SHORT": 1791462039.1115506
+    "NILUSDT:SHORT": 1791462039.1115506,
+    "METAUSDT:SHORT": 1791463706.9796495
   },
   "sl_penalties": {
     "STXUSDT": 1791380763.6872358,
