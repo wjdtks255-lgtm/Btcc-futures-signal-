@@ -12,53 +12,53 @@
       "quality": "A",
       "entry_time": "2026-10-08T12:13:47.525405+09:00"
     },
-    "GUSDT": {
-      "symbol": "GUSDT",
+    "FFUSDT": {
+      "symbol": "FFUSDT",
       "direction": "SHORT",
-      "entry": 0.00433,
-      "sl": 0.004354802876371773,
-      "tp1": 0.0042927956854423395,
-      "tp2": 0.004267992809070566,
+      "entry": 0.10685,
+      "sl": 0.1079436782253487,
+      "tp1": 0.10520948266197694,
+      "tp2": 0.10411580443662824,
       "tp1_hit": false,
       "score": 87,
       "quality": "A",
-      "entry_time": "2026-10-08T22:34:45.417214+09:00"
+      "entry_time": "2026-10-09T00:25:37.475257+09:00"
     },
-    "DOGEUSDT": {
-      "symbol": "DOGEUSDT",
-      "direction": "SHORT",
-      "entry": 0.08696,
-      "sl": 0.08751274084303724,
-      "tp1": 0.08613088873544412,
-      "tp2": 0.08557814789240686,
+    "SOXSUSDT": {
+      "symbol": "SOXSUSDT",
+      "direction": "LONG",
+      "entry": 32.1,
+      "sl": 31.65903931057908,
+      "tp1": 32.76144103413139,
+      "tp2": 33.202401723552306,
       "tp1_hit": false,
-      "score": 90,
+      "score": 87,
       "quality": "A",
-      "entry_time": "2026-10-08T23:41:44.171584+09:00"
+      "entry_time": "2026-10-09T00:25:39.215470+09:00"
     },
-    "TRIAUSDT": {
-      "symbol": "TRIAUSDT",
+    "SOXLUSDT": {
+      "symbol": "SOXLUSDT",
       "direction": "SHORT",
-      "entry": 0.00352,
-      "sl": 0.0035527559450042293,
-      "tp1": 0.003470866082493656,
-      "tp2": 0.003438110137489427,
+      "entry": 151.44,
+      "sl": 153.65379765620742,
+      "tp1": 148.11930351568884,
+      "tp2": 145.90550585948142,
       "tp1_hit": false,
-      "score": 90,
+      "score": 87,
       "quality": "A",
-      "entry_time": "2026-10-08T23:41:45.864054+09:00"
+      "entry_time": "2026-10-09T00:25:41.003077+09:00"
     },
-    "ENAUSDT": {
-      "symbol": "ENAUSDT",
+    "TSMUSDT": {
+      "symbol": "TSMUSDT",
       "direction": "SHORT",
-      "entry": 0.21689,
-      "sl": 0.2193057211844506,
-      "tp1": 0.2132664182233241,
-      "tp2": 0.2108506970388735,
+      "entry": 467.76,
+      "sl": 469.86492,
+      "tp1": 464.60262,
+      "tp2": 462.4977,
       "tp1_hit": false,
-      "score": 90,
+      "score": 85,
       "quality": "A",
-      "entry_time": "2026-10-09T00:01:23.088764+09:00"
+      "entry_time": "2026-10-09T00:25:42.730854+09:00"
     }
   },
   "signals": {
@@ -145,7 +145,11 @@
     "ZESTUSDT:LONG": 1791466483.7131205,
     "DOGEUSDT:SHORT": 1791470502.4254556,
     "TRIAUSDT:SHORT": 1791470502.4254556,
-    "ENAUSDT:SHORT": 1791471681.2186527
+    "ENAUSDT:SHORT": 1791471681.2186527,
+    "FFUSDT:SHORT": 1791473135.711636,
+    "SOXSUSDT:LONG": 1791473135.711636,
+    "SOXLUSDT:SHORT": 1791473135.711636,
+    "TSMUSDT:SHORT": 1791473135.711636
   },
   "sl_penalties": {
     "STXUSDT": 1791380763.6872358,
