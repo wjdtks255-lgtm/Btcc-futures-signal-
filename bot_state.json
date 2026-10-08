@@ -35,6 +35,30 @@
       "score": 90,
       "quality": "A",
       "entry_time": "2026-10-09T02:14:06.864892+09:00"
+    },
+    "TRUTHUSDT": {
+      "symbol": "TRUTHUSDT",
+      "direction": "SHORT",
+      "entry": 0.013644,
+      "sl": 0.013757852466093307,
+      "tp1": 0.013473221300860037,
+      "tp2": 0.01335936883476673,
+      "tp1_hit": false,
+      "score": 87,
+      "quality": "A",
+      "entry_time": "2026-10-09T02:35:41.532114+09:00"
+    },
+    "SILVERUSDT": {
+      "symbol": "SILVERUSDT",
+      "direction": "SHORT",
+      "entry": 59.12,
+      "sl": 59.386039999999994,
+      "tp1": 58.72094,
+      "tp2": 58.454899999999995,
+      "tp1_hit": false,
+      "score": 87,
+      "quality": "A",
+      "entry_time": "2026-10-09T02:35:43.505708+09:00"
     }
   },
   "signals": {
@@ -129,7 +153,9 @@
     "LSKUSDT:SHORT": 1791474553.9834852,
     "PLTRUSDT:LONG": 1791477092.6267495,
     "EWYUSDT:SHORT": 1791477092.6267495,
-    "SIRENUSDT:SHORT": 1791478475.8734167
+    "SIRENUSDT:SHORT": 1791478475.8734167,
+    "TRUTHUSDT:SHORT": 1791480939.4894094,
+    "SILVERUSDT:SHORT": 1791480939.4894094
   },
   "sl_penalties": {
     "STXUSDT": 1791380763.6872358,
