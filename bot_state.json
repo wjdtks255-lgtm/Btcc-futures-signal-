@@ -12,18 +12,6 @@
       "quality": "A",
       "entry_time": "2026-10-09T02:14:06.864892+09:00"
     },
-    "JASMYUSDT": {
-      "symbol": "JASMYUSDT",
-      "direction": "SHORT",
-      "entry": 0.004612,
-      "sl": 0.004679970155676056,
-      "tp1": 0.004510044766485916,
-      "tp2": 0.00444207461080986,
-      "tp1_hit": false,
-      "score": 90,
-      "quality": "A",
-      "entry_time": "2026-10-09T03:43:10.007900+09:00"
-    },
     "BANUSDT": {
       "symbol": "BANUSDT",
       "direction": "SHORT",
@@ -36,29 +24,41 @@
       "quality": "A",
       "entry_time": "2026-10-09T05:50:16.402910+09:00"
     },
-    "1MBABYDOGEUSDT": {
-      "symbol": "1MBABYDOGEUSDT",
+    "HBARUSDT": {
+      "symbol": "HBARUSDT",
       "direction": "SHORT",
-      "entry": 0.0003751,
-      "sl": 0.0003776970887605476,
-      "tp1": 0.0003712043668591786,
-      "tp2": 0.000368607278098631,
-      "tp1_hit": false,
-      "score": 90,
-      "quality": "A",
-      "entry_time": "2026-10-09T06:27:09.730528+09:00"
-    },
-    "SPACEUSDT": {
-      "symbol": "SPACEUSDT",
-      "direction": "SHORT",
-      "entry": 0.004366,
-      "sl": 0.00439626406567241,
-      "tp1": 0.004320603901491386,
-      "tp2": 0.004290339835818977,
+      "entry": 0.09121,
+      "sl": 0.09191564334255982,
+      "tp1": 0.09015153498616028,
+      "tp2": 0.08944589164360046,
       "tp1_hit": false,
       "score": 87,
       "quality": "A",
-      "entry_time": "2026-10-09T07:25:37.742399+09:00"
+      "entry_time": "2026-10-09T08:23:01.999721+09:00"
+    },
+    "COOKIEUSDT": {
+      "symbol": "COOKIEUSDT",
+      "direction": "SHORT",
+      "entry": 0.01143,
+      "sl": 0.01153227680997782,
+      "tp1": 0.011276584785033267,
+      "tp2": 0.011174307975055446,
+      "tp1_hit": false,
+      "score": 87,
+      "quality": "A",
+      "entry_time": "2026-10-09T08:23:03.736217+09:00"
+    },
+    "WLDUSDT": {
+      "symbol": "WLDUSDT",
+      "direction": "SHORT",
+      "entry": 0.4815,
+      "sl": 0.4860522741554725,
+      "tp1": 0.4746715887667912,
+      "tp2": 0.4701193146113187,
+      "tp1_hit": false,
+      "score": 87,
+      "quality": "A",
+      "entry_time": "2026-10-09T08:23:05.505072+09:00"
     }
   },
   "signals": {
@@ -159,7 +159,10 @@
     "STABLEUSDT:SHORT": 1791483402.6478534,
     "FARTCOINUSDT:SHORT": 1791484988.2379594,
     "1MBABYDOGEUSDT:SHORT": 1791494827.9888601,
-    "SPACEUSDT:SHORT": 1791498335.929474
+    "SPACEUSDT:SHORT": 1791498335.929474,
+    "HBARUSDT:SHORT": 1791501780.2422528,
+    "COOKIEUSDT:SHORT": 1791501780.2422528,
+    "WLDUSDT:SHORT": 1791501780.2422528
   },
   "sl_penalties": {
     "STXUSDT": 1791380763.6872358,
@@ -191,6 +194,9 @@
     "STABLEUSDT": 1791484982.1997254,
     "FARTCOINUSDT": 1791492606.1150687,
     "SIRENUSDT": 1791494819.2500608,
-    "SILVERUSDT": 1791498328.136881
+    "SILVERUSDT": 1791498328.136881,
+    "JASMYUSDT": 1791501766.636158,
+    "1MBABYDOGEUSDT": 1791501768.3639884,
+    "SPACEUSDT": 1791501770.107879
   }
 }
