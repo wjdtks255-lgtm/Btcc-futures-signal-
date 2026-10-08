@@ -12,30 +12,6 @@
       "quality": "A",
       "entry_time": "2026-10-08T01:08:59.532460+09:00"
     },
-    "JASMYUSDT": {
-      "symbol": "JASMYUSDT",
-      "direction": "SHORT",
-      "entry": 0.004854,
-      "sl": 0.004854,
-      "tp1": 0.004812903520014604,
-      "tp2": 0.004785505866691006,
-      "tp1_hit": true,
-      "score": 87,
-      "quality": "A",
-      "entry_time": "2026-10-08T08:26:39.161251+09:00"
-    },
-    "KASUSDT": {
-      "symbol": "KASUSDT",
-      "direction": "SHORT",
-      "entry": 0.04047,
-      "sl": 0.04047,
-      "tp1": 0.040182754847724295,
-      "tp2": 0.039991258079540494,
-      "tp1_hit": true,
-      "score": 90,
-      "quality": "A",
-      "entry_time": "2026-10-08T10:43:54.518935+09:00"
-    },
     "LUNAUSDT": {
       "symbol": "LUNAUSDT",
       "direction": "SHORT",
@@ -48,17 +24,41 @@
       "quality": "A",
       "entry_time": "2026-10-08T11:29:27.926997+09:00"
     },
-    "SENTUSDT": {
-      "symbol": "SENTUSDT",
-      "direction": "LONG",
-      "entry": 0.02583,
-      "sl": 0.0255660084334001,
-      "tp1": 0.02622598734989984,
-      "tp2": 0.026489978916499738,
+    "PLAYUSDT": {
+      "symbol": "PLAYUSDT",
+      "direction": "SHORT",
+      "entry": 0.02597,
+      "sl": 0.02613236352740543,
+      "tp1": 0.025726454708891854,
+      "tp2": 0.025564091181486424,
+      "tp1_hit": false,
+      "score": 90,
+      "quality": "A",
+      "entry_time": "2026-10-08T12:13:43.853811+09:00"
+    },
+    "MYXUSDT": {
+      "symbol": "MYXUSDT",
+      "direction": "SHORT",
+      "entry": 0.0689,
+      "sl": 0.06926312688353642,
+      "tp1": 0.06835530967469539,
+      "tp2": 0.06799218279115897,
       "tp1_hit": false,
       "score": 87,
       "quality": "A",
-      "entry_time": "2026-10-08T11:45:23.825948+09:00"
+      "entry_time": "2026-10-08T12:13:45.675184+09:00"
+    },
+    "OPENAIUSDT": {
+      "symbol": "OPENAIUSDT",
+      "direction": "LONG",
+      "entry": 1707.43,
+      "sl": 1699.7465650000001,
+      "tp1": 1718.9551525000002,
+      "tp2": 1726.6385875,
+      "tp1_hit": false,
+      "score": 85,
+      "quality": "A",
+      "entry_time": "2026-10-08T12:13:47.525405+09:00"
     }
   },
   "signals": {
@@ -134,7 +134,10 @@
     "KASUSDT:SHORT": 1791423832.7894971,
     "UNIUSDT:SHORT": 1791425596.8060849,
     "LUNAUSDT:SHORT": 1791426566.056165,
-    "SENTUSDT:LONG": 1791427522.1123776
+    "SENTUSDT:LONG": 1791427522.1123776,
+    "PLAYUSDT:SHORT": 1791429221.9992118,
+    "MYXUSDT:SHORT": 1791429221.9992118,
+    "OPENAIUSDT:LONG": 1791429221.9992118
   },
   "sl_penalties": {
     "STXUSDT": 1791380763.6872358,
@@ -151,6 +154,7 @@
     "ARKMUSDT": 1791412304.130952,
     "BNBUSDT": 1791415591.1778738,
     "EDUUSDT": 1791415592.9258506,
-    "UNIUSDT": 1791427518.9437788
+    "UNIUSDT": 1791427518.9437788,
+    "SENTUSDT": 1791429221.2329106
   }
 }
