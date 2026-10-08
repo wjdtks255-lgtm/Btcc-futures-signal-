@@ -24,18 +24,6 @@
       "quality": "A",
       "entry_time": "2026-10-08T08:26:39.161251+09:00"
     },
-    "VETUSDT": {
-      "symbol": "VETUSDT",
-      "direction": "SHORT",
-      "entry": 0.008065,
-      "sl": 0.008065,
-      "tp1": 0.008010446598693615,
-      "tp2": 0.007974077664489359,
-      "tp1_hit": true,
-      "score": 87,
-      "quality": "A",
-      "entry_time": "2026-10-08T08:26:40.947247+09:00"
-    },
     "KASUSDT": {
       "symbol": "KASUSDT",
       "direction": "SHORT",
@@ -59,6 +47,18 @@
       "score": 90,
       "quality": "A",
       "entry_time": "2026-10-08T11:13:18.494768+09:00"
+    },
+    "LUNAUSDT": {
+      "symbol": "LUNAUSDT",
+      "direction": "SHORT",
+      "entry": 0.044685,
+      "sl": 0.0450148702486496,
+      "tp1": 0.044190194627025614,
+      "tp2": 0.04386032437837602,
+      "tp1_hit": false,
+      "score": 87,
+      "quality": "A",
+      "entry_time": "2026-10-08T11:29:27.926997+09:00"
     }
   },
   "signals": {
@@ -132,7 +132,8 @@
     "EDUUSDT:LONG": 1791412310.2900076,
     "VETUSDT:SHORT": 1791415597.4020784,
     "KASUSDT:SHORT": 1791423832.7894971,
-    "UNIUSDT:SHORT": 1791425596.8060849
+    "UNIUSDT:SHORT": 1791425596.8060849,
+    "LUNAUSDT:SHORT": 1791426566.056165
   },
   "sl_penalties": {
     "STXUSDT": 1791380763.6872358,
