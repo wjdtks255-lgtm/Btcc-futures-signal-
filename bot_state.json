@@ -48,17 +48,17 @@
       "quality": "A",
       "entry_time": "2026-10-09T03:43:10.007900+09:00"
     },
-    "FARTCOINUSDT": {
-      "symbol": "FARTCOINUSDT",
+    "BANUSDT": {
+      "symbol": "BANUSDT",
       "direction": "SHORT",
-      "entry": 0.14895,
-      "sl": 0.151818581136816,
-      "tp1": 0.14464712829477597,
-      "tp2": 0.14177854715795996,
+      "entry": 0.06135,
+      "sl": 0.06204815463402162,
+      "tp1": 0.06030276804896757,
+      "tp2": 0.05960461341494595,
       "tp1_hit": false,
       "score": 90,
       "quality": "A",
-      "entry_time": "2026-10-09T03:43:11.785919+09:00"
+      "entry_time": "2026-10-09T05:50:16.402910+09:00"
     }
   },
   "signals": {
@@ -120,7 +120,7 @@
     "FLRUSDT:SHORT": 1791370422.583242,
     "UAIUSDT:SHORT": 1791395219.127907,
     "CVXUSDT:SHORT": 1791370422.583242,
-    "BANUSDT:SHORT": 1791373071.86648,
+    "BANUSDT:SHORT": 1791492614.640926,
     "ASTERUSDT:SHORT": 1791373071.86648,
     "MANTRAUSDT:SHORT": 1791374596.85774,
     "NESUSDT:SHORT": 1791376111.1684203,
@@ -186,6 +186,7 @@
     "LSKUSDT": 1791477090.5316513,
     "PLTRUSDT": 1791482098.9959986,
     "TRUTHUSDT": 1791484980.4591138,
-    "STABLEUSDT": 1791484982.1997254
+    "STABLEUSDT": 1791484982.1997254,
+    "FARTCOINUSDT": 1791492606.1150687
   }
 }
