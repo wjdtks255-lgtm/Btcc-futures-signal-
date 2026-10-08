@@ -1,17 +1,5 @@
 {
   "positions": {
-    "SIRENUSDT": {
-      "symbol": "SIRENUSDT",
-      "direction": "SHORT",
-      "entry": 0.02224,
-      "sl": 0.02268172785915404,
-      "tp1": 0.02157740821126894,
-      "tp2": 0.021135680352114897,
-      "tp1_hit": false,
-      "score": 87,
-      "quality": "A",
-      "entry_time": "2026-10-09T01:54:37.580828+09:00"
-    },
     "BTWUSDT": {
       "symbol": "BTWUSDT",
       "direction": "LONG",
@@ -59,6 +47,18 @@
       "score": 90,
       "quality": "A",
       "entry_time": "2026-10-09T05:50:16.402910+09:00"
+    },
+    "1MBABYDOGEUSDT": {
+      "symbol": "1MBABYDOGEUSDT",
+      "direction": "SHORT",
+      "entry": 0.0003751,
+      "sl": 0.0003776970887605476,
+      "tp1": 0.0003712043668591786,
+      "tp2": 0.000368607278098631,
+      "tp1_hit": false,
+      "score": 90,
+      "quality": "A",
+      "entry_time": "2026-10-09T06:27:09.730528+09:00"
     }
   },
   "signals": {
@@ -157,7 +157,8 @@
     "TRUTHUSDT:SHORT": 1791480939.4894094,
     "SILVERUSDT:SHORT": 1791480939.4894094,
     "STABLEUSDT:SHORT": 1791483402.6478534,
-    "FARTCOINUSDT:SHORT": 1791484988.2379594
+    "FARTCOINUSDT:SHORT": 1791484988.2379594,
+    "1MBABYDOGEUSDT:SHORT": 1791494827.9888601
   },
   "sl_penalties": {
     "STXUSDT": 1791380763.6872358,
@@ -187,6 +188,7 @@
     "PLTRUSDT": 1791482098.9959986,
     "TRUTHUSDT": 1791484980.4591138,
     "STABLEUSDT": 1791484982.1997254,
-    "FARTCOINUSDT": 1791492606.1150687
+    "FARTCOINUSDT": 1791492606.1150687,
+    "SIRENUSDT": 1791494819.2500608
   }
 }
