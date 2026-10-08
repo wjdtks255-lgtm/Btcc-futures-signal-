@@ -1,17 +1,5 @@
 {
   "positions": {
-    "BLESSUSDT": {
-      "symbol": "BLESSUSDT",
-      "direction": "SHORT",
-      "entry": 0.008372,
-      "sl": 0.008448875879810042,
-      "tp1": 0.008256686180284935,
-      "tp2": 0.008179810300474892,
-      "tp1_hit": false,
-      "score": 90,
-      "quality": "A",
-      "entry_time": "2026-10-08T01:08:59.532460+09:00"
-    },
     "LUNAUSDT": {
       "symbol": "LUNAUSDT",
       "direction": "SHORT",
@@ -24,26 +12,14 @@
       "quality": "A",
       "entry_time": "2026-10-08T11:29:27.926997+09:00"
     },
-    "PLAYUSDT": {
-      "symbol": "PLAYUSDT",
-      "direction": "SHORT",
-      "entry": 0.02597,
-      "sl": 0.02613236352740543,
-      "tp1": 0.025726454708891854,
-      "tp2": 0.025564091181486424,
-      "tp1_hit": false,
-      "score": 90,
-      "quality": "A",
-      "entry_time": "2026-10-08T12:13:43.853811+09:00"
-    },
     "MYXUSDT": {
       "symbol": "MYXUSDT",
       "direction": "SHORT",
       "entry": 0.0689,
-      "sl": 0.06926312688353642,
+      "sl": 0.0689,
       "tp1": 0.06835530967469539,
       "tp2": 0.06799218279115897,
-      "tp1_hit": false,
+      "tp1_hit": true,
       "score": 87,
       "quality": "A",
       "entry_time": "2026-10-08T12:13:45.675184+09:00"
@@ -59,6 +35,30 @@
       "score": 85,
       "quality": "A",
       "entry_time": "2026-10-08T12:13:47.525405+09:00"
+    },
+    "CHZUSDT": {
+      "symbol": "CHZUSDT",
+      "direction": "SHORT",
+      "entry": 0.01554,
+      "sl": 0.015633218164969757,
+      "tp1": 0.015400172752545361,
+      "tp2": 0.015306954587575602,
+      "tp1_hit": false,
+      "score": 87,
+      "quality": "A",
+      "entry_time": "2026-10-08T21:20:40.955198+09:00"
+    },
+    "NILUSDT": {
+      "symbol": "NILUSDT",
+      "direction": "SHORT",
+      "entry": 0.08652,
+      "sl": 0.08750797344955248,
+      "tp1": 0.08503803982567126,
+      "tp2": 0.08405006637611878,
+      "tp1_hit": false,
+      "score": 87,
+      "quality": "A",
+      "entry_time": "2026-10-08T21:20:42.792956+09:00"
     }
   },
   "signals": {
@@ -137,7 +137,9 @@
     "SENTUSDT:LONG": 1791427522.1123776,
     "PLAYUSDT:SHORT": 1791429221.9992118,
     "MYXUSDT:SHORT": 1791429221.9992118,
-    "OPENAIUSDT:LONG": 1791429221.9992118
+    "OPENAIUSDT:LONG": 1791429221.9992118,
+    "CHZUSDT:SHORT": 1791462039.1115506,
+    "NILUSDT:SHORT": 1791462039.1115506
   },
   "sl_penalties": {
     "STXUSDT": 1791380763.6872358,
