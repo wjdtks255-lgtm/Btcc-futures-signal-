@@ -1,41 +1,5 @@
 {
   "positions": {
-    "SOXSUSDT": {
-      "symbol": "SOXSUSDT",
-      "direction": "LONG",
-      "entry": 32.1,
-      "sl": 31.65903931057908,
-      "tp1": 32.76144103413139,
-      "tp2": 33.202401723552306,
-      "tp1_hit": false,
-      "score": 87,
-      "quality": "A",
-      "entry_time": "2026-10-09T00:25:39.215470+09:00"
-    },
-    "SOXLUSDT": {
-      "symbol": "SOXLUSDT",
-      "direction": "SHORT",
-      "entry": 151.44,
-      "sl": 153.65379765620742,
-      "tp1": 148.11930351568884,
-      "tp2": 145.90550585948142,
-      "tp1_hit": false,
-      "score": 87,
-      "quality": "A",
-      "entry_time": "2026-10-09T00:25:41.003077+09:00"
-    },
-    "TSMUSDT": {
-      "symbol": "TSMUSDT",
-      "direction": "SHORT",
-      "entry": 467.76,
-      "sl": 467.76,
-      "tp1": 464.60262,
-      "tp2": 462.4977,
-      "tp1_hit": true,
-      "score": 85,
-      "quality": "A",
-      "entry_time": "2026-10-09T00:25:42.730854+09:00"
-    },
     "PLTRUSDT": {
       "symbol": "PLTRUSDT",
       "direction": "LONG",
@@ -48,17 +12,17 @@
       "quality": "A",
       "entry_time": "2026-10-09T01:31:34.373799+09:00"
     },
-    "EWYUSDT": {
-      "symbol": "EWYUSDT",
+    "SIRENUSDT": {
+      "symbol": "SIRENUSDT",
       "direction": "SHORT",
-      "entry": 178.69,
-      "sl": 179.494105,
-      "tp1": 177.4838425,
-      "tp2": 176.6797375,
+      "entry": 0.02224,
+      "sl": 0.02268172785915404,
+      "tp1": 0.02157740821126894,
+      "tp2": 0.021135680352114897,
       "tp1_hit": false,
-      "score": 85,
+      "score": 87,
       "quality": "A",
-      "entry_time": "2026-10-09T01:31:36.082097+09:00"
+      "entry_time": "2026-10-09T01:54:37.580828+09:00"
     }
   },
   "signals": {
@@ -152,7 +116,8 @@
     "TSMUSDT:SHORT": 1791473135.711636,
     "LSKUSDT:SHORT": 1791474553.9834852,
     "PLTRUSDT:LONG": 1791477092.6267495,
-    "EWYUSDT:SHORT": 1791477092.6267495
+    "EWYUSDT:SHORT": 1791477092.6267495,
+    "SIRENUSDT:SHORT": 1791478475.8734167
   },
   "sl_penalties": {
     "STXUSDT": 1791380763.6872358,
