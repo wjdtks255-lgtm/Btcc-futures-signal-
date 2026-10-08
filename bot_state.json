@@ -23,6 +23,18 @@
       "score": 87,
       "quality": "A",
       "entry_time": "2026-10-09T01:54:37.580828+09:00"
+    },
+    "BTWUSDT": {
+      "symbol": "BTWUSDT",
+      "direction": "LONG",
+      "entry": 1.385402,
+      "sl": 1.3645671726281732,
+      "tp1": 1.4166542410577403,
+      "tp2": 1.4374890684295671,
+      "tp1_hit": false,
+      "score": 90,
+      "quality": "A",
+      "entry_time": "2026-10-09T02:14:06.864892+09:00"
     }
   },
   "signals": {
@@ -33,7 +45,7 @@
     "OUSDT:SHORT": 1791358639.5219054,
     "MEMEUSDT:SHORT": 1791358953.0830307,
     "FOGOUSDT:SHORT": 1791358953.0830307,
-    "BTWUSDT:LONG": 1791358953.0830307,
+    "BTWUSDT:LONG": 1791479645.1011746,
     "AVNTUSDT:SHORT": 1791358953.0830307,
     "PYTHUSDT:SHORT": 1791358953.0830307,
     "MONUSDT:SHORT": 1791359510.753104,
