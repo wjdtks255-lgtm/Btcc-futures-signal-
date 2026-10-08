@@ -1,17 +1,5 @@
 {
   "positions": {
-    "PLTRUSDT": {
-      "symbol": "PLTRUSDT",
-      "direction": "LONG",
-      "entry": 198.11,
-      "sl": 196.58791343621445,
-      "tp1": 200.39312984567837,
-      "tp2": 201.91521640946394,
-      "tp1_hit": false,
-      "score": 87,
-      "quality": "A",
-      "entry_time": "2026-10-09T01:31:34.373799+09:00"
-    },
     "SIRENUSDT": {
       "symbol": "SIRENUSDT",
       "direction": "SHORT",
@@ -181,6 +169,7 @@
     "CHZUSDT": 1791471677.0755208,
     "OPENAIUSDT": 1791474553.3191264,
     "FFUSDT": 1791477088.824896,
-    "LSKUSDT": 1791477090.5316513
+    "LSKUSDT": 1791477090.5316513,
+    "PLTRUSDT": 1791482098.9959986
   }
 }
