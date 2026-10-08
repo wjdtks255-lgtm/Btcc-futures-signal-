@@ -47,6 +47,18 @@
       "score": 87,
       "quality": "A",
       "entry_time": "2026-10-09T02:35:43.505708+09:00"
+    },
+    "STABLEUSDT": {
+      "symbol": "STABLEUSDT",
+      "direction": "SHORT",
+      "entry": 0.025979,
+      "sl": 0.026253428949272628,
+      "tp1": 0.025567356576091056,
+      "tp2": 0.02529292762681843,
+      "tp1_hit": false,
+      "score": 87,
+      "quality": "A",
+      "entry_time": "2026-10-09T03:16:44.562392+09:00"
     }
   },
   "signals": {
@@ -143,7 +155,8 @@
     "EWYUSDT:SHORT": 1791477092.6267495,
     "SIRENUSDT:SHORT": 1791478475.8734167,
     "TRUTHUSDT:SHORT": 1791480939.4894094,
-    "SILVERUSDT:SHORT": 1791480939.4894094
+    "SILVERUSDT:SHORT": 1791480939.4894094,
+    "STABLEUSDT:SHORT": 1791483402.6478534
   },
   "sl_penalties": {
     "STXUSDT": 1791380763.6872358,
