@@ -1,17 +1,5 @@
 {
   "positions": {
-    "LUNAUSDT": {
-      "symbol": "LUNAUSDT",
-      "direction": "SHORT",
-      "entry": 0.044685,
-      "sl": 0.044685,
-      "tp1": 0.044190194627025614,
-      "tp2": 0.04386032437837602,
-      "tp1_hit": true,
-      "score": 87,
-      "quality": "A",
-      "entry_time": "2026-10-08T11:29:27.926997+09:00"
-    },
     "OPENAIUSDT": {
       "symbol": "OPENAIUSDT",
       "direction": "LONG",
@@ -48,17 +36,29 @@
       "quality": "A",
       "entry_time": "2026-10-08T22:34:45.417214+09:00"
     },
-    "ZESTUSDT": {
-      "symbol": "ZESTUSDT",
-      "direction": "LONG",
-      "entry": 0.18819,
-      "sl": 0.1868451362721332,
-      "tp1": 0.1902072955918002,
-      "tp2": 0.191552159319667,
+    "DOGEUSDT": {
+      "symbol": "DOGEUSDT",
+      "direction": "SHORT",
+      "entry": 0.08696,
+      "sl": 0.08751274084303724,
+      "tp1": 0.08613088873544412,
+      "tp2": 0.08557814789240686,
       "tp1_hit": false,
-      "score": 87,
+      "score": 90,
       "quality": "A",
-      "entry_time": "2026-10-08T22:34:47.122266+09:00"
+      "entry_time": "2026-10-08T23:41:44.171584+09:00"
+    },
+    "TRIAUSDT": {
+      "symbol": "TRIAUSDT",
+      "direction": "SHORT",
+      "entry": 0.00352,
+      "sl": 0.0035527559450042293,
+      "tp1": 0.003470866082493656,
+      "tp2": 0.003438110137489427,
+      "tp1_hit": false,
+      "score": 90,
+      "quality": "A",
+      "entry_time": "2026-10-08T23:41:45.864054+09:00"
     }
   },
   "signals": {
@@ -142,7 +142,9 @@
     "NILUSDT:SHORT": 1791462039.1115506,
     "METAUSDT:SHORT": 1791463706.9796495,
     "GUSDT:SHORT": 1791466483.7131205,
-    "ZESTUSDT:LONG": 1791466483.7131205
+    "ZESTUSDT:LONG": 1791466483.7131205,
+    "DOGEUSDT:SHORT": 1791470502.4254556,
+    "TRIAUSDT:SHORT": 1791470502.4254556
   },
   "sl_penalties": {
     "STXUSDT": 1791380763.6872358,
@@ -162,6 +164,8 @@
     "UNIUSDT": 1791427518.9437788,
     "SENTUSDT": 1791429221.2329106,
     "NILUSDT": 1791466477.314854,
-    "METAUSDT": 1791466479.009138
+    "METAUSDT": 1791466479.009138,
+    "LUNAUSDT": 1791470494.678036,
+    "ZESTUSDT": 1791470496.3703535
   }
 }
