@@ -24,18 +24,6 @@
       "quality": "A",
       "entry_time": "2026-10-09T02:14:06.864892+09:00"
     },
-    "TRUTHUSDT": {
-      "symbol": "TRUTHUSDT",
-      "direction": "SHORT",
-      "entry": 0.013644,
-      "sl": 0.013757852466093307,
-      "tp1": 0.013473221300860037,
-      "tp2": 0.01335936883476673,
-      "tp1_hit": false,
-      "score": 87,
-      "quality": "A",
-      "entry_time": "2026-10-09T02:35:41.532114+09:00"
-    },
     "SILVERUSDT": {
       "symbol": "SILVERUSDT",
       "direction": "SHORT",
@@ -48,17 +36,29 @@
       "quality": "A",
       "entry_time": "2026-10-09T02:35:43.505708+09:00"
     },
-    "STABLEUSDT": {
-      "symbol": "STABLEUSDT",
+    "JASMYUSDT": {
+      "symbol": "JASMYUSDT",
       "direction": "SHORT",
-      "entry": 0.025979,
-      "sl": 0.026253428949272628,
-      "tp1": 0.025567356576091056,
-      "tp2": 0.02529292762681843,
+      "entry": 0.004612,
+      "sl": 0.004679970155676056,
+      "tp1": 0.004510044766485916,
+      "tp2": 0.00444207461080986,
       "tp1_hit": false,
-      "score": 87,
+      "score": 90,
       "quality": "A",
-      "entry_time": "2026-10-09T03:16:44.562392+09:00"
+      "entry_time": "2026-10-09T03:43:10.007900+09:00"
+    },
+    "FARTCOINUSDT": {
+      "symbol": "FARTCOINUSDT",
+      "direction": "SHORT",
+      "entry": 0.14895,
+      "sl": 0.151818581136816,
+      "tp1": 0.14464712829477597,
+      "tp2": 0.14177854715795996,
+      "tp1_hit": false,
+      "score": 90,
+      "quality": "A",
+      "entry_time": "2026-10-09T03:43:11.785919+09:00"
     }
   },
   "signals": {
@@ -78,7 +78,7 @@
     "ENJUSDT:SHORT": 1791360184.5480165,
     "CRVUSDT:SHORT": 1791377526.1091416,
     "RAVEUSDT:SHORT": 1791360184.5480165,
-    "JASMYUSDT:SHORT": 1791415597.4020784,
+    "JASMYUSDT:SHORT": 1791484988.2379594,
     "PIPPINUSDT:SHORT": 1791360473.4529753,
     "HOMEUSDT:SHORT": 1791360473.4529753,
     "BIOUSDT:SHORT": 1791360918.4161968,
@@ -156,7 +156,8 @@
     "SIRENUSDT:SHORT": 1791478475.8734167,
     "TRUTHUSDT:SHORT": 1791480939.4894094,
     "SILVERUSDT:SHORT": 1791480939.4894094,
-    "STABLEUSDT:SHORT": 1791483402.6478534
+    "STABLEUSDT:SHORT": 1791483402.6478534,
+    "FARTCOINUSDT:SHORT": 1791484988.2379594
   },
   "sl_penalties": {
     "STXUSDT": 1791380763.6872358,
@@ -183,6 +184,8 @@
     "OPENAIUSDT": 1791474553.3191264,
     "FFUSDT": 1791477088.824896,
     "LSKUSDT": 1791477090.5316513,
-    "PLTRUSDT": 1791482098.9959986
+    "PLTRUSDT": 1791482098.9959986,
+    "TRUTHUSDT": 1791484980.4591138,
+    "STABLEUSDT": 1791484982.1997254
   }
 }
