@@ -1,17 +1,5 @@
 {
   "positions": {
-    "UNITREEUSDT": {
-      "symbol": "UNITREEUSDT",
-      "direction": "SHORT",
-      "entry": 67.929,
-      "sl": 67.929,
-      "tp1": 67.4195325,
-      "tp2": 67.0798875,
-      "tp1_hit": true,
-      "score": 94,
-      "quality": "A+",
-      "entry_time": "2026-10-07T17:45:03.964452+09:00"
-    },
     "BLESSUSDT": {
       "symbol": "BLESSUSDT",
       "direction": "SHORT",
@@ -59,6 +47,18 @@
       "score": 87,
       "quality": "A",
       "entry_time": "2026-10-08T08:26:40.947247+09:00"
+    },
+    "KASUSDT": {
+      "symbol": "KASUSDT",
+      "direction": "SHORT",
+      "entry": 0.04047,
+      "sl": 0.0406614967681838,
+      "tp1": 0.040182754847724295,
+      "tp2": 0.039991258079540494,
+      "tp1_hit": false,
+      "score": 90,
+      "quality": "A",
+      "entry_time": "2026-10-08T10:43:54.518935+09:00"
     }
   },
   "signals": {
@@ -130,7 +130,8 @@
     "SKRUSDT:SHORT": 1791393071.0218923,
     "ARKMUSDT:SHORT": 1791396027.8025534,
     "EDUUSDT:LONG": 1791412310.2900076,
-    "VETUSDT:SHORT": 1791415597.4020784
+    "VETUSDT:SHORT": 1791415597.4020784,
+    "KASUSDT:SHORT": 1791423832.7894971
   },
   "sl_penalties": {
     "STXUSDT": 1791380763.6872358,
