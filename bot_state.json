@@ -24,18 +24,6 @@
       "quality": "A",
       "entry_time": "2026-10-09T20:52:11.106947+09:00"
     },
-    "1MBABYDOGEUSDT": {
-      "symbol": "1MBABYDOGEUSDT",
-      "direction": "SHORT",
-      "entry": 0.00037934,
-      "sl": 0.00038133140042841097,
-      "tp1": 0.00037635289935738353,
-      "tp2": 0.00037436149892897255,
-      "tp1_hit": false,
-      "score": 87,
-      "quality": "A",
-      "entry_time": "2026-10-09T23:35:21.699113+09:00"
-    },
     "BICOUSDT": {
       "symbol": "BICOUSDT",
       "direction": "SHORT",
@@ -59,6 +47,18 @@
       "score": 90,
       "quality": "A",
       "entry_time": "2026-10-10T01:24:13.714296+09:00"
+    },
+    "PONSUSDT": {
+      "symbol": "PONSUSDT",
+      "direction": "SHORT",
+      "entry": 0.34458,
+      "sl": 0.34847528001368844,
+      "tp1": 0.33873707997946734,
+      "tp2": 0.3348417999657789,
+      "tp1_hit": false,
+      "score": 87,
+      "quality": "A",
+      "entry_time": "2026-10-10T02:02:51.383601+09:00"
     }
   },
   "signals": {
@@ -173,7 +173,8 @@
     "BEATUSDT:LONG": 1791553854.0623665,
     "BILLUSDT:SHORT": 1791556519.898543,
     "BICOUSDT:SHORT": 1791559175.1062849,
-    "TSLAUSDT:LONG": 1791563051.8644247
+    "TSLAUSDT:LONG": 1791563051.8644247,
+    "PONSUSDT:SHORT": 1791565369.5227373
   },
   "sl_penalties": {
     "STXUSDT": 1791380763.6872358,
@@ -207,7 +208,7 @@
     "SIRENUSDT": 1791494819.2500608,
     "SILVERUSDT": 1791498328.136881,
     "JASMYUSDT": 1791501766.636158,
-    "1MBABYDOGEUSDT": 1791501768.3639884,
+    "1MBABYDOGEUSDT": 1791565368.775967,
     "SPACEUSDT": 1791501770.107879,
     "WLDUSDT": 1791510367.1699083,
     "RENDERUSDT": 1791513800.1189022,
