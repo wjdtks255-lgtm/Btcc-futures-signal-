@@ -1,17 +1,5 @@
 {
   "positions": {
-    "HBARUSDT": {
-      "symbol": "HBARUSDT",
-      "direction": "SHORT",
-      "entry": 0.09121,
-      "sl": 0.09191564334255982,
-      "tp1": 0.09015153498616028,
-      "tp2": 0.08944589164360046,
-      "tp1_hit": false,
-      "score": 87,
-      "quality": "A",
-      "entry_time": "2026-10-09T08:23:01.999721+09:00"
-    },
     "HEMIUSDT": {
       "symbol": "HEMIUSDT",
       "direction": "SHORT",
@@ -206,6 +194,7 @@
     "BANUSDT": 1791516182.7618537,
     "GUNUSDT": 1791516184.6627781,
     "COOKIEUSDT": 1791517505.646876,
-    "KITEUSDT": 1791522152.1876538
+    "KITEUSDT": 1791522152.1876538,
+    "HBARUSDT": 1791523513.2669804
   }
 }
