@@ -24,18 +24,6 @@
       "quality": "A",
       "entry_time": "2026-10-09T20:52:11.106947+09:00"
     },
-    "BICOUSDT": {
-      "symbol": "BICOUSDT",
-      "direction": "SHORT",
-      "entry": 0.01932,
-      "sl": 0.019509356801476346,
-      "tp1": 0.019035964797785482,
-      "tp2": 0.018846607996309134,
-      "tp1_hit": false,
-      "score": 87,
-      "quality": "A",
-      "entry_time": "2026-10-10T00:19:36.923424+09:00"
-    },
     "TSLAUSDT": {
       "symbol": "TSLAUSDT",
       "direction": "LONG",
@@ -59,6 +47,18 @@
       "score": 90,
       "quality": "A",
       "entry_time": "2026-10-10T04:58:48.132981+09:00"
+    },
+    "ZBCNUSDT": {
+      "symbol": "ZBCNUSDT",
+      "direction": "SHORT",
+      "entry": 0.0022498,
+      "sl": 0.002266577920428631,
+      "tp1": 0.002224633119357054,
+      "tp2": 0.002207855198928423,
+      "tp1_hit": false,
+      "score": 90,
+      "quality": "A",
+      "entry_time": "2026-10-10T08:15:54.644424+09:00"
     }
   },
   "signals": {
@@ -174,7 +174,8 @@
     "BILLUSDT:SHORT": 1791556519.898543,
     "BICOUSDT:SHORT": 1791559175.1062849,
     "TSLAUSDT:LONG": 1791563051.8644247,
-    "PONSUSDT:SHORT": 1791565369.5227373
+    "PONSUSDT:SHORT": 1791565369.5227373,
+    "ZBCNUSDT:SHORT": 1791587752.7681868
   },
   "sl_penalties": {
     "STXUSDT": 1791380763.6872358,
@@ -223,6 +224,7 @@
     "TIAUSDT": 1791534386.2504938,
     "MYXUSDT": 1791546727.803244,
     "ORCLUSDT": 1791553853.1825883,
-    "BEATUSDT": 1791556516.2095673
+    "BEATUSDT": 1791556516.2095673,
+    "BICOUSDT": 1791587751.6266668
   }
 }
