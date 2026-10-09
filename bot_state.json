@@ -12,18 +12,6 @@
       "quality": "A",
       "entry_time": "2026-10-09T08:23:01.999721+09:00"
     },
-    "COOKIEUSDT": {
-      "symbol": "COOKIEUSDT",
-      "direction": "SHORT",
-      "entry": 0.01143,
-      "sl": 0.01153227680997782,
-      "tp1": 0.011276584785033267,
-      "tp2": 0.011174307975055446,
-      "tp1_hit": false,
-      "score": 87,
-      "quality": "A",
-      "entry_time": "2026-10-09T08:23:03.736217+09:00"
-    },
     "HEMIUSDT": {
       "symbol": "HEMIUSDT",
       "direction": "SHORT",
@@ -59,6 +47,18 @@
       "score": 87,
       "quality": "A",
       "entry_time": "2026-10-09T12:23:10.316391+09:00"
+    },
+    "GRVTUSDT": {
+      "symbol": "GRVTUSDT",
+      "direction": "LONG",
+      "entry": 0.2293,
+      "sl": 0.22743028353627465,
+      "tp1": 0.23210457469558804,
+      "tp2": 0.2339742911593134,
+      "tp1_hit": false,
+      "score": 87,
+      "quality": "A",
+      "entry_time": "2026-10-09T12:45:10.853539+09:00"
     }
   },
   "signals": {
@@ -164,7 +164,8 @@
     "COOKIEUSDT:SHORT": 1791501780.2422528,
     "WLDUSDT:SHORT": 1791501780.2422528,
     "RENDERUSDT:SHORT": 1791510372.5181398,
-    "KITEUSDT:SHORT": 1791516186.4746506
+    "KITEUSDT:SHORT": 1791516186.4746506,
+    "GRVTUSDT:LONG": 1791517509.0958972
   },
   "sl_penalties": {
     "STXUSDT": 1791380763.6872358,
@@ -203,6 +204,7 @@
     "WLDUSDT": 1791510367.1699083,
     "RENDERUSDT": 1791513800.1189022,
     "BANUSDT": 1791516182.7618537,
-    "GUNUSDT": 1791516184.6627781
+    "GUNUSDT": 1791516184.6627781,
+    "COOKIEUSDT": 1791517505.646876
   }
 }
