@@ -12,18 +12,6 @@
       "quality": "A+",
       "entry_time": "2026-10-09T11:43:32.005018+09:00"
     },
-    "MONUSDT": {
-      "symbol": "MONUSDT",
-      "direction": "SHORT",
-      "entry": 0.02415,
-      "sl": 0.024370036807478096,
-      "tp1": 0.02381994478878286,
-      "tp2": 0.023599907981304766,
-      "tp1_hit": false,
-      "score": 87,
-      "quality": "A",
-      "entry_time": "2026-10-09T14:02:35.329122+09:00"
-    },
     "BUSDT": {
       "symbol": "BUSDT",
       "direction": "SHORT",
@@ -59,6 +47,18 @@
       "score": 87,
       "quality": "A",
       "entry_time": "2026-10-09T15:02:38.514880+09:00"
+    },
+    "CPUSDT": {
+      "symbol": "CPUSDT",
+      "direction": "SHORT",
+      "entry": 0.01053,
+      "sl": 0.010583047947698267,
+      "tp1": 0.010450428078452598,
+      "tp2": 0.010397380130754332,
+      "tp1_hit": false,
+      "score": 87,
+      "quality": "A",
+      "entry_time": "2026-10-09T15:58:28.744386+09:00"
     }
   },
   "signals": {
@@ -166,7 +166,8 @@
     "RENDERUSDT:SHORT": 1791510372.5181398,
     "KITEUSDT:SHORT": 1791516186.4746506,
     "GRVTUSDT:LONG": 1791517509.0958972,
-    "TIAUSDT:LONG": 1791524811.316607
+    "TIAUSDT:LONG": 1791524811.316607,
+    "CPUSDT:SHORT": 1791529106.8216052
   },
   "sl_penalties": {
     "STXUSDT": 1791380763.6872358,
@@ -210,6 +211,7 @@
     "KITEUSDT": 1791522152.1876538,
     "HBARUSDT": 1791523513.2669804,
     "BCHUSDT": 1791524809.2846215,
-    "GRVTUSDT": 1791525755.5953627
+    "GRVTUSDT": 1791525755.5953627,
+    "MONUSDT": 1791529106.1558383
   }
 }
