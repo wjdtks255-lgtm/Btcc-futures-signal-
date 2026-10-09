@@ -1,17 +1,5 @@
 {
   "positions": {
-    "BTWUSDT": {
-      "symbol": "BTWUSDT",
-      "direction": "LONG",
-      "entry": 1.385402,
-      "sl": 1.385402,
-      "tp1": 1.4166542410577403,
-      "tp2": 1.4374890684295671,
-      "tp1_hit": true,
-      "score": 90,
-      "quality": "A",
-      "entry_time": "2026-10-09T02:14:06.864892+09:00"
-    },
     "BANUSDT": {
       "symbol": "BANUSDT",
       "direction": "SHORT",
@@ -48,17 +36,29 @@
       "quality": "A",
       "entry_time": "2026-10-09T08:23:03.736217+09:00"
     },
-    "RENDERUSDT": {
-      "symbol": "RENDERUSDT",
+    "HEMIUSDT": {
+      "symbol": "HEMIUSDT",
       "direction": "SHORT",
-      "entry": 1.841,
-      "sl": 1.8572769078763085,
-      "tp1": 1.816584638185537,
-      "tp2": 1.8003077303092283,
+      "entry": 0.005865,
+      "sl": 0.005920447432011823,
+      "tp1": 0.005781828851982267,
+      "tp2": 0.005726381419970445,
       "tp1_hit": false,
-      "score": 87,
-      "quality": "A",
-      "entry_time": "2026-10-09T10:46:14.432142+09:00"
+      "score": 95,
+      "quality": "A+",
+      "entry_time": "2026-10-09T11:43:32.005018+09:00"
+    },
+    "GUNUSDT": {
+      "symbol": "GUNUSDT",
+      "direction": "SHORT",
+      "entry": 0.002766,
+      "sl": 0.0027845581315133227,
+      "tp1": 0.0027381628027300154,
+      "tp2": 0.0027196046712166925,
+      "tp1_hit": false,
+      "score": 95,
+      "quality": "A+",
+      "entry_time": "2026-10-09T11:43:33.836841+09:00"
     }
   },
   "signals": {
@@ -73,7 +73,7 @@
     "AVNTUSDT:SHORT": 1791358953.0830307,
     "PYTHUSDT:SHORT": 1791358953.0830307,
     "MONUSDT:SHORT": 1791359510.753104,
-    "GUNUSDT:SHORT": 1791359510.753104,
+    "GUNUSDT:SHORT": 1791513810.1506774,
     "XRPUSDT:SHORT": 1791359510.753104,
     "ENJUSDT:SHORT": 1791360184.5480165,
     "CRVUSDT:SHORT": 1791377526.1091416,
@@ -106,7 +106,7 @@
     "CYSUSDT:SHORT": 1791364574.4470468,
     "ONEUSDT:SHORT": 1791364574.4470468,
     "AKEUSDT:SHORT": 1791364574.4470468,
-    "HEMIUSDT:SHORT": 1791365141.5239792,
+    "HEMIUSDT:SHORT": 1791513810.1506774,
     "AEROUSDT:SHORT": 1791365141.5239792,
     "SANDUSDT:LONG": 1791365141.5239792,
     "ALCHUSDT:SHORT": 1791365406.144873,
@@ -199,6 +199,7 @@
     "JASMYUSDT": 1791501766.636158,
     "1MBABYDOGEUSDT": 1791501768.3639884,
     "SPACEUSDT": 1791501770.107879,
-    "WLDUSDT": 1791510367.1699083
+    "WLDUSDT": 1791510367.1699083,
+    "RENDERUSDT": 1791513800.1189022
   }
 }
