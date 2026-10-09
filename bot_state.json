@@ -36,18 +36,6 @@
       "quality": "A",
       "entry_time": "2026-10-09T12:23:08.338581+09:00"
     },
-    "KITEUSDT": {
-      "symbol": "KITEUSDT",
-      "direction": "SHORT",
-      "entry": 0.12587,
-      "sl": 0.12675378565965534,
-      "tp1": 0.12454432151051702,
-      "tp2": 0.12366053585086169,
-      "tp1_hit": false,
-      "score": 87,
-      "quality": "A",
-      "entry_time": "2026-10-09T12:23:10.316391+09:00"
-    },
     "GRVTUSDT": {
       "symbol": "GRVTUSDT",
       "direction": "LONG",
@@ -59,6 +47,18 @@
       "score": 87,
       "quality": "A",
       "entry_time": "2026-10-09T12:45:10.853539+09:00"
+    },
+    "MONUSDT": {
+      "symbol": "MONUSDT",
+      "direction": "SHORT",
+      "entry": 0.02415,
+      "sl": 0.024370036807478096,
+      "tp1": 0.02381994478878286,
+      "tp2": 0.023599907981304766,
+      "tp1_hit": false,
+      "score": 87,
+      "quality": "A",
+      "entry_time": "2026-10-09T14:02:35.329122+09:00"
     }
   },
   "signals": {
@@ -72,7 +72,7 @@
     "BTWUSDT:LONG": 1791479645.1011746,
     "AVNTUSDT:SHORT": 1791358953.0830307,
     "PYTHUSDT:SHORT": 1791358953.0830307,
-    "MONUSDT:SHORT": 1791359510.753104,
+    "MONUSDT:SHORT": 1791522153.4521744,
     "GUNUSDT:SHORT": 1791513810.1506774,
     "XRPUSDT:SHORT": 1791359510.753104,
     "ENJUSDT:SHORT": 1791360184.5480165,
@@ -205,6 +205,7 @@
     "RENDERUSDT": 1791513800.1189022,
     "BANUSDT": 1791516182.7618537,
     "GUNUSDT": 1791516184.6627781,
-    "COOKIEUSDT": 1791517505.646876
+    "COOKIEUSDT": 1791517505.646876,
+    "KITEUSDT": 1791522152.1876538
   }
 }
