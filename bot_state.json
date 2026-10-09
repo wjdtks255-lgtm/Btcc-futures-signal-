@@ -52,10 +52,10 @@
       "symbol": "PONSUSDT",
       "direction": "SHORT",
       "entry": 0.34458,
-      "sl": 0.34847528001368844,
+      "sl": 0.34458,
       "tp1": 0.33873707997946734,
       "tp2": 0.3348417999657789,
-      "tp1_hit": false,
+      "tp1_hit": true,
       "score": 87,
       "quality": "A",
       "entry_time": "2026-10-10T02:02:51.383601+09:00"
