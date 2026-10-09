@@ -12,18 +12,6 @@
       "quality": "A+",
       "entry_time": "2026-10-09T11:43:32.005018+09:00"
     },
-    "CPUSDT": {
-      "symbol": "CPUSDT",
-      "direction": "SHORT",
-      "entry": 0.01053,
-      "sl": 0.01053,
-      "tp1": 0.010450428078452598,
-      "tp2": 0.010397380130754332,
-      "tp1_hit": true,
-      "score": 87,
-      "quality": "A",
-      "entry_time": "2026-10-09T15:58:28.744386+09:00"
-    },
     "GUSDT": {
       "symbol": "GUSDT",
       "direction": "SHORT",
@@ -59,6 +47,18 @@
       "score": 87,
       "quality": "A",
       "entry_time": "2026-10-09T23:35:23.497457+09:00"
+    },
+    "BICOUSDT": {
+      "symbol": "BICOUSDT",
+      "direction": "SHORT",
+      "entry": 0.01932,
+      "sl": 0.019509356801476346,
+      "tp1": 0.019035964797785482,
+      "tp2": 0.018846607996309134,
+      "tp1_hit": false,
+      "score": 87,
+      "quality": "A",
+      "entry_time": "2026-10-10T00:19:36.923424+09:00"
     }
   },
   "signals": {
@@ -171,7 +171,8 @@
     "COLLECTUSDT:LONG": 1791549493.2147708,
     "ORCLUSDT:SHORT": 1791552436.371555,
     "BEATUSDT:LONG": 1791553854.0623665,
-    "BILLUSDT:SHORT": 1791556519.898543
+    "BILLUSDT:SHORT": 1791556519.898543,
+    "BICOUSDT:SHORT": 1791559175.1062849
   },
   "sl_penalties": {
     "STXUSDT": 1791380763.6872358,
