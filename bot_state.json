@@ -16,25 +16,13 @@
       "symbol": "BUSDT",
       "direction": "SHORT",
       "entry": 0.14924,
-      "sl": 0.15035778802447378,
+      "sl": 0.14924,
       "tp1": 0.14756331796328936,
       "tp2": 0.1464455299388156,
-      "tp1_hit": false,
+      "tp1_hit": true,
       "score": 87,
       "quality": "A",
       "entry_time": "2026-10-09T14:46:53.107015+09:00"
-    },
-    "TIAUSDT": {
-      "symbol": "TIAUSDT",
-      "direction": "LONG",
-      "entry": 0.5123,
-      "sl": 0.5038830858500074,
-      "tp1": 0.5249253712249888,
-      "tp2": 0.5333422853749814,
-      "tp1_hit": false,
-      "score": 87,
-      "quality": "A",
-      "entry_time": "2026-10-09T14:46:54.898088+09:00"
     },
     "EDUUSDT": {
       "symbol": "EDUUSDT",
@@ -59,6 +47,18 @@
       "score": 87,
       "quality": "A",
       "entry_time": "2026-10-09T15:58:28.744386+09:00"
+    },
+    "MYXUSDT": {
+      "symbol": "MYXUSDT",
+      "direction": "SHORT",
+      "entry": 0.0647,
+      "sl": 0.06499115,
+      "tp1": 0.064263275,
+      "tp2": 0.06397212499999999,
+      "tp1_hit": false,
+      "score": 87,
+      "quality": "A",
+      "entry_time": "2026-10-09T17:26:34.326235+09:00"
     }
   },
   "signals": {
@@ -136,7 +136,7 @@
     "LUNAUSDT:SHORT": 1791426566.056165,
     "SENTUSDT:LONG": 1791427522.1123776,
     "PLAYUSDT:SHORT": 1791429221.9992118,
-    "MYXUSDT:SHORT": 1791429221.9992118,
+    "MYXUSDT:SHORT": 1791534387.262965,
     "OPENAIUSDT:LONG": 1791429221.9992118,
     "CHZUSDT:SHORT": 1791462039.1115506,
     "NILUSDT:SHORT": 1791462039.1115506,
@@ -212,6 +212,7 @@
     "HBARUSDT": 1791523513.2669804,
     "BCHUSDT": 1791524809.2846215,
     "GRVTUSDT": 1791525755.5953627,
-    "MONUSDT": 1791529106.1558383
+    "MONUSDT": 1791529106.1558383,
+    "TIAUSDT": 1791534386.2504938
   }
 }
