@@ -1,17 +1,5 @@
 {
   "positions": {
-    "BANUSDT": {
-      "symbol": "BANUSDT",
-      "direction": "SHORT",
-      "entry": 0.06135,
-      "sl": 0.06204815463402162,
-      "tp1": 0.06030276804896757,
-      "tp2": 0.05960461341494595,
-      "tp1_hit": false,
-      "score": 90,
-      "quality": "A",
-      "entry_time": "2026-10-09T05:50:16.402910+09:00"
-    },
     "HBARUSDT": {
       "symbol": "HBARUSDT",
       "direction": "SHORT",
@@ -48,17 +36,29 @@
       "quality": "A+",
       "entry_time": "2026-10-09T11:43:32.005018+09:00"
     },
-    "GUNUSDT": {
-      "symbol": "GUNUSDT",
+    "BCHUSDT": {
+      "symbol": "BCHUSDT",
       "direction": "SHORT",
-      "entry": 0.002766,
-      "sl": 0.0027845581315133227,
-      "tp1": 0.0027381628027300154,
-      "tp2": 0.0027196046712166925,
+      "entry": 278.72,
+      "sl": 280.9701935769959,
+      "tp1": 275.3447096345063,
+      "tp2": 273.0945160575104,
       "tp1_hit": false,
-      "score": 95,
-      "quality": "A+",
-      "entry_time": "2026-10-09T11:43:33.836841+09:00"
+      "score": 90,
+      "quality": "A",
+      "entry_time": "2026-10-09T12:23:08.338581+09:00"
+    },
+    "KITEUSDT": {
+      "symbol": "KITEUSDT",
+      "direction": "SHORT",
+      "entry": 0.12587,
+      "sl": 0.12675378565965534,
+      "tp1": 0.12454432151051702,
+      "tp2": 0.12366053585086169,
+      "tp1_hit": false,
+      "score": 87,
+      "quality": "A",
+      "entry_time": "2026-10-09T12:23:10.316391+09:00"
     }
   },
   "signals": {
@@ -96,7 +96,7 @@
     "TRXUSDT:SHORT": 1791362702.0539832,
     "UNITREEUSDT:SHORT": 1791362702.0539832,
     "ARCUSDT:SHORT": 1791362702.0539832,
-    "BCHUSDT:SHORT": 1791363037.8301704,
+    "BCHUSDT:SHORT": 1791516186.4746506,
     "SLXUSDT:SHORT": 1791363037.8301704,
     "EIGENUSDT:SHORT": 1791363037.8301704,
     "BNBUSDT:SHORT": 1791363415.263516,
@@ -163,7 +163,8 @@
     "HBARUSDT:SHORT": 1791501780.2422528,
     "COOKIEUSDT:SHORT": 1791501780.2422528,
     "WLDUSDT:SHORT": 1791501780.2422528,
-    "RENDERUSDT:SHORT": 1791510372.5181398
+    "RENDERUSDT:SHORT": 1791510372.5181398,
+    "KITEUSDT:SHORT": 1791516186.4746506
   },
   "sl_penalties": {
     "STXUSDT": 1791380763.6872358,
@@ -200,6 +201,8 @@
     "1MBABYDOGEUSDT": 1791501768.3639884,
     "SPACEUSDT": 1791501770.107879,
     "WLDUSDT": 1791510367.1699083,
-    "RENDERUSDT": 1791513800.1189022
+    "RENDERUSDT": 1791513800.1189022,
+    "BANUSDT": 1791516182.7618537,
+    "GUNUSDT": 1791516184.6627781
   }
 }
