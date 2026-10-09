@@ -12,18 +12,6 @@
       "quality": "A+",
       "entry_time": "2026-10-09T11:43:32.005018+09:00"
     },
-    "GRVTUSDT": {
-      "symbol": "GRVTUSDT",
-      "direction": "LONG",
-      "entry": 0.2293,
-      "sl": 0.22743028353627465,
-      "tp1": 0.23210457469558804,
-      "tp2": 0.2339742911593134,
-      "tp1_hit": false,
-      "score": 87,
-      "quality": "A",
-      "entry_time": "2026-10-09T12:45:10.853539+09:00"
-    },
     "MONUSDT": {
       "symbol": "MONUSDT",
       "direction": "SHORT",
@@ -59,6 +47,18 @@
       "score": 87,
       "quality": "A",
       "entry_time": "2026-10-09T14:46:54.898088+09:00"
+    },
+    "EDUUSDT": {
+      "symbol": "EDUUSDT",
+      "direction": "LONG",
+      "entry": 0.06793,
+      "sl": 0.06653910034174616,
+      "tp1": 0.07001634948738077,
+      "tp2": 0.07140724914563461,
+      "tp1_hit": false,
+      "score": 87,
+      "quality": "A",
+      "entry_time": "2026-10-09T15:02:38.514880+09:00"
     }
   },
   "signals": {
@@ -129,7 +129,7 @@
     "BLESSUSDT:SHORT": 1791389337.7101,
     "SKRUSDT:SHORT": 1791393071.0218923,
     "ARKMUSDT:SHORT": 1791396027.8025534,
-    "EDUUSDT:LONG": 1791412310.2900076,
+    "EDUUSDT:LONG": 1791525756.5978363,
     "VETUSDT:SHORT": 1791415597.4020784,
     "KASUSDT:SHORT": 1791423832.7894971,
     "UNIUSDT:SHORT": 1791425596.8060849,
@@ -209,6 +209,7 @@
     "COOKIEUSDT": 1791517505.646876,
     "KITEUSDT": 1791522152.1876538,
     "HBARUSDT": 1791523513.2669804,
-    "BCHUSDT": 1791524809.2846215
+    "BCHUSDT": 1791524809.2846215,
+    "GRVTUSDT": 1791525755.5953627
   }
 }
