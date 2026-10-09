@@ -48,17 +48,17 @@
       "quality": "A",
       "entry_time": "2026-10-09T21:38:15.010902+09:00"
     },
-    "ORCLUSDT": {
-      "symbol": "ORCLUSDT",
-      "direction": "SHORT",
-      "entry": 137.28,
-      "sl": 137.89776,
-      "tp1": 136.35336,
-      "tp2": 135.7356,
+    "BEATUSDT": {
+      "symbol": "BEATUSDT",
+      "direction": "LONG",
+      "entry": 0.09002,
+      "sl": 0.08938748174363655,
+      "tp1": 0.09096877738454517,
+      "tp2": 0.09160129564090863,
       "tp1_hit": false,
-      "score": 85,
+      "score": 87,
       "quality": "A",
-      "entry_time": "2026-10-09T22:27:18.209450+09:00"
+      "entry_time": "2026-10-09T22:50:56.097579+09:00"
     }
   },
   "signals": {
@@ -169,7 +169,8 @@
     "TIAUSDT:LONG": 1791524811.316607,
     "CPUSDT:SHORT": 1791529106.8216052,
     "COLLECTUSDT:LONG": 1791549493.2147708,
-    "ORCLUSDT:SHORT": 1791552436.371555
+    "ORCLUSDT:SHORT": 1791552436.371555,
+    "BEATUSDT:LONG": 1791553854.0623665
   },
   "sl_penalties": {
     "STXUSDT": 1791380763.6872358,
@@ -216,6 +217,7 @@
     "GRVTUSDT": 1791525755.5953627,
     "MONUSDT": 1791529106.1558383,
     "TIAUSDT": 1791534386.2504938,
-    "MYXUSDT": 1791546727.803244
+    "MYXUSDT": 1791546727.803244,
+    "ORCLUSDT": 1791553853.1825883
   }
 }
