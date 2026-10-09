@@ -12,18 +12,6 @@
       "quality": "A+",
       "entry_time": "2026-10-09T11:43:32.005018+09:00"
     },
-    "BCHUSDT": {
-      "symbol": "BCHUSDT",
-      "direction": "SHORT",
-      "entry": 278.72,
-      "sl": 280.9701935769959,
-      "tp1": 275.3447096345063,
-      "tp2": 273.0945160575104,
-      "tp1_hit": false,
-      "score": 90,
-      "quality": "A",
-      "entry_time": "2026-10-09T12:23:08.338581+09:00"
-    },
     "GRVTUSDT": {
       "symbol": "GRVTUSDT",
       "direction": "LONG",
@@ -47,6 +35,30 @@
       "score": 87,
       "quality": "A",
       "entry_time": "2026-10-09T14:02:35.329122+09:00"
+    },
+    "BUSDT": {
+      "symbol": "BUSDT",
+      "direction": "SHORT",
+      "entry": 0.14924,
+      "sl": 0.15035778802447378,
+      "tp1": 0.14756331796328936,
+      "tp2": 0.1464455299388156,
+      "tp1_hit": false,
+      "score": 87,
+      "quality": "A",
+      "entry_time": "2026-10-09T14:46:53.107015+09:00"
+    },
+    "TIAUSDT": {
+      "symbol": "TIAUSDT",
+      "direction": "LONG",
+      "entry": 0.5123,
+      "sl": 0.5038830858500074,
+      "tp1": 0.5249253712249888,
+      "tp2": 0.5333422853749814,
+      "tp1_hit": false,
+      "score": 87,
+      "quality": "A",
+      "entry_time": "2026-10-09T14:46:54.898088+09:00"
     }
   },
   "signals": {
@@ -70,7 +82,7 @@
     "PIPPINUSDT:SHORT": 1791360473.4529753,
     "HOMEUSDT:SHORT": 1791360473.4529753,
     "BIOUSDT:SHORT": 1791360918.4161968,
-    "BUSDT:SHORT": 1791360918.4161968,
+    "BUSDT:SHORT": 1791524811.316607,
     "XLMUSDT:SHORT": 1791360918.4161968,
     "MERLUSDT:SHORT": 1791376111.1684203,
     "BBUSDT:SHORT": 1791377526.1091416,
@@ -153,7 +165,8 @@
     "WLDUSDT:SHORT": 1791501780.2422528,
     "RENDERUSDT:SHORT": 1791510372.5181398,
     "KITEUSDT:SHORT": 1791516186.4746506,
-    "GRVTUSDT:LONG": 1791517509.0958972
+    "GRVTUSDT:LONG": 1791517509.0958972,
+    "TIAUSDT:LONG": 1791524811.316607
   },
   "sl_penalties": {
     "STXUSDT": 1791380763.6872358,
@@ -195,6 +208,7 @@
     "GUNUSDT": 1791516184.6627781,
     "COOKIEUSDT": 1791517505.646876,
     "KITEUSDT": 1791522152.1876538,
-    "HBARUSDT": 1791523513.2669804
+    "HBARUSDT": 1791523513.2669804,
+    "BCHUSDT": 1791524809.2846215
   }
 }
