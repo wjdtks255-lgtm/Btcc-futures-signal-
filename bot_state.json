@@ -36,29 +36,29 @@
       "quality": "A",
       "entry_time": "2026-10-09T20:52:11.106947+09:00"
     },
-    "COLLECTUSDT": {
-      "symbol": "COLLECTUSDT",
-      "direction": "LONG",
-      "entry": 0.02146,
-      "sl": 0.02146,
-      "tp1": 0.021822954859941894,
-      "tp2": 0.022064924766569825,
-      "tp1_hit": true,
-      "score": 87,
-      "quality": "A",
-      "entry_time": "2026-10-09T21:38:15.010902+09:00"
-    },
-    "BEATUSDT": {
-      "symbol": "BEATUSDT",
-      "direction": "LONG",
-      "entry": 0.09002,
-      "sl": 0.08938748174363655,
-      "tp1": 0.09096877738454517,
-      "tp2": 0.09160129564090863,
+    "1MBABYDOGEUSDT": {
+      "symbol": "1MBABYDOGEUSDT",
+      "direction": "SHORT",
+      "entry": 0.00037934,
+      "sl": 0.00038133140042841097,
+      "tp1": 0.00037635289935738353,
+      "tp2": 0.00037436149892897255,
       "tp1_hit": false,
       "score": 87,
       "quality": "A",
-      "entry_time": "2026-10-09T22:50:56.097579+09:00"
+      "entry_time": "2026-10-09T23:35:21.699113+09:00"
+    },
+    "BILLUSDT": {
+      "symbol": "BILLUSDT",
+      "direction": "SHORT",
+      "entry": 0.00943,
+      "sl": 0.009512610818611666,
+      "tp1": 0.0093060837720825,
+      "tp2": 0.009223472953470833,
+      "tp1_hit": false,
+      "score": 87,
+      "quality": "A",
+      "entry_time": "2026-10-09T23:35:23.497457+09:00"
     }
   },
   "signals": {
@@ -158,7 +158,7 @@
     "SILVERUSDT:SHORT": 1791480939.4894094,
     "STABLEUSDT:SHORT": 1791483402.6478534,
     "FARTCOINUSDT:SHORT": 1791484988.2379594,
-    "1MBABYDOGEUSDT:SHORT": 1791494827.9888601,
+    "1MBABYDOGEUSDT:SHORT": 1791556519.898543,
     "SPACEUSDT:SHORT": 1791498335.929474,
     "HBARUSDT:SHORT": 1791501780.2422528,
     "COOKIEUSDT:SHORT": 1791501780.2422528,
@@ -170,7 +170,8 @@
     "CPUSDT:SHORT": 1791529106.8216052,
     "COLLECTUSDT:LONG": 1791549493.2147708,
     "ORCLUSDT:SHORT": 1791552436.371555,
-    "BEATUSDT:LONG": 1791553854.0623665
+    "BEATUSDT:LONG": 1791553854.0623665,
+    "BILLUSDT:SHORT": 1791556519.898543
   },
   "sl_penalties": {
     "STXUSDT": 1791380763.6872358,
@@ -218,6 +219,7 @@
     "MONUSDT": 1791529106.1558383,
     "TIAUSDT": 1791534386.2504938,
     "MYXUSDT": 1791546727.803244,
-    "ORCLUSDT": 1791553853.1825883
+    "ORCLUSDT": 1791553853.1825883,
+    "BEATUSDT": 1791556516.2095673
   }
 }
