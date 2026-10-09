@@ -48,17 +48,17 @@
       "quality": "A",
       "entry_time": "2026-10-09T08:23:03.736217+09:00"
     },
-    "WLDUSDT": {
-      "symbol": "WLDUSDT",
+    "RENDERUSDT": {
+      "symbol": "RENDERUSDT",
       "direction": "SHORT",
-      "entry": 0.4815,
-      "sl": 0.4860522741554725,
-      "tp1": 0.4746715887667912,
-      "tp2": 0.4701193146113187,
+      "entry": 1.841,
+      "sl": 1.8572769078763085,
+      "tp1": 1.816584638185537,
+      "tp2": 1.8003077303092283,
       "tp1_hit": false,
       "score": 87,
       "quality": "A",
-      "entry_time": "2026-10-09T08:23:05.505072+09:00"
+      "entry_time": "2026-10-09T10:46:14.432142+09:00"
     }
   },
   "signals": {
@@ -162,7 +162,8 @@
     "SPACEUSDT:SHORT": 1791498335.929474,
     "HBARUSDT:SHORT": 1791501780.2422528,
     "COOKIEUSDT:SHORT": 1791501780.2422528,
-    "WLDUSDT:SHORT": 1791501780.2422528
+    "WLDUSDT:SHORT": 1791501780.2422528,
+    "RENDERUSDT:SHORT": 1791510372.5181398
   },
   "sl_penalties": {
     "STXUSDT": 1791380763.6872358,
@@ -197,6 +198,7 @@
     "SILVERUSDT": 1791498328.136881,
     "JASMYUSDT": 1791501766.636158,
     "1MBABYDOGEUSDT": 1791501768.3639884,
-    "SPACEUSDT": 1791501770.107879
+    "SPACEUSDT": 1791501770.107879,
+    "WLDUSDT": 1791510367.1699083
   }
 }
