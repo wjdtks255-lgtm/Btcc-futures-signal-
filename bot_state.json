@@ -4,10 +4,10 @@
       "symbol": "HEMIUSDT",
       "direction": "SHORT",
       "entry": 0.005865,
-      "sl": 0.005920447432011823,
+      "sl": 0.005865,
       "tp1": 0.005781828851982267,
       "tp2": 0.005726381419970445,
-      "tp1_hit": false,
+      "tp1_hit": true,
       "score": 95,
       "quality": "A+",
       "entry_time": "2026-10-09T11:43:32.005018+09:00"
