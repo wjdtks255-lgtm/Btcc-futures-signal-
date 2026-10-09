@@ -48,17 +48,17 @@
       "quality": "A",
       "entry_time": "2026-10-10T01:24:13.714296+09:00"
     },
-    "PONSUSDT": {
-      "symbol": "PONSUSDT",
+    "SOXLUSDT": {
+      "symbol": "SOXLUSDT",
       "direction": "SHORT",
-      "entry": 0.34458,
-      "sl": 0.34458,
-      "tp1": 0.33873707997946734,
-      "tp2": 0.3348417999657789,
-      "tp1_hit": true,
-      "score": 87,
+      "entry": 139.97,
+      "sl": 141.5349150005848,
+      "tp1": 137.62262749912284,
+      "tp2": 136.05771249853805,
+      "tp1_hit": false,
+      "score": 90,
       "quality": "A",
-      "entry_time": "2026-10-10T02:02:51.383601+09:00"
+      "entry_time": "2026-10-10T04:58:48.132981+09:00"
     }
   },
   "signals": {
@@ -148,7 +148,7 @@
     "ENAUSDT:SHORT": 1791471681.2186527,
     "FFUSDT:SHORT": 1791473135.711636,
     "SOXSUSDT:LONG": 1791473135.711636,
-    "SOXLUSDT:SHORT": 1791473135.711636,
+    "SOXLUSDT:SHORT": 1791575926.3093393,
     "TSMUSDT:SHORT": 1791473135.711636,
     "LSKUSDT:SHORT": 1791474553.9834852,
     "PLTRUSDT:LONG": 1791477092.6267495,
