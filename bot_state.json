@@ -48,17 +48,17 @@
       "quality": "A",
       "entry_time": "2026-10-10T13:20:50.324450+09:00"
     },
-    "OPGUSDT": {
-      "symbol": "OPGUSDT",
+    "WLFIUSDT": {
+      "symbol": "WLFIUSDT",
       "direction": "LONG",
-      "entry": 0.1515,
-      "sl": 0.1515,
-      "tp1": 0.15399887313534416,
-      "tp2": 0.15566478855890692,
-      "tp1_hit": true,
-      "score": 90,
+      "entry": 0.05717,
+      "sl": 0.056912735,
+      "tp1": 0.0575558975,
+      "tp2": 0.0578131625,
+      "tp1_hit": false,
+      "score": 85,
       "quality": "A",
-      "entry_time": "2026-10-10T13:59:43.666746+09:00"
+      "entry_time": "2026-10-10T16:24:44.166436+09:00"
     }
   },
   "signals": {
@@ -181,7 +181,8 @@
     "AEVOUSDT:LONG": 1791595669.7984393,
     "GENIUSUSDT:LONG": 1791606048.4330566,
     "JUPUSDT:LONG": 1791607376.1573246,
-    "OPGUSDT:LONG": 1791608381.9048004
+    "OPGUSDT:LONG": 1791608381.9048004,
+    "WLFIUSDT:LONG": 1791617082.3845727
   },
   "sl_penalties": {
     "STXUSDT": 1791380763.6872358,
@@ -236,6 +237,7 @@
     "ZBCNUSDT": 1791593104.7476246,
     "ORCAUSDT": 1791595668.0931818,
     "AEVOUSDT": 1791606046.1275089,
-    "JUPUSDT": 1791608379.9259176
+    "JUPUSDT": 1791608379.9259176,
+    "OPGUSDT": 1791617080.5942209
   }
 }
