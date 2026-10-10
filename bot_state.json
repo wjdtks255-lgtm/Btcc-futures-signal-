@@ -36,18 +36,6 @@
       "quality": "A",
       "entry_time": "2026-10-10T04:58:48.132981+09:00"
     },
-    "ZBCNUSDT": {
-      "symbol": "ZBCNUSDT",
-      "direction": "SHORT",
-      "entry": 0.0022498,
-      "sl": 0.002266577920428631,
-      "tp1": 0.002224633119357054,
-      "tp2": 0.002207855198928423,
-      "tp1_hit": false,
-      "score": 90,
-      "quality": "A",
-      "entry_time": "2026-10-10T08:15:54.644424+09:00"
-    },
     "AXTIUSDT": {
       "symbol": "AXTIUSDT",
       "direction": "SHORT",
@@ -59,6 +47,18 @@
       "score": 90,
       "quality": "A",
       "entry_time": "2026-10-10T09:11:59.370715+09:00"
+    },
+    "ORCAUSDT": {
+      "symbol": "ORCAUSDT",
+      "direction": "SHORT",
+      "entry": 2.263,
+      "sl": 2.2905639067661165,
+      "tp1": 2.2216541398508247,
+      "tp2": 2.194090233084708,
+      "tp1_hit": false,
+      "score": 87,
+      "quality": "A",
+      "entry_time": "2026-10-10T09:45:08.132419+09:00"
     }
   },
   "signals": {
@@ -176,7 +176,8 @@
     "TSLAUSDT:LONG": 1791563051.8644247,
     "PONSUSDT:SHORT": 1791565369.5227373,
     "ZBCNUSDT:SHORT": 1791587752.7681868,
-    "AXTIUSDT:SHORT": 1791591117.6690931
+    "AXTIUSDT:SHORT": 1791591117.6690931,
+    "ORCAUSDT:SHORT": 1791593106.3653913
   },
   "sl_penalties": {
     "STXUSDT": 1791380763.6872358,
@@ -227,6 +228,7 @@
     "ORCLUSDT": 1791553853.1825883,
     "BEATUSDT": 1791556516.2095673,
     "BICOUSDT": 1791587751.6266668,
-    "GUSDT": 1791591116.1276324
+    "GUSDT": 1791591116.1276324,
+    "ZBCNUSDT": 1791593104.7476246
   }
 }
