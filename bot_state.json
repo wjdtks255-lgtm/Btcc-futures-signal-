@@ -1,17 +1,5 @@
 {
   "positions": {
-    "HEMIUSDT": {
-      "symbol": "HEMIUSDT",
-      "direction": "SHORT",
-      "entry": 0.005865,
-      "sl": 0.005865,
-      "tp1": 0.005781828851982267,
-      "tp2": 0.005726381419970445,
-      "tp1_hit": true,
-      "score": 95,
-      "quality": "A+",
-      "entry_time": "2026-10-09T11:43:32.005018+09:00"
-    },
     "TSLAUSDT": {
       "symbol": "TSLAUSDT",
       "direction": "LONG",
@@ -59,6 +47,18 @@
       "score": 90,
       "quality": "A",
       "entry_time": "2026-10-10T13:20:50.324450+09:00"
+    },
+    "JUPUSDT": {
+      "symbol": "JUPUSDT",
+      "direction": "LONG",
+      "entry": 0.3737,
+      "sl": 0.37023024432226775,
+      "tp1": 0.3789046335165983,
+      "tp2": 0.38237438919433053,
+      "tp1_hit": false,
+      "score": 87,
+      "quality": "A",
+      "entry_time": "2026-10-10T13:42:58.164416+09:00"
     }
   },
   "signals": {
@@ -179,7 +179,8 @@
     "AXTIUSDT:SHORT": 1791591117.6690931,
     "ORCAUSDT:SHORT": 1791593106.3653913,
     "AEVOUSDT:LONG": 1791595669.7984393,
-    "GENIUSUSDT:LONG": 1791606048.4330566
+    "GENIUSUSDT:LONG": 1791606048.4330566,
+    "JUPUSDT:LONG": 1791607376.1573246
   },
   "sl_penalties": {
     "STXUSDT": 1791380763.6872358,
@@ -189,7 +190,7 @@
     "CRVUSDT": 1791388484.1826649,
     "BBUSDT": 1791388485.9443974,
     "ALLOUSDT": 1791389330.3138776,
-    "HEMIUSDT": 1791389332.1497035,
+    "HEMIUSDT": 1791607373.8896608,
     "METISUSDT": 1791389334.0227375,
     "BANKUSDT": 1791395211.2441027,
     "UAIUSDT": 1791396024.2866883,
