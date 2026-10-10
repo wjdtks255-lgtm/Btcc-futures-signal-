@@ -36,18 +36,6 @@
       "quality": "A",
       "entry_time": "2026-10-10T09:11:59.370715+09:00"
     },
-    "BILLUSDT": {
-      "symbol": "BILLUSDT",
-      "direction": "SHORT",
-      "entry": 0.00934,
-      "sl": 0.009429108049921938,
-      "tp1": 0.009206337925117089,
-      "tp2": 0.00911722987519515,
-      "tp1_hit": false,
-      "score": 87,
-      "quality": "A",
-      "entry_time": "2026-10-10T20:21:26.443383+09:00"
-    },
     "LABUSDT": {
       "symbol": "LABUSDT",
       "direction": "LONG",
@@ -59,6 +47,18 @@
       "score": 87,
       "quality": "A",
       "entry_time": "2026-10-10T22:23:13.367186+09:00"
+    },
+    "WALUSDT": {
+      "symbol": "WALUSDT",
+      "direction": "LONG",
+      "entry": 0.03715,
+      "sl": 0.03636411187618808,
+      "tp1": 0.03832883218571789,
+      "tp2": 0.039114720309529824,
+      "tp1_hit": false,
+      "score": 90,
+      "quality": "A",
+      "entry_time": "2026-10-11T00:26:53.627494+09:00"
     }
   },
   "signals": {
@@ -185,7 +185,8 @@
     "WLFIUSDT:LONG": 1791617082.3845727,
     "ONDOUSDT:LONG": 1791621645.483422,
     "NIGHTUSDT:LONG": 1791632405.5681574,
-    "LABUSDT:LONG": 1791638591.6232376
+    "LABUSDT:LONG": 1791638591.6232376,
+    "WALUSDT:LONG": 1791646011.9349396
   },
   "sl_penalties": {
     "STXUSDT": 1791380763.6872358,
@@ -246,6 +247,7 @@
     "ONDOUSDT": 1791630090.2169101,
     "WLFIUSDT": 1791631283.4406624,
     "BTWUSDT": 1791632403.8379624,
-    "NIGHTUSDT": 1791636270.1267052
+    "NIGHTUSDT": 1791636270.1267052,
+    "BILLUSDT": 1791646010.7407494
   }
 }
