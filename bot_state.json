@@ -28,10 +28,10 @@
       "symbol": "AXTIUSDT",
       "direction": "SHORT",
       "entry": 69.07,
-      "sl": 69.380815,
+      "sl": 69.07,
       "tp1": 68.60377749999999,
       "tp2": 68.29296249999999,
-      "tp1_hit": false,
+      "tp1_hit": true,
       "score": 90,
       "quality": "A",
       "entry_time": "2026-10-10T09:11:59.370715+09:00"
