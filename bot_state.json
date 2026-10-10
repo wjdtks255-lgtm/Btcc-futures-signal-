@@ -36,18 +36,6 @@
       "quality": "A",
       "entry_time": "2026-10-11T00:26:53.627494+09:00"
     },
-    "THETAUSDT": {
-      "symbol": "THETAUSDT",
-      "direction": "LONG",
-      "entry": 0.2283,
-      "sl": 0.22703016239576454,
-      "tp1": 0.2302047564063532,
-      "tp2": 0.23147459401058867,
-      "tp1_hit": false,
-      "score": 87,
-      "quality": "A",
-      "entry_time": "2026-10-11T02:49:21.315814+09:00"
-    },
     "BREVUSDT": {
       "symbol": "BREVUSDT",
       "direction": "LONG",
@@ -59,6 +47,18 @@
       "score": 90,
       "quality": "A",
       "entry_time": "2026-10-11T03:24:38.319492+09:00"
+    },
+    "NEARUSDT": {
+      "symbol": "NEARUSDT",
+      "direction": "LONG",
+      "entry": 5.328,
+      "sl": 5.2819753156674,
+      "tp1": 5.397037026498901,
+      "tp2": 5.443061710831501,
+      "tp1_hit": false,
+      "score": 87,
+      "quality": "A",
+      "entry_time": "2026-10-11T04:02:57.257131+09:00"
     }
   },
   "signals": {
@@ -188,7 +188,8 @@
     "LABUSDT:LONG": 1791638591.6232376,
     "WALUSDT:LONG": 1791646011.9349396,
     "THETAUSDT:LONG": 1791654559.4941533,
-    "BREVUSDT:LONG": 1791656676.419783
+    "BREVUSDT:LONG": 1791656676.419783,
+    "NEARUSDT:LONG": 1791658975.573446
   },
   "sl_penalties": {
     "STXUSDT": 1791380763.6872358,
@@ -250,6 +251,7 @@
     "WLFIUSDT": 1791631283.4406624,
     "BTWUSDT": 1791632403.8379624,
     "NIGHTUSDT": 1791636270.1267052,
-    "BILLUSDT": 1791646010.7407494
+    "BILLUSDT": 1791646010.7407494,
+    "THETAUSDT": 1791658973.3408213
   }
 }
