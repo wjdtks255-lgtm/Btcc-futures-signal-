@@ -24,18 +24,6 @@
       "quality": "A",
       "entry_time": "2026-10-10T04:58:48.132981+09:00"
     },
-    "LABUSDT": {
-      "symbol": "LABUSDT",
-      "direction": "LONG",
-      "entry": 0.05464,
-      "sl": 0.05464,
-      "tp1": 0.05537267014038525,
-      "tp2": 0.05586111690064209,
-      "tp1_hit": true,
-      "score": 87,
-      "quality": "A",
-      "entry_time": "2026-10-10T22:23:13.367186+09:00"
-    },
     "WALUSDT": {
       "symbol": "WALUSDT",
       "direction": "LONG",
@@ -59,6 +47,18 @@
       "score": 87,
       "quality": "A",
       "entry_time": "2026-10-11T02:49:21.315814+09:00"
+    },
+    "BREVUSDT": {
+      "symbol": "BREVUSDT",
+      "direction": "LONG",
+      "entry": 0.08823,
+      "sl": 0.08753583093170166,
+      "tp1": 0.08927125360244752,
+      "tp2": 0.08996542267074586,
+      "tp1_hit": false,
+      "score": 90,
+      "quality": "A",
+      "entry_time": "2026-10-11T03:24:38.319492+09:00"
     }
   },
   "signals": {
@@ -187,7 +187,8 @@
     "NIGHTUSDT:LONG": 1791632405.5681574,
     "LABUSDT:LONG": 1791638591.6232376,
     "WALUSDT:LONG": 1791646011.9349396,
-    "THETAUSDT:LONG": 1791654559.4941533
+    "THETAUSDT:LONG": 1791654559.4941533,
+    "BREVUSDT:LONG": 1791656676.419783
   },
   "sl_penalties": {
     "STXUSDT": 1791380763.6872358,
