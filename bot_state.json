@@ -47,6 +47,18 @@
       "score": 87,
       "quality": "A",
       "entry_time": "2026-10-10T20:21:26.443383+09:00"
+    },
+    "LABUSDT": {
+      "symbol": "LABUSDT",
+      "direction": "LONG",
+      "entry": 0.05464,
+      "sl": 0.05415155323974317,
+      "tp1": 0.05537267014038525,
+      "tp2": 0.05586111690064209,
+      "tp1_hit": false,
+      "score": 87,
+      "quality": "A",
+      "entry_time": "2026-10-10T22:23:13.367186+09:00"
     }
   },
   "signals": {
@@ -172,7 +184,8 @@
     "OPGUSDT:LONG": 1791608381.9048004,
     "WLFIUSDT:LONG": 1791617082.3845727,
     "ONDOUSDT:LONG": 1791621645.483422,
-    "NIGHTUSDT:LONG": 1791632405.5681574
+    "NIGHTUSDT:LONG": 1791632405.5681574,
+    "LABUSDT:LONG": 1791638591.6232376
   },
   "sl_penalties": {
     "STXUSDT": 1791380763.6872358,
