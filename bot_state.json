@@ -52,10 +52,10 @@
       "symbol": "OPGUSDT",
       "direction": "LONG",
       "entry": 0.1515,
-      "sl": 0.14983408457643724,
+      "sl": 0.1515,
       "tp1": 0.15399887313534416,
       "tp2": 0.15566478855890692,
-      "tp1_hit": false,
+      "tp1_hit": true,
       "score": 90,
       "quality": "A",
       "entry_time": "2026-10-10T13:59:43.666746+09:00"
