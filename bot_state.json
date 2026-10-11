@@ -12,58 +12,58 @@
       "quality": "A",
       "entry_time": "2026-10-10T01:24:13.714296+09:00"
     },
-    "SOXLUSDT": {
-      "symbol": "SOXLUSDT",
-      "direction": "SHORT",
-      "entry": 139.97,
-      "sl": 141.5349150005848,
-      "tp1": 137.62262749912284,
-      "tp2": 136.05771249853805,
-      "tp1_hit": false,
-      "score": 90,
-      "quality": "A",
-      "entry_time": "2026-10-10T04:58:48.132981+09:00"
-    },
-    "SANDUSDT": {
-      "symbol": "SANDUSDT",
-      "direction": "SHORT",
-      "entry": 0.06503,
-      "sl": 0.06551641514781752,
-      "tp1": 0.06430037727827374,
-      "tp2": 0.06381396213045623,
-      "tp1_hit": false,
-      "score": 87,
-      "quality": "A",
-      "entry_time": "2026-10-11T16:07:54.975175+09:00"
-    },
     "SKYAIUSDT": {
       "symbol": "SKYAIUSDT",
       "direction": "SHORT",
       "entry": 0.03432,
-      "sl": 0.034483896561073375,
+      "sl": 0.03432,
       "tp1": 0.03407415515838995,
       "tp2": 0.033910258597316584,
-      "tp1_hit": false,
+      "tp1_hit": true,
       "score": 87,
       "quality": "A",
       "entry_time": "2026-10-11T23:20:31.749382+09:00"
     },
-    "CAPUSDT": {
-      "symbol": "CAPUSDT",
+    "GALAUSDT": {
+      "symbol": "GALAUSDT",
       "direction": "LONG",
-      "entry": 0.09349,
-      "sl": 0.09256923309099528,
-      "tp1": 0.09487115036350707,
-      "tp2": 0.0957919172725118,
+      "entry": 0.002447,
+      "sl": 0.002431946405615124,
+      "tp1": 0.0024695803915773143,
+      "tp2": 0.0024846339859621903,
       "tp1_hit": false,
       "score": 87,
       "quality": "A",
-      "entry_time": "2026-10-11T23:20:33.470771+09:00"
+      "entry_time": "2026-10-12T04:04:01.004114+09:00"
+    },
+    "SOPHUSDT": {
+      "symbol": "SOPHUSDT",
+      "direction": "SHORT",
+      "entry": 0.003571,
+      "sl": 0.0036019952792208697,
+      "tp1": 0.003524507081168695,
+      "tp2": 0.0034935118019478253,
+      "tp1_hit": false,
+      "score": 87,
+      "quality": "A",
+      "entry_time": "2026-10-12T04:04:02.804843+09:00"
+    },
+    "BIOUSDT": {
+      "symbol": "BIOUSDT",
+      "direction": "LONG",
+      "entry": 0.03004,
+      "sl": 0.02984712399373358,
+      "tp1": 0.03032931400939963,
+      "tp2": 0.03052219001566605,
+      "tp1_hit": false,
+      "score": 87,
+      "quality": "A",
+      "entry_time": "2026-10-12T04:04:04.604064+09:00"
     }
   },
   "signals": {
     "PUMPUSDT:LONG": 1791358639.5219054,
-    "SOPHUSDT:SHORT": 1791358639.5219054,
+    "SOPHUSDT:SHORT": 1791745439.215018,
     "STXUSDT:LONG": 1791374596.85774,
     "JUPUSDT:SHORT": 1791358639.5219054,
     "OUSDT:SHORT": 1791358639.5219054,
@@ -201,7 +201,9 @@
     "QNTUSDT:SHORT": 1791692598.2679546,
     "PUMPUSDT:SHORT": 1791699882.7673533,
     "SANDUSDT:SHORT": 1791702473.2839267,
-    "CAPUSDT:LONG": 1791728430.0438666
+    "CAPUSDT:LONG": 1791728430.0438666,
+    "GALAUSDT:LONG": 1791745439.215018,
+    "BIOUSDT:LONG": 1791745439.215018
   },
   "sl_penalties": {
     "STXUSDT": 1791380763.6872358,
@@ -274,6 +276,9 @@
     "APTUSDT": 1791689017.9422874,
     "CVXUSDT": 1791701460.2805958,
     "PUMPUSDT": 1791702471.0441628,
-    "QNTUSDT": 1791728425.2835639
+    "QNTUSDT": 1791728425.2835639,
+    "SOXLUSDT": 1791745430.1924686,
+    "SANDUSDT": 1791745431.9770396,
+    "CAPUSDT": 1791745435.5683904
   }
 }
