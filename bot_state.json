@@ -36,18 +36,6 @@
       "quality": "A",
       "entry_time": "2026-10-11T13:01:25.295505+09:00"
     },
-    "GENIUSUSDT": {
-      "symbol": "GENIUSUSDT",
-      "direction": "LONG",
-      "entry": 0.34421,
-      "sl": 0.3425807872970079,
-      "tp1": 0.34665381905448817,
-      "tp2": 0.34828303175748027,
-      "tp1_hit": false,
-      "score": 87,
-      "quality": "A",
-      "entry_time": "2026-10-11T13:23:20.109200+09:00"
-    },
     "QNTUSDT": {
       "symbol": "QNTUSDT",
       "direction": "SHORT",
@@ -59,6 +47,18 @@
       "score": 87,
       "quality": "A",
       "entry_time": "2026-10-11T13:23:21.935649+09:00"
+    },
+    "CVXUSDT": {
+      "symbol": "CVXUSDT",
+      "direction": "SHORT",
+      "entry": 2.057,
+      "sl": 2.067418153052275,
+      "tp1": 2.0413727704215874,
+      "tp2": 2.030954617369312,
+      "tp1_hit": false,
+      "score": 87,
+      "quality": "A",
+      "entry_time": "2026-10-11T14:41:33.680957+09:00"
     }
   },
   "signals": {
@@ -119,7 +119,7 @@
     "BSBUSDT:SHORT": 1791369485.414245,
     "FLRUSDT:SHORT": 1791370422.583242,
     "UAIUSDT:SHORT": 1791395219.127907,
-    "CVXUSDT:SHORT": 1791370422.583242,
+    "CVXUSDT:SHORT": 1791697291.8509362,
     "BANUSDT:SHORT": 1791492614.640926,
     "ASTERUSDT:SHORT": 1791373071.86648,
     "MANTRAUSDT:SHORT": 1791374596.85774,
@@ -255,7 +255,7 @@
     "AEVOUSDT": 1791606046.1275089,
     "JUPUSDT": 1791608379.9259176,
     "OPGUSDT": 1791617080.5942209,
-    "GENIUSUSDT": 1791621643.8715887,
+    "GENIUSUSDT": 1791697290.5947545,
     "ONDOUSDT": 1791630090.2169101,
     "WLFIUSDT": 1791631283.4406624,
     "BTWUSDT": 1791632403.8379624,
