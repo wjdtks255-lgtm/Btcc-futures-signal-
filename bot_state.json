@@ -24,18 +24,6 @@
       "quality": "A",
       "entry_time": "2026-10-10T04:58:48.132981+09:00"
     },
-    "GASUSDT": {
-      "symbol": "GASUSDT",
-      "direction": "LONG",
-      "entry": 1.4007,
-      "sl": 1.4007,
-      "tp1": 1.4124002427482287,
-      "tp2": 1.420200404580381,
-      "tp1_hit": true,
-      "score": 90,
-      "quality": "A",
-      "entry_time": "2026-10-11T09:23:30.932705+09:00"
-    },
     "ONUSDT": {
       "symbol": "ONUSDT",
       "direction": "LONG",
@@ -47,18 +35,6 @@
       "score": 87,
       "quality": "A",
       "entry_time": "2026-10-11T09:51:56.710730+09:00"
-    },
-    "APTUSDT": {
-      "symbol": "APTUSDT",
-      "direction": "LONG",
-      "entry": 0.8655,
-      "sl": 0.8536768563824687,
-      "tp1": 0.8832347154262972,
-      "tp2": 0.8950578590438285,
-      "tp1_hit": false,
-      "score": 90,
-      "quality": "A",
-      "entry_time": "2026-10-11T11:44:54.681959+09:00"
     }
   },
   "signals": {
@@ -264,6 +240,8 @@
     "BREVUSDT": 1791678203.127648,
     "NEARUSDT": 1791678204.8027556,
     "VTHOUSDT": 1791679910.3817225,
-    "PLUMEUSDT": 1791679912.1274827
+    "PLUMEUSDT": 1791679912.1274827,
+    "GASUSDT": 1791689016.188916,
+    "APTUSDT": 1791689017.9422874
   }
 }
