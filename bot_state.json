@@ -35,6 +35,18 @@
       "score": 87,
       "quality": "A",
       "entry_time": "2026-10-11T09:51:56.710730+09:00"
+    },
+    "BOMEUSDT": {
+      "symbol": "BOMEUSDT",
+      "direction": "LONG",
+      "entry": 0.0010669,
+      "sl": 0.0010534796231426774,
+      "tp1": 0.001087030565285984,
+      "tp2": 0.0011004509421433065,
+      "tp1_hit": false,
+      "score": 87,
+      "quality": "A",
+      "entry_time": "2026-10-11T13:01:25.295505+09:00"
     }
   },
   "signals": {
@@ -172,7 +184,8 @@
     "PLUMEUSDT:LONG": 1791678209.222636,
     "ONUSDT:LONG": 1791679914.943713,
     "AXLUSDT:LONG": 1791679914.943713,
-    "APTUSDT:LONG": 1791686692.8393326
+    "APTUSDT:LONG": 1791686692.8393326,
+    "BOMEUSDT:LONG": 1791691283.6105967
   },
   "sl_penalties": {
     "STXUSDT": 1791380763.6872358,
