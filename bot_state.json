@@ -24,18 +24,6 @@
       "quality": "A",
       "entry_time": "2026-10-10T04:58:48.132981+09:00"
     },
-    "ONUSDT": {
-      "symbol": "ONUSDT",
-      "direction": "LONG",
-      "entry": 0.11865,
-      "sl": 0.11865,
-      "tp1": 0.12020623603027729,
-      "tp2": 0.12124372671712881,
-      "tp1_hit": true,
-      "score": 87,
-      "quality": "A",
-      "entry_time": "2026-10-11T09:51:56.710730+09:00"
-    },
     "BOMEUSDT": {
       "symbol": "BOMEUSDT",
       "direction": "LONG",
@@ -47,6 +35,30 @@
       "score": 87,
       "quality": "A",
       "entry_time": "2026-10-11T13:01:25.295505+09:00"
+    },
+    "GENIUSUSDT": {
+      "symbol": "GENIUSUSDT",
+      "direction": "LONG",
+      "entry": 0.34421,
+      "sl": 0.3425807872970079,
+      "tp1": 0.34665381905448817,
+      "tp2": 0.34828303175748027,
+      "tp1_hit": false,
+      "score": 87,
+      "quality": "A",
+      "entry_time": "2026-10-11T13:23:20.109200+09:00"
+    },
+    "QNTUSDT": {
+      "symbol": "QNTUSDT",
+      "direction": "SHORT",
+      "entry": 237.55,
+      "sl": 239.06226131292289,
+      "tp1": 235.2816080306157,
+      "tp2": 233.76934671769286,
+      "tp1_hit": false,
+      "score": 87,
+      "quality": "A",
+      "entry_time": "2026-10-11T13:23:21.935649+09:00"
     }
   },
   "signals": {
@@ -167,7 +179,7 @@
     "AXTIUSDT:SHORT": 1791591117.6690931,
     "ORCAUSDT:SHORT": 1791593106.3653913,
     "AEVOUSDT:LONG": 1791595669.7984393,
-    "GENIUSUSDT:LONG": 1791606048.4330566,
+    "GENIUSUSDT:LONG": 1791692598.2679546,
     "JUPUSDT:LONG": 1791607376.1573246,
     "OPGUSDT:LONG": 1791608381.9048004,
     "WLFIUSDT:LONG": 1791617082.3845727,
@@ -185,7 +197,8 @@
     "ONUSDT:LONG": 1791679914.943713,
     "AXLUSDT:LONG": 1791679914.943713,
     "APTUSDT:LONG": 1791686692.8393326,
-    "BOMEUSDT:LONG": 1791691283.6105967
+    "BOMEUSDT:LONG": 1791691283.6105967,
+    "QNTUSDT:SHORT": 1791692598.2679546
   },
   "sl_penalties": {
     "STXUSDT": 1791380763.6872358,
