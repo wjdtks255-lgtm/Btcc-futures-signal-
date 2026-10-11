@@ -36,18 +36,6 @@
       "quality": "A",
       "entry_time": "2026-10-11T13:23:21.935649+09:00"
     },
-    "PUMPUSDT": {
-      "symbol": "PUMPUSDT",
-      "direction": "SHORT",
-      "entry": 0.005437,
-      "sl": 0.0054779329192655895,
-      "tp1": 0.005375600621101616,
-      "tp2": 0.005334667701836026,
-      "tp1_hit": false,
-      "score": 87,
-      "quality": "A",
-      "entry_time": "2026-10-11T15:24:44.485595+09:00"
-    },
     "BICOUSDT": {
       "symbol": "BICOUSDT",
       "direction": "SHORT",
@@ -59,6 +47,18 @@
       "score": 87,
       "quality": "A",
       "entry_time": "2026-10-11T15:51:04.298596+09:00"
+    },
+    "SANDUSDT": {
+      "symbol": "SANDUSDT",
+      "direction": "SHORT",
+      "entry": 0.06503,
+      "sl": 0.06551641514781752,
+      "tp1": 0.06430037727827374,
+      "tp2": 0.06381396213045623,
+      "tp1_hit": false,
+      "score": 87,
+      "quality": "A",
+      "entry_time": "2026-10-11T16:07:54.975175+09:00"
     }
   },
   "signals": {
@@ -199,7 +199,8 @@
     "APTUSDT:LONG": 1791686692.8393326,
     "BOMEUSDT:LONG": 1791691283.6105967,
     "QNTUSDT:SHORT": 1791692598.2679546,
-    "PUMPUSDT:SHORT": 1791699882.7673533
+    "PUMPUSDT:SHORT": 1791699882.7673533,
+    "SANDUSDT:SHORT": 1791702473.2839267
   },
   "sl_penalties": {
     "STXUSDT": 1791380763.6872358,
@@ -270,6 +271,7 @@
     "PLUMEUSDT": 1791679912.1274827,
     "GASUSDT": 1791689016.188916,
     "APTUSDT": 1791689017.9422874,
-    "CVXUSDT": 1791701460.2805958
+    "CVXUSDT": 1791701460.2805958,
+    "PUMPUSDT": 1791702471.0441628
   }
 }
