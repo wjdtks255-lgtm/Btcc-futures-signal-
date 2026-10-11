@@ -24,18 +24,6 @@
       "quality": "A",
       "entry_time": "2026-10-10T04:58:48.132981+09:00"
     },
-    "BOMEUSDT": {
-      "symbol": "BOMEUSDT",
-      "direction": "LONG",
-      "entry": 0.0010669,
-      "sl": 0.0010669,
-      "tp1": 0.001087030565285984,
-      "tp2": 0.0011004509421433065,
-      "tp1_hit": true,
-      "score": 87,
-      "quality": "A",
-      "entry_time": "2026-10-11T13:01:25.295505+09:00"
-    },
     "QNTUSDT": {
       "symbol": "QNTUSDT",
       "direction": "SHORT",
@@ -59,6 +47,18 @@
       "score": 87,
       "quality": "A",
       "entry_time": "2026-10-11T14:41:33.680957+09:00"
+    },
+    "PUMPUSDT": {
+      "symbol": "PUMPUSDT",
+      "direction": "SHORT",
+      "entry": 0.005437,
+      "sl": 0.0054779329192655895,
+      "tp1": 0.005375600621101616,
+      "tp2": 0.005334667701836026,
+      "tp1_hit": false,
+      "score": 87,
+      "quality": "A",
+      "entry_time": "2026-10-11T15:24:44.485595+09:00"
     }
   },
   "signals": {
@@ -198,7 +198,8 @@
     "AXLUSDT:LONG": 1791679914.943713,
     "APTUSDT:LONG": 1791686692.8393326,
     "BOMEUSDT:LONG": 1791691283.6105967,
-    "QNTUSDT:SHORT": 1791692598.2679546
+    "QNTUSDT:SHORT": 1791692598.2679546,
+    "PUMPUSDT:SHORT": 1791699882.7673533
   },
   "sl_penalties": {
     "STXUSDT": 1791380763.6872358,
