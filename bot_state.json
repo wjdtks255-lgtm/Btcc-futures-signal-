@@ -28,10 +28,10 @@
       "symbol": "GASUSDT",
       "direction": "LONG",
       "entry": 1.4007,
-      "sl": 1.3928998381678477,
+      "sl": 1.4007,
       "tp1": 1.4124002427482287,
       "tp2": 1.420200404580381,
-      "tp1_hit": false,
+      "tp1_hit": true,
       "score": 90,
       "quality": "A",
       "entry_time": "2026-10-11T09:23:30.932705+09:00"
