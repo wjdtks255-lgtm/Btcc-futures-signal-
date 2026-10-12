@@ -36,18 +36,6 @@
       "quality": "A",
       "entry_time": "2026-10-12T04:04:02.804843+09:00"
     },
-    "BIOUSDT": {
-      "symbol": "BIOUSDT",
-      "direction": "LONG",
-      "entry": 0.03004,
-      "sl": 0.02984712399373358,
-      "tp1": 0.03032931400939963,
-      "tp2": 0.03052219001566605,
-      "tp1_hit": false,
-      "score": 87,
-      "quality": "A",
-      "entry_time": "2026-10-12T04:04:04.604064+09:00"
-    },
     "FILUSDT": {
       "symbol": "FILUSDT",
       "direction": "LONG",
@@ -59,6 +47,18 @@
       "score": 90,
       "quality": "A",
       "entry_time": "2026-10-12T07:50:16.402206+09:00"
+    },
+    "BULLAUSDT": {
+      "symbol": "BULLAUSDT",
+      "direction": "SHORT",
+      "entry": 0.077071,
+      "sl": 0.07792716941647748,
+      "tp1": 0.07578674587528378,
+      "tp2": 0.07493057645880628,
+      "tp1_hit": false,
+      "score": 87,
+      "quality": "A",
+      "entry_time": "2026-10-12T10:54:53.813621+09:00"
     }
   },
   "signals": {
@@ -204,7 +204,8 @@
     "CAPUSDT:LONG": 1791728430.0438666,
     "GALAUSDT:LONG": 1791745439.215018,
     "BIOUSDT:LONG": 1791745439.215018,
-    "FILUSDT:LONG": 1791759014.6905584
+    "FILUSDT:LONG": 1791759014.6905584,
+    "BULLAUSDT:SHORT": 1791770091.9890602
   },
   "sl_penalties": {
     "STXUSDT": 1791380763.6872358,
@@ -281,6 +282,7 @@
     "SOXLUSDT": 1791745430.1924686,
     "SANDUSDT": 1791745431.9770396,
     "CAPUSDT": 1791745435.5683904,
-    "GALAUSDT": 1791759010.720857
+    "GALAUSDT": 1791759010.720857,
+    "BIOUSDT": 1791770088.9474237
   }
 }
