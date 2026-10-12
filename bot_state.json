@@ -1,40 +1,64 @@
 {
   "positions": {
-    "SOPHUSDT": {
-      "symbol": "SOPHUSDT",
+    "SPACEUSDT": {
+      "symbol": "SPACEUSDT",
       "direction": "SHORT",
-      "entry": 0.003571,
-      "sl": 0.003571,
-      "tp1": 0.003524507081168695,
-      "tp2": 0.0034935118019478253,
-      "tp1_hit": true,
-      "score": 87,
-      "quality": "A",
-      "entry_time": "2026-10-12T04:04:02.804843+09:00"
-    },
-    "FILUSDT": {
-      "symbol": "FILUSDT",
-      "direction": "LONG",
-      "entry": 1.2065,
-      "sl": 1.1837684579767376,
-      "tp1": 1.2405973130348935,
-      "tp2": 1.2633288550581558,
+      "entry": 0.004238,
+      "sl": 0.004260891856385365,
+      "tp1": 0.004203662215421952,
+      "tp2": 0.004180770359036587,
       "tp1_hit": false,
       "score": 90,
       "quality": "A",
-      "entry_time": "2026-10-12T07:50:16.402206+09:00"
+      "entry_time": "2026-10-13T06:53:13.750304+09:00"
     },
-    "MRVLUSDT": {
-      "symbol": "MRVLUSDT",
+    "SAHARAUSDT": {
+      "symbol": "SAHARAUSDT",
       "direction": "SHORT",
-      "entry": 272.9,
-      "sl": 275.00963579300213,
-      "tp1": 269.7355463104967,
-      "tp2": 267.62591051749456,
+      "entry": 0.008687,
+      "sl": 0.00874936972544485,
+      "tp1": 0.008593445411832728,
+      "tp2": 0.008531075686387878,
+      "tp1_hit": false,
+      "score": 87,
+      "quality": "A",
+      "entry_time": "2026-10-13T06:53:15.671327+09:00"
+    },
+    "TRUTHUSDT": {
+      "symbol": "TRUTHUSDT",
+      "direction": "LONG",
+      "entry": 0.014703,
+      "sl": 0.014541643157615048,
+      "tp1": 0.014945035263577431,
+      "tp2": 0.015106392105962384,
       "tp1_hit": false,
       "score": 85,
       "quality": "A",
-      "entry_time": "2026-10-12T22:45:56.784299+09:00"
+      "entry_time": "2026-10-13T06:53:17.545778+09:00"
+    },
+    "BTWUSDT": {
+      "symbol": "BTWUSDT",
+      "direction": "LONG",
+      "entry": 1.743776,
+      "sl": 1.6997933849854496,
+      "tp1": 1.8097499225218256,
+      "tp2": 1.853732537536376,
+      "tp1_hit": false,
+      "score": 85,
+      "quality": "A",
+      "entry_time": "2026-10-13T06:53:19.399492+09:00"
+    },
+    "PRLUSDT": {
+      "symbol": "PRLUSDT",
+      "direction": "SHORT",
+      "entry": 0.11096,
+      "sl": 0.11150799341664379,
+      "tp1": 0.11013800987503433,
+      "tp2": 0.10959001645839055,
+      "tp1_hit": false,
+      "score": 85,
+      "quality": "A",
+      "entry_time": "2026-10-13T06:53:21.263542+09:00"
     }
   },
   "signals": {
@@ -45,7 +69,7 @@
     "OUSDT:SHORT": 1791358639.5219054,
     "MEMEUSDT:SHORT": 1791358953.0830307,
     "FOGOUSDT:SHORT": 1791358953.0830307,
-    "BTWUSDT:LONG": 1791630090.875925,
+    "BTWUSDT:LONG": 1791841991.7484508,
     "AVNTUSDT:SHORT": 1791358953.0830307,
     "PYTHUSDT:SHORT": 1791358953.0830307,
     "MONUSDT:SHORT": 1791522153.4521744,
@@ -135,7 +159,7 @@
     "STABLEUSDT:SHORT": 1791483402.6478534,
     "FARTCOINUSDT:SHORT": 1791484988.2379594,
     "1MBABYDOGEUSDT:SHORT": 1791556519.898543,
-    "SPACEUSDT:SHORT": 1791498335.929474,
+    "SPACEUSDT:SHORT": 1791841991.7484508,
     "HBARUSDT:SHORT": 1791501780.2422528,
     "COOKIEUSDT:SHORT": 1791501780.2422528,
     "WLDUSDT:SHORT": 1791501780.2422528,
@@ -182,7 +206,10 @@
     "BIOUSDT:LONG": 1791745439.215018,
     "FILUSDT:LONG": 1791759014.6905584,
     "BULLAUSDT:SHORT": 1791770091.9890602,
-    "MRVLUSDT:SHORT": 1791812754.9918346
+    "MRVLUSDT:SHORT": 1791812754.9918346,
+    "SAHARAUSDT:SHORT": 1791841991.7484508,
+    "TRUTHUSDT:LONG": 1791841991.7484508,
+    "PRLUSDT:SHORT": 1791841991.7484508
   },
   "sl_penalties": {
     "STXUSDT": 1791380763.6872358,
@@ -262,6 +289,7 @@
     "GALAUSDT": 1791759010.720857,
     "BIOUSDT": 1791770088.9474237,
     "TSLAUSDT": 1791812748.3784075,
-    "BULLAUSDT": 1791812753.6579974
+    "BULLAUSDT": 1791812753.6579974,
+    "FILUSDT": 1791841987.2158077
   }
 }
