@@ -123,7 +123,7 @@ def rows():
         "filter": [{"left": "exchange", "operation": "equal", "right": "BTCC"}],
         "columns": COL,
         "sort": {"sortBy": "volume|15", "sortOrder": "desc"},
-        "range": [0, 500],
+        "range": [0, 1000],  # BTCC 전체 종목 전수 탐색
     }
     try:
         r = requests.post(TV_URL, json=q, headers=HEAD, timeout=25)
@@ -463,7 +463,6 @@ def check(state, rs):
 
         if long and price <= p["sl"] or not long and price >= p["sl"]:
             tg(posmsg(p, "SL"), f"{p['symbol']} SL")
-            # 손절 발생 시점에 해당 종목에 대한 12시간 패널티 타임스탬프 기록
             state.setdefault("sl_penalties", {})[key] = time.time()
             state["positions"].pop(key, None)
             continue
@@ -493,8 +492,6 @@ def main():
         return
 
     state = load()
-    
-    # 1. 포지션 청산 조건 검사 (TP2, SL 도달 시 슬롯 회전 및 손절 패널티 부여)
     check(state, rs)
 
     st = {
@@ -557,7 +554,6 @@ def main():
                 print("SKIP ACTIVE:", key)
                 continue
 
-            # 2. 손절(SL) 패널티 기간(12시간) 내에 있는 종목인지 검사
             if key in sl_penalties:
                 elapsed = t - float(sl_penalties[key])
                 if elapsed < SL_PENALTY_HOURS * 3600:
