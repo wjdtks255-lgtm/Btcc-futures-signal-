@@ -1,37 +1,13 @@
 {
   "positions": {
-    "TSLAUSDT": {
-      "symbol": "TSLAUSDT",
-      "direction": "LONG",
-      "entry": 383.55,
-      "sl": 381.42958504579224,
-      "tp1": 386.73062243131164,
-      "tp2": 388.8510373855194,
-      "tp1_hit": false,
-      "score": 90,
-      "quality": "A",
-      "entry_time": "2026-10-10T01:24:13.714296+09:00"
-    },
-    "SKYAIUSDT": {
-      "symbol": "SKYAIUSDT",
-      "direction": "SHORT",
-      "entry": 0.03432,
-      "sl": 0.03432,
-      "tp1": 0.03407415515838995,
-      "tp2": 0.033910258597316584,
-      "tp1_hit": true,
-      "score": 87,
-      "quality": "A",
-      "entry_time": "2026-10-11T23:20:31.749382+09:00"
-    },
     "SOPHUSDT": {
       "symbol": "SOPHUSDT",
       "direction": "SHORT",
       "entry": 0.003571,
-      "sl": 0.0036019952792208697,
+      "sl": 0.003571,
       "tp1": 0.003524507081168695,
       "tp2": 0.0034935118019478253,
-      "tp1_hit": false,
+      "tp1_hit": true,
       "score": 87,
       "quality": "A",
       "entry_time": "2026-10-12T04:04:02.804843+09:00"
@@ -48,17 +24,17 @@
       "quality": "A",
       "entry_time": "2026-10-12T07:50:16.402206+09:00"
     },
-    "BULLAUSDT": {
-      "symbol": "BULLAUSDT",
+    "MRVLUSDT": {
+      "symbol": "MRVLUSDT",
       "direction": "SHORT",
-      "entry": 0.077071,
-      "sl": 0.07792716941647748,
-      "tp1": 0.07578674587528378,
-      "tp2": 0.07493057645880628,
+      "entry": 272.9,
+      "sl": 275.00963579300213,
+      "tp1": 269.7355463104967,
+      "tp2": 267.62591051749456,
       "tp1_hit": false,
-      "score": 87,
+      "score": 85,
       "quality": "A",
-      "entry_time": "2026-10-12T10:54:53.813621+09:00"
+      "entry_time": "2026-10-12T22:45:56.784299+09:00"
     }
   },
   "signals": {
@@ -205,7 +181,8 @@
     "GALAUSDT:LONG": 1791745439.215018,
     "BIOUSDT:LONG": 1791745439.215018,
     "FILUSDT:LONG": 1791759014.6905584,
-    "BULLAUSDT:SHORT": 1791770091.9890602
+    "BULLAUSDT:SHORT": 1791770091.9890602,
+    "MRVLUSDT:SHORT": 1791812754.9918346
   },
   "sl_penalties": {
     "STXUSDT": 1791380763.6872358,
@@ -283,6 +260,8 @@
     "SANDUSDT": 1791745431.9770396,
     "CAPUSDT": 1791745435.5683904,
     "GALAUSDT": 1791759010.720857,
-    "BIOUSDT": 1791770088.9474237
+    "BIOUSDT": 1791770088.9474237,
+    "TSLAUSDT": 1791812748.3784075,
+    "BULLAUSDT": 1791812753.6579974
   }
 }
