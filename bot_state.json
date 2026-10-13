@@ -1,29 +1,5 @@
 {
   "positions": {
-    "SPACEUSDT": {
-      "symbol": "SPACEUSDT",
-      "direction": "SHORT",
-      "entry": 0.004238,
-      "sl": 0.004260891856385365,
-      "tp1": 0.004203662215421952,
-      "tp2": 0.004180770359036587,
-      "tp1_hit": false,
-      "score": 90,
-      "quality": "A",
-      "entry_time": "2026-10-13T06:53:13.750304+09:00"
-    },
-    "SAHARAUSDT": {
-      "symbol": "SAHARAUSDT",
-      "direction": "SHORT",
-      "entry": 0.008687,
-      "sl": 0.00874936972544485,
-      "tp1": 0.008593445411832728,
-      "tp2": 0.008531075686387878,
-      "tp1_hit": false,
-      "score": 87,
-      "quality": "A",
-      "entry_time": "2026-10-13T06:53:15.671327+09:00"
-    },
     "TRUTHUSDT": {
       "symbol": "TRUTHUSDT",
       "direction": "LONG",
@@ -48,17 +24,41 @@
       "quality": "A",
       "entry_time": "2026-10-13T06:53:19.399492+09:00"
     },
-    "PRLUSDT": {
-      "symbol": "PRLUSDT",
+    "REZUSDT": {
+      "symbol": "REZUSDT",
       "direction": "SHORT",
-      "entry": 0.11096,
-      "sl": 0.11150799341664379,
-      "tp1": 0.11013800987503433,
-      "tp2": 0.10959001645839055,
+      "entry": 0.003702,
+      "sl": 0.003740342298888588,
+      "tp1": 0.0036444865516671175,
+      "tp2": 0.0036061442527785294,
       "tp1_hit": false,
-      "score": 85,
+      "score": 90,
       "quality": "A",
-      "entry_time": "2026-10-13T06:53:21.263542+09:00"
+      "entry_time": "2026-10-13T11:47:36.920973+09:00"
+    },
+    "FOGOUSDT": {
+      "symbol": "FOGOUSDT",
+      "direction": "SHORT",
+      "entry": 0.004521,
+      "sl": 0.004575959445646079,
+      "tp1": 0.00443856083153088,
+      "tp2": 0.004383601385884801,
+      "tp1_hit": false,
+      "score": 90,
+      "quality": "A",
+      "entry_time": "2026-10-13T11:47:38.642035+09:00"
+    },
+    "ENJUSDT": {
+      "symbol": "ENJUSDT",
+      "direction": "SHORT",
+      "entry": 0.03006,
+      "sl": 0.030414328089962795,
+      "tp1": 0.029528507865055807,
+      "tp2": 0.029174179775093012,
+      "tp1_hit": false,
+      "score": 90,
+      "quality": "A",
+      "entry_time": "2026-10-13T11:47:40.386992+09:00"
     }
   },
   "signals": {
@@ -68,14 +68,14 @@
     "JUPUSDT:SHORT": 1791358639.5219054,
     "OUSDT:SHORT": 1791358639.5219054,
     "MEMEUSDT:SHORT": 1791358953.0830307,
-    "FOGOUSDT:SHORT": 1791358953.0830307,
+    "FOGOUSDT:SHORT": 1791859655.1173308,
     "BTWUSDT:LONG": 1791841991.7484508,
     "AVNTUSDT:SHORT": 1791358953.0830307,
     "PYTHUSDT:SHORT": 1791358953.0830307,
     "MONUSDT:SHORT": 1791522153.4521744,
     "GUNUSDT:SHORT": 1791513810.1506774,
     "XRPUSDT:SHORT": 1791359510.753104,
-    "ENJUSDT:SHORT": 1791360184.5480165,
+    "ENJUSDT:SHORT": 1791859655.1173308,
     "CRVUSDT:SHORT": 1791377526.1091416,
     "RAVEUSDT:SHORT": 1791360184.5480165,
     "JASMYUSDT:SHORT": 1791484988.2379594,
@@ -209,7 +209,8 @@
     "MRVLUSDT:SHORT": 1791812754.9918346,
     "SAHARAUSDT:SHORT": 1791841991.7484508,
     "TRUTHUSDT:LONG": 1791841991.7484508,
-    "PRLUSDT:SHORT": 1791841991.7484508
+    "PRLUSDT:SHORT": 1791841991.7484508,
+    "REZUSDT:SHORT": 1791859655.1173308
   },
   "sl_penalties": {
     "STXUSDT": 1791380763.6872358,
