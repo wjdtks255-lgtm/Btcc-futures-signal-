@@ -1,52 +1,64 @@
 {
   "positions": {
-    "BTWUSDT": {
-      "symbol": "BTWUSDT",
-      "direction": "LONG",
-      "entry": 1.743776,
-      "sl": 1.743776,
-      "tp1": 1.8097499225218256,
-      "tp2": 1.853732537536376,
-      "tp1_hit": true,
-      "score": 85,
-      "quality": "A",
-      "entry_time": "2026-10-13T06:53:19.399492+09:00"
-    },
-    "ENJUSDT": {
-      "symbol": "ENJUSDT",
+    "COOKIEUSDT": {
+      "symbol": "COOKIEUSDT",
       "direction": "SHORT",
-      "entry": 0.03006,
-      "sl": 0.030414328089962795,
-      "tp1": 0.029528507865055807,
-      "tp2": 0.029174179775093012,
+      "entry": 0.01109,
+      "sl": 0.011196347193233713,
+      "tp1": 0.01093047921014943,
+      "tp2": 0.010824132016915717,
       "tp1_hit": false,
       "score": 90,
       "quality": "A",
-      "entry_time": "2026-10-13T11:47:40.386992+09:00"
+      "entry_time": "2026-10-14T02:10:28.612256+09:00"
     },
-    "ONUSDT": {
-      "symbol": "ONUSDT",
-      "direction": "LONG",
-      "entry": 0.13279,
-      "sl": 0.13071730973080917,
-      "tp1": 0.13589903540378626,
-      "tp2": 0.13797172567297708,
+    "HEMIUSDT": {
+      "symbol": "HEMIUSDT",
+      "direction": "SHORT",
+      "entry": 0.005626,
+      "sl": 0.005666176261983628,
+      "tp1": 0.005565735607024558,
+      "tp2": 0.00552555934504093,
       "tp1_hit": false,
       "score": 87,
       "quality": "A",
-      "entry_time": "2026-10-13T18:46:32.159850+09:00"
+      "entry_time": "2026-10-14T02:10:30.325454+09:00"
     },
-    "TIAUSDT": {
-      "symbol": "TIAUSDT",
-      "direction": "LONG",
-      "entry": 0.6066,
-      "sl": 0.5964977327122212,
-      "tp1": 0.6217534009316683,
-      "tp2": 0.631855668219447,
+    "HOMEUSDT": {
+      "symbol": "HOMEUSDT",
+      "direction": "SHORT",
+      "entry": 0.005259,
+      "sl": 0.005313735103209622,
+      "tp1": 0.005176897345185566,
+      "tp2": 0.005122162241975943,
       "tp1_hit": false,
       "score": 87,
       "quality": "A",
-      "entry_time": "2026-10-13T18:46:34.010013+09:00"
+      "entry_time": "2026-10-14T02:10:32.037183+09:00"
+    },
+    "BANKUSDT": {
+      "symbol": "BANKUSDT",
+      "direction": "SHORT",
+      "entry": 0.02767,
+      "sl": 0.027866444148275746,
+      "tp1": 0.02737533377758638,
+      "tp2": 0.027178889629310633,
+      "tp1_hit": false,
+      "score": 87,
+      "quality": "A",
+      "entry_time": "2026-10-14T02:10:33.749146+09:00"
+    },
+    "ZORAUSDT": {
+      "symbol": "ZORAUSDT",
+      "direction": "SHORT",
+      "entry": 0.006791,
+      "sl": 0.006849919600952489,
+      "tp1": 0.006702620598571268,
+      "tp2": 0.00664370099761878,
+      "tp1_hit": false,
+      "score": 87,
+      "quality": "A",
+      "entry_time": "2026-10-14T02:10:35.496383+09:00"
     }
   },
   "signals": {
@@ -68,7 +80,7 @@
     "RAVEUSDT:SHORT": 1791360184.5480165,
     "JASMYUSDT:SHORT": 1791484988.2379594,
     "PIPPINUSDT:SHORT": 1791360473.4529753,
-    "HOMEUSDT:SHORT": 1791360473.4529753,
+    "HOMEUSDT:SHORT": 1791911426.8955,
     "BIOUSDT:SHORT": 1791360918.4161968,
     "BUSDT:SHORT": 1791524811.316607,
     "XLMUSDT:SHORT": 1791360918.4161968,
@@ -80,7 +92,7 @@
     "ESPORTSUSDT:SHORT": 1791362439.7748892,
     "SOLUSDC:SHORT": 1791362483.706792,
     "SOLUSDT:SHORT": 1791362483.706792,
-    "BANKUSDT:SHORT": 1791378499.3573387,
+    "BANKUSDT:SHORT": 1791911426.8955,
     "TRXUSDT:SHORT": 1791362702.0539832,
     "UNITREEUSDT:SHORT": 1791362702.0539832,
     "ARCUSDT:SHORT": 1791362702.0539832,
@@ -94,7 +106,7 @@
     "CYSUSDT:SHORT": 1791364574.4470468,
     "ONEUSDT:SHORT": 1791364574.4470468,
     "AKEUSDT:SHORT": 1791364574.4470468,
-    "HEMIUSDT:SHORT": 1791513810.1506774,
+    "HEMIUSDT:SHORT": 1791911426.8955,
     "AEROUSDT:SHORT": 1791365141.5239792,
     "SANDUSDT:LONG": 1791365141.5239792,
     "ALCHUSDT:SHORT": 1791365406.144873,
@@ -149,7 +161,7 @@
     "1MBABYDOGEUSDT:SHORT": 1791556519.898543,
     "SPACEUSDT:SHORT": 1791841991.7484508,
     "HBARUSDT:SHORT": 1791501780.2422528,
-    "COOKIEUSDT:SHORT": 1791501780.2422528,
+    "COOKIEUSDT:SHORT": 1791911426.8955,
     "WLDUSDT:SHORT": 1791501780.2422528,
     "RENDERUSDT:SHORT": 1791510372.5181398,
     "KITEUSDT:SHORT": 1791516186.4746506,
@@ -198,7 +210,8 @@
     "SAHARAUSDT:SHORT": 1791841991.7484508,
     "TRUTHUSDT:LONG": 1791841991.7484508,
     "PRLUSDT:SHORT": 1791841991.7484508,
-    "REZUSDT:SHORT": 1791859655.1173308
+    "REZUSDT:SHORT": 1791859655.1173308,
+    "ZORAUSDT:SHORT": 1791911426.8955
   },
   "sl_penalties": {
     "STXUSDT": 1791380763.6872358,
@@ -244,7 +257,7 @@
     "BCHUSDT": 1791524809.2846215,
     "GRVTUSDT": 1791525755.5953627,
     "MONUSDT": 1791529106.1558383,
-    "TIAUSDT": 1791534386.2504938,
+    "TIAUSDT": 1791911421.081803,
     "MYXUSDT": 1791546727.803244,
     "ORCLUSDT": 1791553853.1825883,
     "BEATUSDT": 1791556516.2095673,
@@ -281,6 +294,8 @@
     "BULLAUSDT": 1791812753.6579974,
     "FILUSDT": 1791841987.2158077,
     "REZUSDT": 1791884787.750539,
-    "FOGOUSDT": 1791884789.568713
+    "FOGOUSDT": 1791884789.568713,
+    "ENJUSDT": 1791911417.5608644,
+    "ONUSDT": 1791911419.3009076
   }
 }
