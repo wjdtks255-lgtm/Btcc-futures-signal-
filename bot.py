@@ -1,12 +1,13 @@
 from datetime import datetime, timedelta, timezone
 import json
 import os
+import random
 import time
 import requests
 
 TOKEN = os.getenv("TELEGRAM_TOKEN", "").strip()
 CHAT_ID = (os.getenv("TELEGRAM_CHAT_ID") or os.getenv("CHAT_ID") or "").strip()
-STATE_FILE = "bot_state.json"
+STATE_FILE = "btcc_state.json"
 KST = timezone(timedelta(hours=9))
 TV_URL = "https://scanner.tradingview.com/crypto/scan"
 
@@ -26,30 +27,11 @@ SYMBOL_MAP = {
 }
 
 COL = [
-    "open|15",
-    "high|15",
-    "low|15",
-    "close|15",
-    "volume|15",
-    "EMA20|15",
-    "EMA50|15",
-    "EMA100|15",
-    "RSI|15",
-    "ADX|15",
-    "ATR|15",
-    "open|60",
-    "high|60",
-    "low|60",
-    "close|60",
-    "volume|60",
-    "EMA20|60",
-    "EMA50|60",
-    "EMA100|60",
-    "RSI|60",
-    "ADX|60",
-    "ATR|60",
-    "change|15",
-    "change|60",
+    "open|15", "high|15", "low|15", "close|15", "volume|15",
+    "EMA20|15", "EMA50|15", "EMA100|15", "RSI|15", "ADX|15", "ATR|15",
+    "open|60", "high|60", "low|60", "close|60", "volume|60",
+    "EMA20|60", "EMA50|60", "EMA100|60", "RSI|60", "ADX|60", "ATR|60",
+    "change|15", "change|60",
 ]
 
 HEAD = {
@@ -98,16 +80,11 @@ def tg(msg, label="MSG"):
         try:
             r = requests.post(url, json=data, timeout=20)
             j = r.json() if r.status_code == 200 else {}
-            print(
-                f"TG {label}: http={r.status_code} ok={j.get('ok')} "
-                f"message_id={j.get('result', {}).get('message_id')} desc={j.get('description', '')}"
-            )
             if r.status_code == 200 and j.get("ok") is True:
                 time.sleep(1.2)
                 return True
             if r.status_code == 429:
                 retry_after = int(r.headers.get("Retry-After", 3))
-                print(f"Rate limited. Waiting {retry_after}s...")
                 time.sleep(retry_after)
         except Exception as e:
             print("TG ERROR:", e)
@@ -123,11 +100,10 @@ def rows():
         "filter": [{"left": "exchange", "operation": "equal", "right": "BTCC"}],
         "columns": COL,
         "sort": {"sortBy": "volume|15", "sortOrder": "desc"},
-        "range": [0, 1000],  # BTCC 전체 종목 전수 탐색
+        "range": [0, 1000],
     }
     try:
         r = requests.post(TV_URL, json=q, headers=HEAD, timeout=25)
-        print("TV:", r.status_code)
         return r.json().get("data", []) if r.status_code == 200 else []
     except Exception as e:
         print("TV ERROR:", e)
@@ -182,6 +158,14 @@ def fetch_klines(sym, limit=12):
     except Exception as e:
         print(f"KLINE FETCH ERROR ({sym}):", e)
     return []
+
+
+def get_recent_high_low(sym):
+    klines = fetch_klines(sym, limit=2)
+    if klines:
+        curr = klines[-1]
+        return curr["high"], curr["low"], curr["close"]
+    return None, None, None
 
 
 def verify_candle_structure(sym, direction, current_p):
@@ -337,12 +321,16 @@ def analyze(r, st):
         sl = p - risk
         tp1 = p + risk * 1.5
         tp2 = p + risk * 2.5
+        tp3 = p + risk * 4.0
         setup = "눌림 후 상승 재진입(파동 확인)"
+        pos_text = "롱 (LONG) 🟢"
     else:
         sl = p + risk
         tp1 = p - risk * 1.5
         tp2 = p - risk * 2.5
+        tp3 = p - risk * 4.0
         setup = "반등 후 하락 재진입(파동 확인)"
+        pos_text = "숏 (SHORT) 🔴"
 
     lev = 8 if atrp < 0.8 else (6 if atrp < 1.4 else 4 if atrp < 2 else 3)
 
@@ -362,6 +350,7 @@ def analyze(r, st):
         "sl": sl,
         "tp1": tp1,
         "tp2": tp2,
+        "tp3": tp3,
         "rsi": rs,
         "rsh": rsh,
         "adx": adx,
@@ -380,104 +369,120 @@ def analyze(r, st):
         "lev": lev,
         "setup": setup,
         "reasons": reasons,
+        "pos_text": pos_text,
     }
 
 
-def msg(s):
-    icon = "🟢" if s["direction"] == "LONG" else "🔴"
+def msg(s, slot_no):
     tv_chart_url = f"https://www.tradingview.com/chart/?symbol=BTCC:{s['symbol']}.P"
-
     return (
-        f"{icon} 🔥 {s['quality']} HIGH QUALITY ENTRY\n\n"
-        "━━━━━━━━━━━━━━━━━━━━\n"
-        f"🪙 #{s['symbol']}\n"
-        f"📌 {s['direction']} {icon}\n"
-        f"🏆 Quality : {s['quality']}\n"
-        f"⭐ Entry Score : {s['score']}/100\n"
-        f"🎯 Setup : {s['setup']}\n"
-        "━━━━━━━━━━━━━━━━━━━━\n\n"
-        "💰 TRADE PLAN\n"
-        f"├ Entry : {fmt(s['price'])}\n"
-        f"├ SL : {fmt(s['sl'])}\n"
-        f"├ TP1 : {fmt(s['tp1'])}\n"
-        f"└ TP2 : {fmt(s['tp2'])}\n\n"
-        "📊 MARKET\n"
-        f"├ RSI 15M : {s['rsi']:.1f}\n"
-        f"├ RSI 1H : {s['rsh']:.1f}\n"
-        f"├ ADX 15M : {s['adx']:.1f}\n"
-        f"├ ADX 1H : {s['adxh']:.1f}\n"
-        f"├ 15M : {s['ch15']:+.2f}%\n"
-        f"├ 1H : {s['ch60']:+.2f}%\n"
-        f"└ ATR : {s['atrp']:.2f}%\n\n"
-        "🎯 QUALITY\n"
-        f"├ Trend : {s['trend']}/25\n"
-        f"├ Location : {s['location']}/20\n"
-        f"├ Timing : {s['timing']}/23\n"
-        f"├ RSI : {s['rscore']}/10\n"
-        f"├ ADX : {s['adscore']}/10\n"
-        f"├ Momentum : {s['momscore']}/10\n"
-        f"└ Volatility : {s['volscore']}/5\n"
-        f"Penalty : -{s['penalty']}\n\n"
-        "🧠 ENTRY REASONS\n"
-        + "\n".join("• " + x for x in s["reasons"])
-        + "\n\n⚙️ RISK\n"
-        f"├ Leverage : {s['lev']}x\n"
-        "├ TP1 → SL = ENTRY\n"
-        "└ TP2 → TRACKING END\n\n"
-        f"🔗 BTCC:{s['symbol']}.P\n"
-        f"📈 [트레이딩뷰 차트 보기]({tv_chart_url})\n\n"
-        "⚠️ Signal only / No auto order"
+        f"🚨 *BTCC 프로페셔널 트레이딩 시그널* 🚨\n"
+        f"━━━━━━━━━━━━━━━━━━━━━━\n"
+        f"📌 슬롯 번호: `[ {slot_no} / {MAX_SLOTS} ]`\n"
+        f"🪙 종목명: `#{s['symbol']}` | 🏆 `{s['quality']}` (Score: {s['score']})\n"
+        f"📊 포지션: **{s['pos_text']}**\n"
+        f"🎯 진입 셋업: {s['setup']}\n\n"
+        f"💰 **TRADE PLAN**\n"
+        f"├ Entry : `{fmt(s['price'])}`\n"
+        f"├ SL : `{fmt(s['sl'])}`\n"
+        f"├ TP1 : `{fmt(s['tp1'])}` (본전 스탑)\n"
+        f"├ TP2 : `{fmt(s['tp2'])}`\n"
+        f"└ TP3 : `{fmt(s['tp3'])}` (최종 익절)\n\n"
+        f"📊 **MARKET & QUALITY**\n"
+        f"├ RSI 15M/1H : `{s['rsi']:.1f}` / `{s['rsh']:.1f}`\n"
+        f"├ ADX 15M/1H : `{s['adx']:.1f}` / `{s['adxh']:.1f}`\n"
+        f"├ 변동률 15M/1H : `{s['ch15']:+.2f}%` / `{s['ch60']:+.2f}%`\n"
+        f"└ ATR : `{s['atrp']:.2f}%` | 레버리지: `{s['lev']}x`\n\n"
+        f"🔗 [트레이딩뷰 차트 보기]({tv_chart_url})\n"
+        f"⚠️ Signal only / No auto order"
     )
 
 
+def status_msg(positions):
+    if not positions:
+        return "📊 *[현재 보유 중인 BTCC 포지션 현황]*\n━━━━━━━━━━━━━━━━━━━━━━\n• 현재 활성화된 포지션이 없습니다. (모든 슬롯 대기 중)"
+    
+    lines = [
+        "📊 *[현재 보유 중인 BTCC 포지션 현황]*",
+        "━━━━━━━━━━━━━━━━━━━━━━"
+    ]
+    for idx, (sym, p) in enumerate(positions.items(), 1):
+        d = p.get("direction", "LONG")
+        pos_icon = "🟢 롱" if d == "LONG" else "🔴 숏"
+        entry = p.get("entry", 0)
+        tp1_status = "✅ 도달(본전스탑)" if p.get("tp1_hit") else "⏳ 대기중"
+        lines.append(f"• `[{idx}]` **#{sym}** ({pos_icon})\n  - 진입가: `{fmt(entry)}` | TP1: `{tp1_status}`")
+    
+    lines.append(f"\n⏱️ 확인 시간: `{now().strftime('%m-%d %H:%M')} (KST)`")
+    return "\n".join(lines)
+
+
 def posmsg(p, k):
-    d = p.get("direction", "LONG")
     sy = p.get("symbol", "UNKNOWN")
+    d = p.get("direction", "LONG")
     if k == "TP1":
-        return f"🎯 TP1 HIT\n\n🪙 #{sy}\n📌 {d}\n💰 Entry : {fmt(p['entry'])}\n🎯 TP1 : {fmt(p['tp1'])}\n\n🔒 SL → ENTRY\n원금 방어 모드로 전환"
+        return f"🎯 *[TP1 1차 익절 & 본전스탑]*\n🪙 종목: `#{sy}` ({d})\n💰 1차 목표가 도달!\n🛡️ 손절가를 진입가로 상향 조정."
     if k == "TP2":
-        return f"🎯 TP2 HIT\n\n🪙 #{sy}\n📌 {d}\n🎯 TP2 : {fmt(p['tp2'])}\n\n✅ 추적 종료"
-    return f"🛑 STOP LOSS\n\n🪙 #{sy}\n📌 {d}\n🛑 SL : {fmt(p['sl'])}\n\n❌ 포지션 추적 종료 (12시간 동안 재진입 금지)"
+        return f"🎯 *[TP2 2차 익절 도달]*\n🪙 종목: `#{sy}` ({d})\n💰 2차 목표가 도달!"
+    if k == "TP3":
+        return f"🎉 *[TP3 최종 익절 달성 마감!]*\n🪙 종목: `#{sy}` ({d})\n🎯 3차 목표가 달성 완료!"
+    return f"🛡️ *[손절(SL) 도달 마감]*\n🪙 종목: `#{sy}` ({d})\n📉 손절가 이탈로 포지션 종료 (12시간 재진입 금지)"
 
 
-def check(state, rs):
-    mp = {symbol(r): r for r in rs}
+def check(state):
     for key, p in list(state["positions"].items()):
         if not isinstance(p, dict):
             state["positions"].pop(key, None)
             continue
         p.setdefault("symbol", key)
-        if not all(x in p for x in ("entry", "sl", "tp1", "tp2", "direction")):
-            state["positions"].pop(key, None)
+        
+        h, l, curr_p = get_recent_high_low(p["symbol"])
+        if curr_p is None:
             continue
-        r = mp.get(p["symbol"])
-        if not r:
-            continue
-        price = v(r, 3)
+            
+        high_p = h if h else curr_p
+        low_p = l if l else curr_p
         long = p["direction"] == "LONG"
 
-        if long and price >= p["tp2"] or not long and price <= p["tp2"]:
-            tg(posmsg(p, "TP2"), f"{p['symbol']} TP2")
-            state["positions"].pop(key, None)
-            continue
-
-        if long and price <= p["sl"] or not long and price >= p["sl"]:
-            tg(posmsg(p, "SL"), f"{p['symbol']} SL")
-            state.setdefault("sl_penalties", {})[key] = time.time()
-            state["positions"].pop(key, None)
-            continue
-
-        if not p.get("tp1_hit", False) and (
-            price >= p["tp1"] if long else price <= p["tp1"]
-        ):
-            p["tp1_hit"] = True
-            p["sl"] = p["entry"]
-            tg(posmsg(p, "TP1"), f"{p['symbol']} TP1")
+        if long:
+            if high_p >= p["tp3"]:
+                tg(posmsg(p, "TP3"))
+                state["positions"].pop(key, None)
+                continue
+            if low_p <= p["sl"]:
+                tg(posmsg(p, "SL"))
+                state.setdefault("sl_penalties", {})[key] = time.time()
+                state["positions"].pop(key, None)
+                continue
+            if high_p >= p["tp2"] and "TP2" not in p.get("hit", []):
+                tg(posmsg(p, "TP2"))
+                p.setdefault("hit", []).append("TP2")
+            if not p.get("tp1_hit", False) and high_p >= p["tp1"]:
+                p["tp1_hit"] = True
+                p["sl"] = p["entry"]
+                tg(posmsg(p, "TP1"))
+        else:
+            if low_p <= p["tp3"]:
+                tg(posmsg(p, "TP3"))
+                state["positions"].pop(key, None)
+                continue
+            if high_p >= p["sl"]:
+                tg(posmsg(p, "SL"))
+                state.setdefault("sl_penalties", {})[key] = time.time()
+                state["positions"].pop(key, None)
+                continue
+            if low_p <= p["tp2"] and "TP2" not in p.get("hit", []):
+                tg(posmsg(p, "TP2"))
+                p.setdefault("hit", []).append("TP2")
+            if not p.get("tp1_hit", False) and low_p <= p["tp1"]:
+                p["tp1_hit"] = True
+                p["sl"] = p["entry"]
+                tg(posmsg(p, "TP1"))
 
 
 def main():
     print("===================================")
-    print(" BTCC SLOT ROTATION + SL PENALTY BOT")
+    print(" BTCC DIRECT POSITION MONITOR + BOT")
     print("===================================")
     print("KST:", now().isoformat())
 
@@ -485,31 +490,23 @@ def main():
         print("TELEGRAM SECRET ERROR")
         return
 
+    state = load()
+    check(state)
+    save(state)
+
+    tg(status_msg(state["positions"]))
+
     rs = rows()
     print("BTCC REAL ROWS:", len(rs))
     if not rs:
         tg("⚠️ BTCC DATA ERROR\n\nBTCC TradingView 데이터 조회 실패", "DATA ERROR")
         return
 
-    state = load()
-    check(state, rs)
-
     st = {
         k: 0
         for k in [
-            "data",
-            "dead",
-            "volatile",
-            "trend",
-            "location",
-            "trigger",
-            "chase",
-            "momentum",
-            "rsi",
-            "adx",
-            "score",
-            "grade",
-            "risk",
+            "data", "dead", "volatile", "trend", "location",
+            "trigger", "chase", "momentum", "rsi", "adx", "score", "grade", "risk",
         ]
     }
 
@@ -565,7 +562,8 @@ def main():
                 print("SKIP COOLDOWN:", key)
                 continue
 
-            if not tg(msg(s), f"{key} {s['direction']} {s['quality']}"):
+            current_slot_number = current_active_count + sent + 1
+            if not tg(msg(s, current_slot_number), f"{key} {s['direction']} {s['quality']}"):
                 print("SEND FAILED:", key)
                 continue
 
@@ -577,7 +575,9 @@ def main():
                 "sl": s["sl"],
                 "tp1": s["tp1"],
                 "tp2": s["tp2"],
+                "tp3": s["tp3"],
                 "tp1_hit": False,
+                "hit": [],
                 "score": s["score"],
                 "quality": s["quality"],
                 "entry_time": now().isoformat(),
