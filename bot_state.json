@@ -1,17 +1,5 @@
 {
   "positions": {
-    "COOKIEUSDT": {
-      "symbol": "COOKIEUSDT",
-      "direction": "SHORT",
-      "entry": 0.01109,
-      "sl": 0.011196347193233713,
-      "tp1": 0.01093047921014943,
-      "tp2": 0.010824132016915717,
-      "tp1_hit": false,
-      "score": 90,
-      "quality": "A",
-      "entry_time": "2026-10-14T02:10:28.612256+09:00"
-    },
     "HEMIUSDT": {
       "symbol": "HEMIUSDT",
       "direction": "SHORT",
@@ -23,18 +11,6 @@
       "score": 87,
       "quality": "A",
       "entry_time": "2026-10-14T02:10:30.325454+09:00"
-    },
-    "HOMEUSDT": {
-      "symbol": "HOMEUSDT",
-      "direction": "SHORT",
-      "entry": 0.005259,
-      "sl": 0.005313735103209622,
-      "tp1": 0.005176897345185566,
-      "tp2": 0.005122162241975943,
-      "tp1_hit": false,
-      "score": 87,
-      "quality": "A",
-      "entry_time": "2026-10-14T02:10:32.037183+09:00"
     },
     "BANKUSDT": {
       "symbol": "BANKUSDT",
@@ -59,6 +35,30 @@
       "score": 87,
       "quality": "A",
       "entry_time": "2026-10-14T02:10:35.496383+09:00"
+    },
+    "BILLUSDT": {
+      "symbol": "BILLUSDT",
+      "direction": "SHORT",
+      "entry": 0.00869,
+      "sl": 0.008772341593291474,
+      "tp1": 0.008566487610062786,
+      "tp2": 0.008484146016771311,
+      "tp1_hit": false,
+      "score": 87,
+      "quality": "A",
+      "entry_time": "2026-10-14T09:40:51.569575+09:00"
+    },
+    "SIRENUSDT": {
+      "symbol": "SIRENUSDT",
+      "direction": "LONG",
+      "entry": 0.02279,
+      "sl": 0.022687445,
+      "tp1": 0.0229438325,
+      "tp2": 0.0230463875,
+      "tp1_hit": false,
+      "score": 85,
+      "quality": "A",
+      "entry_time": "2026-10-14T09:40:53.460040+09:00"
     }
   },
   "signals": {
@@ -171,7 +171,7 @@
     "COLLECTUSDT:LONG": 1791549493.2147708,
     "ORCLUSDT:SHORT": 1791552436.371555,
     "BEATUSDT:LONG": 1791553854.0623665,
-    "BILLUSDT:SHORT": 1791631284.747345,
+    "BILLUSDT:SHORT": 1791938449.7079356,
     "BICOUSDT:SHORT": 1791701462.584906,
     "TSLAUSDT:LONG": 1791563051.8644247,
     "PONSUSDT:SHORT": 1791565369.5227373,
@@ -211,7 +211,8 @@
     "TRUTHUSDT:LONG": 1791841991.7484508,
     "PRLUSDT:SHORT": 1791841991.7484508,
     "REZUSDT:SHORT": 1791859655.1173308,
-    "ZORAUSDT:SHORT": 1791911426.8955
+    "ZORAUSDT:SHORT": 1791911426.8955,
+    "SIRENUSDT:LONG": 1791938449.7079356
   },
   "sl_penalties": {
     "STXUSDT": 1791380763.6872358,
@@ -251,7 +252,7 @@
     "RENDERUSDT": 1791513800.1189022,
     "BANUSDT": 1791516182.7618537,
     "GUNUSDT": 1791516184.6627781,
-    "COOKIEUSDT": 1791517505.646876,
+    "COOKIEUSDT": 1791938447.1700034,
     "KITEUSDT": 1791522152.1876538,
     "HBARUSDT": 1791523513.2669804,
     "BCHUSDT": 1791524809.2846215,
@@ -296,6 +297,7 @@
     "REZUSDT": 1791884787.750539,
     "FOGOUSDT": 1791884789.568713,
     "ENJUSDT": 1791911417.5608644,
-    "ONUSDT": 1791911419.3009076
+    "ONUSDT": 1791911419.3009076,
+    "HOMEUSDT": 1791938449.0291815
   }
 }
