@@ -6,7 +6,7 @@ import time
 import requests
 
 TOKEN = os.getenv("TELEGRAM_TOKEN", "").strip()
-CHAT_ID = (os.getenv("CHAT_ID") or "").strip()
+CHAT_ID = (os.getenv("TELEGRAM_CHAT_ID") or os.getenv("CHAT_ID") or "").strip()
 STATE_FILE = "bot_state.json"
 KST = timezone(timedelta(hours=9))
 
