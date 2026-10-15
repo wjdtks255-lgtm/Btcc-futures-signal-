@@ -40,12 +40,6 @@ jobs:
         run: |
           python bot.py
 
-      - name: Pull latest changes before commit
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git pull origin main --rebase || echo "No rebase needed"
-
       - name: Commit and push changes
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
