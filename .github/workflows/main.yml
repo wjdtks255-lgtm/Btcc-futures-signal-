@@ -26,18 +26,36 @@ jobs:
           python-version: '3.10'
           cache: 'pip'
 
-      - name: Install dependencies
+      - name: Find and Install dependencies
         run: |
           python -m pip install --upgrade pip
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-          if [ -f Btcc-futures-signal-/requirements.txt ]; then pip install -r Btcc-futures-signal-/requirements.txt; fi
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+          elif [ -f Btcc-futures-signal-/requirements.txt ]; then
+            pip install -r Btcc-futures-signal-/requirements.txt
+          else
+            find . -name "requirements.txt" -exec pip install -r {} \;
+          fi
 
-      - name: Run BTCC Bot
+      - name: Find and Run BTCC Bot
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
-          if [ -f main.py ]; then python main.py; elif [ -f Btcc-futures-signal-/main.py ]; then python Btcc-futures-signal-/main.py; else python */main.py; fi
+          if [ -f main.py ]; then
+            python main.py
+          elif [ -f Btcc-futures-signal-/main.py ]; then
+            cd Btcc-futures-signal- && python main.py
+          else
+            PYTHON_FILE=$(find . -name "main.py" | head -n 1)
+            if [ -n "$PYTHON_FILE" ]; then
+              DIR_NAME=$(dirname "$PYTHON_FILE")
+              cd "$DIR_NAME" && python main.py
+            else
+              echo "Error: main.py not found!"
+              exit 1
+            fi
+          fi
 
       - name: Pull latest changes before commit
         run: |
