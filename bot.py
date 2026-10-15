@@ -4,22 +4,18 @@ import os
 import random
 import time
 import requests
-import ccxt
 
-TOKEN = os.getenv("BTCC_TELEGRAM_TOKEN", "").strip() or os.getenv("TELEGRAM_TOKEN", "").strip()
-CHAT_ID = (os.getenv("BTCC_TELEGRAM_CHAT_ID") or os.getenv("TELEGRAM_CHAT_ID") or os.getenv("CHAT_ID") or "").strip()
-STATE_FILE = "btcc_state.json"
+TOKEN = os.getenv("TELEGRAM_TOKEN", "").strip()
+CHAT_ID = (os.getenv("CHAT_ID") or "").strip()
+STATE_FILE = "bot_state.json"
 KST = timezone(timedelta(hours=9))
 
-MAX_SLOTS = 5
+GATE_FUTURES_TICKERS = "https://fx-api.gateio.ws/api/v4/futures/usdt/tickers"
+GATE_FUTURES_CANDLES = "https://fx-api.gateio.ws/api/v4/futures/usdt/candlesticks"
+
+MAX_SLOTS = 8
 COOLDOWN = 120
 SL_PENALTY_HOURS = 12
-
-# CCXT를 통한 BTCC 선물(Swap) 거래소 연결
-exchange = ccxt.btcc({
-    'enableRateLimit': True,
-    'options': {'defaultType': 'swap'}
-})
 
 
 def now():
@@ -69,56 +65,54 @@ def tg(msg):
 def get_market_data():
     valid_tickers = []
     try:
-        exchange.load_markets()
-        tickers = exchange.fetch_tickers()
-        
-        # USDT 퍼페추얼 마켓 필터링
-        market_list = []
-        for symbol, ticker in tickers.items():
-            if '/USDT:USDT' in symbol or ('/USDT' in symbol and exchange.markets[symbol].get('swap', False)):
-                market_list.append((symbol, ticker))
-
-        random.shuffle(market_list)
-        for symbol, ticker in market_list:
-            try:
-                last_price = float(ticker.get('last', 0) or 0)
-                change = float(ticker.get('percentage', 0) or 0)
-                if last_price <= 0:
+        r = requests.get(GATE_FUTURES_TICKERS, timeout=15)
+        if r.status_code == 200:
+            data = r.json()
+            if isinstance(data, dict):
+                data = data.get("data", [])
+            random.shuffle(data)
+            for item in data:
+                contract = item.get("contract") or item.get("name")
+                if not contract or item.get("in_delisting", False):
                     continue
-                
-                base_symbol = symbol.split('/')[0]
-                if "MATIC" in base_symbol:
+                if "MATIC" in contract:
                     continue
-
-                valid_tickers.append({
-                    "symbol": base_symbol,
-                    "contract": symbol,
-                    "price": last_price,
-                    "change": change
-                })
-            except Exception:
-                pass
+                try:
+                    last_price = float(item.get("last", 0))
+                    change = float(item.get("change_percentage", 0))
+                    if 0.000001 < last_price <= 100000.0:
+                        valid_tickers.append({
+                            "symbol": contract.replace("_USDT", "").replace("USDT", ""),
+                            "contract": contract,
+                            "price": last_price,
+                            "change": change
+                        })
+                except Exception:
+                    pass
     except Exception as e:
-        print(f"Error fetching BTCC tickers: {e}")
+        print(f"Error fetching market tickers: {e}")
 
     if not valid_tickers:
         valid_tickers = [
-            {"symbol": "BTC", "contract": "BTC/USDT:USDT", "price": 60000.0, "change": 1.5},
-            {"symbol": "ETH", "contract": "ETH/USDT:USDT", "price": 3000.0, "change": -0.8},
+            {"symbol": "BTC", "contract": "BTC_USDT", "price": 60000.0, "change": 1.5},
+            {"symbol": "ETH", "contract": "ETH_USDT", "price": 3000.0, "change": -0.8},
         ]
     return valid_tickers
 
 
 def get_recent_high_low(contract):
     try:
-        ohlcv = exchange.fetch_ohlcv(contract, timeframe='15m', limit=10)
-        if ohlcv and isinstance(ohlcv, list):
-            highs = [float(item[2]) for item in ohlcv]
-            lows = [float(item[3]) for item in ohlcv]
-            closes = [float(item[4]) for item in ohlcv]
-            return max(highs), min(lows), closes[-1]
-    except Exception as e:
-        print(f"Error fetching OHLCV for {contract}: {e}")
+        url = f"{GATE_FUTURES_CANDLES}?contract={contract}&interval=15m&limit=10"
+        r = requests.get(url, timeout=5)
+        if r.status_code == 200:
+            data = r.json()
+            if data and isinstance(data, list):
+                highs = [float(item.get("high", item.get("h", 0))) for item in data]
+                lows = [float(item.get("low", item.get("l", 0))) for item in data]
+                closes = [float(item.get("close", item.get("c", 0))) for item in data]
+                return max(highs), min(lows), closes[-1]
+    except Exception:
+        pass
     return None, None, None
 
 
@@ -188,7 +182,7 @@ def check(state):
             state["positions"].pop(key, None)
             continue
         p.setdefault("symbol", key)
-        contract = p.get("contract", f"{key}/USDT:USDT")
+        contract = f"{key}_USDT"
         
         h, l, curr_p = get_recent_high_low(contract)
         if curr_p is None:
@@ -236,11 +230,10 @@ def check(state):
 
 def main():
     print("===================================")
-    print(" BTCC DIRECT POSITION MONITOR")
+    print(" BTCC FUTURES SIGNAL BOT")
     print("===================================")
     
     state = load()
-    
     check(state)
     save(state)
 
@@ -255,7 +248,6 @@ def main():
     candidates = []
     for item in tickers:
         sym = item["symbol"]
-        contract = item["contract"]
         p = item["price"]
         ch = item["change"]
         
@@ -287,7 +279,6 @@ def main():
 
         candidates.append({
             "symbol": sym,
-            "contract": contract,
             "direction": direction,
             "price": p,
             "sl": sl,
@@ -329,7 +320,6 @@ def main():
             state["signals"][sid] = t
             state["positions"][key] = {
                 "symbol": key,
-                "contract": s["contract"],
                 "direction": s["direction"],
                 "entry": s["price"],
                 "sl": s["sl"],
