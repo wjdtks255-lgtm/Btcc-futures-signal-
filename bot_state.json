@@ -1,5 +1,103 @@
 {
-  "positions": {},
-  "signals": {},
+  "positions": {
+    "USD1": {
+      "symbol": "USD1",
+      "direction": "SHORT",
+      "entry": 0.9969,
+      "sl": 1.0118535,
+      "tp1": 0.97446975,
+      "tp2": 0.95951625,
+      "tp3": 0.937086,
+      "tp1_hit": false,
+      "hit": []
+    },
+    "EDEN": {
+      "symbol": "EDEN",
+      "direction": "SHORT",
+      "entry": 0.05565,
+      "sl": 0.05648475,
+      "tp1": 0.054397875,
+      "tp2": 0.053563124999999996,
+      "tp3": 0.052310999999999996,
+      "tp1_hit": false,
+      "hit": []
+    },
+    "SAGA": {
+      "symbol": "SAGA",
+      "direction": "SHORT",
+      "entry": 0.01952,
+      "sl": 0.0198128,
+      "tp1": 0.0190808,
+      "tp2": 0.018788,
+      "tp3": 0.0183488,
+      "tp1_hit": false,
+      "hit": []
+    },
+    "LITE": {
+      "symbol": "LITE",
+      "direction": "SHORT",
+      "entry": 854.13,
+      "sl": 866.94195,
+      "tp1": 834.912075,
+      "tp2": 822.100125,
+      "tp3": 802.8822,
+      "tp1_hit": false,
+      "hit": []
+    },
+    "EWY": {
+      "symbol": "EWY",
+      "direction": "SHORT",
+      "entry": 150.56,
+      "sl": 152.8184,
+      "tp1": 147.1724,
+      "tp2": 144.91400000000002,
+      "tp3": 141.5264,
+      "tp1_hit": false,
+      "hit": []
+    },
+    "POL": {
+      "symbol": "POL",
+      "direction": "SHORT",
+      "entry": 0.09311,
+      "sl": 0.09450665,
+      "tp1": 0.091015025,
+      "tp2": 0.089618375,
+      "tp3": 0.0875234,
+      "tp1_hit": false,
+      "hit": []
+    },
+    "CATI": {
+      "symbol": "CATI",
+      "direction": "SHORT",
+      "entry": 0.05141,
+      "sl": 0.052181149999999996,
+      "tp1": 0.050253275,
+      "tp2": 0.049482124999999995,
+      "tp3": 0.0483254,
+      "tp1_hit": false,
+      "hit": []
+    },
+    "BEL": {
+      "symbol": "BEL",
+      "direction": "SHORT",
+      "entry": 0.11114,
+      "sl": 0.11280710000000001,
+      "tp1": 0.10863935,
+      "tp2": 0.10697225,
+      "tp3": 0.1044716,
+      "tp1_hit": false,
+      "hit": []
+    }
+  },
+  "signals": {
+    "USD1:SHORT": 1792067920.0792637,
+    "EDEN:SHORT": 1792067920.0792637,
+    "SAGA:SHORT": 1792067920.0792637,
+    "LITE:SHORT": 1792067920.0792637,
+    "EWY:SHORT": 1792067920.0792637,
+    "POL:SHORT": 1792067920.0792637,
+    "CATI:SHORT": 1792067920.0792637,
+    "BEL:SHORT": 1792067920.0792637
+  },
   "sl_penalties": {}
 }
