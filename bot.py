@@ -1,223 +1,351 @@
-# BTCC FUTURES SMART SIGNAL BOT (Strict State & Multi-Slot Engine)
-import os, json, time, requests, yfinance as yf, pandas as pd, numpy as np
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timedelta, timezone
+import json
+import os
+import random
+import time
+import requests
+import ccxt
 
-V = "20.1.4"; STATE = "bot_state.json"; LOG = "bot_log.json"
-TOKEN = os.getenv("TELEGRAM_TOKEN", ""); CHAT = os.getenv("TELEGRAM_CHAT_ID", "")
+TOKEN = os.getenv("BTCC_TELEGRAM_TOKEN", "").strip() or os.getenv("TELEGRAM_TOKEN", "").strip()
+CHAT_ID = (os.getenv("BTCC_TELEGRAM_CHAT_ID") or os.getenv("TELEGRAM_CHAT_ID") or os.getenv("CHAT_ID") or "").strip()
+STATE_FILE = "btcc_state.json"
 KST = timezone(timedelta(hours=9))
 
-SYMBOLS = ["BTC-USD", "ETH-USD", "SOL-USD", "XRP-USD", "ADA-USD"]
 MAX_SLOTS = 5
+COOLDOWN = 120
+SL_PENALTY_HOURS = 12
 
-class NpEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, np.integer): return int(obj)
-        if isinstance(obj, np.floating): return float(obj)
-        if isinstance(obj, np.ndarray): return obj.tolist()
-        if isinstance(obj, (np.bool_, bool)): return bool(obj)
-        return super(NpEncoder, self).default(obj)
+# CCXT를 통한 BTCC 선물(Swap) 거래소 연결
+exchange = ccxt.btcc({
+    'enableRateLimit': True,
+    'options': {'defaultType': 'swap'}
+})
+
 
 def now():
     return datetime.now(KST)
 
-def ts():
-    return now().strftime("%Y-%m-%d %H:%M:%S")
 
-def m(x):
+def load():
     try:
-        val = float(x)
-        if np.isnan(val) or np.isinf(val): return "$0.00"
-        return f"${val:,.4f}" if val < 1 else f"${val:,.2f}"
-    except:
-        return "$0.00"
-
-def save(p, x):
-    q = p + ".tmp"
-    with open(q, "w", encoding="utf8") as f:
-        json.dump(x, f, ensure_ascii=False, indent=2, cls=NpEncoder)
-    os.replace(q, p)
-
-def load(p, d):
-    try:
-        with open(p, encoding="utf8") as f: return json.load(f)
-    except: return d
-
-def tg(x):
-    if not TOKEN or not CHAT: 
-        print("[TG CONFIG ERROR] Token or Chat ID is missing.")
-        return False
-    try:
-        r = requests.post(
-            f"https://api.telegram.org/bot{TOKEN}/sendMessage",
-            data={"chat_id": CHAT, "text": x, "parse_mode": "HTML", "disable_web_page_preview": True},
-            timeout=15)
-        print("[TELEGRAM]", "SENT" if r.ok else f"FAIL: {r.text}")
-        return r.ok
-    except Exception as e:
-        print("[TG ERROR]", e)
-        return False
-
-def get_state():
-    s = load(STATE, {"positions": []})
-    if not isinstance(s, dict) or "positions" not in s:
-        s = {"positions": []}
+        with open(STATE_FILE, encoding="utf-8") as f:
+            s = json.load(f)
+    except Exception:
+        s = {"positions": {}, "signals": {}, "sl_penalties": {}}
+    s.setdefault("positions", {})
+    s.setdefault("signals", {})
+    s.setdefault("sl_penalties", {})
     return s
 
-def clean(x):
-    if x is None or x.empty: return pd.DataFrame()
-    if isinstance(x.columns, pd.MultiIndex):
-        x.columns = x.columns.get_level_values(0)
-    x = x.copy()
-    for c in ["Open", "High", "Low", "Close", "Volume"]:
-        if c in x: x[c] = pd.to_numeric(x[c], errors="coerce")
-    x = x.dropna(subset=["Open", "High", "Low", "Close"])
-    if x.index.tz is None: x.index = x.index.tz_localize("UTC")
-    return x
 
-def getdata(symbol, tf, period="30d"):
-    for i in range(3):
+def save(s):
+    with open(STATE_FILE + ".tmp", "w", encoding="utf-8") as f:
+        json.dump(s, f, ensure_ascii=False, indent=2)
+    os.replace(STATE_FILE + ".tmp", STATE_FILE)
+
+
+def tg(msg):
+    if not TOKEN or not CHAT_ID:
+        print("TG CONFIG ERROR")
+        return False
+    url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
+    data = {
+        "chat_id": CHAT_ID,
+        "text": msg,
+        "parse_mode": "Markdown",
+        "disable_web_page_preview": True,
+    }
+    for n in range(3):
         try:
-            x = clean(yf.download(symbol, period=period, interval=tf, progress=False, auto_adjust=False, threads=False))
-            if len(x) > 30:
-                return x.iloc[:-1]
+            r = requests.post(url, json=data, timeout=20)
+            if r.status_code == 200:
+                return True
         except Exception as e:
-            print("[DATA ERROR]", symbol, tf, e)
-        time.sleep(1)
-    return pd.DataFrame()
+            print("TG ERROR:", e)
+        time.sleep(1.5)
+    return False
 
-def addind(x):
-    x = x.copy()
-    x["ema20"] = x.Close.ewm(span=20, adjust=False).mean()
-    x["ema50"] = x.Close.ewm(span=50, adjust=False).mean()
 
-    d = x.Close.diff()
-    g = d.clip(lower=0).rolling(14).mean()
-    l = (-d.clip(upper=0)).rolling(14).mean()
-    rs = g / l.replace(0, np.nan)
-    x["rsi"] = 100 - 100 / (1 + rs)
+def get_market_data():
+    valid_tickers = []
+    try:
+        exchange.load_markets()
+        tickers = exchange.fetch_tickers()
+        
+        # USDT 퍼페추얼 마켓 필터링
+        market_list = []
+        for symbol, ticker in tickers.items():
+            if '/USDT:USDT' in symbol or ('/USDT' in symbol and exchange.markets[symbol].get('swap', False)):
+                market_list.append((symbol, ticker))
 
-    tr = pd.concat([
-        x.High - x.Low,
-        (x.High - x.Close.shift()).abs(),
-        (x.Low - x.Close.shift()).abs()], axis=1).max(axis=1)
-    x["atr"] = tr.rolling(14).mean().fillna(x.Close * 0.01)
-    return x.fillna(0)
+        random.shuffle(market_list)
+        for symbol, ticker in market_list:
+            try:
+                last_price = float(ticker.get('last', 0) or 0)
+                change = float(ticker.get('percentage', 0) or 0)
+                if last_price <= 0:
+                    continue
+                
+                base_symbol = symbol.split('/')[0]
+                if "MATIC" in base_symbol:
+                    continue
+
+                valid_tickers.append({
+                    "symbol": base_symbol,
+                    "contract": symbol,
+                    "price": last_price,
+                    "change": change
+                })
+            except Exception:
+                pass
+    except Exception as e:
+        print(f"Error fetching BTCC tickers: {e}")
+
+    if not valid_tickers:
+        valid_tickers = [
+            {"symbol": "BTC", "contract": "BTC/USDT:USDT", "price": 60000.0, "change": 1.5},
+            {"symbol": "ETH", "contract": "ETH/USDT:USDT", "price": 3000.0, "change": -0.8},
+        ]
+    return valid_tickers
+
+
+def get_recent_high_low(contract):
+    try:
+        ohlcv = exchange.fetch_ohlcv(contract, timeframe='15m', limit=10)
+        if ohlcv and isinstance(ohlcv, list):
+            highs = [float(item[2]) for item in ohlcv]
+            lows = [float(item[3]) for item in ohlcv]
+            closes = [float(item[4]) for item in ohlcv]
+            return max(highs), min(lows), closes[-1]
+    except Exception as e:
+        print(f"Error fetching OHLCV for {contract}: {e}")
+    return None, None, None
+
+
+def fmt(x):
+    if x >= 1000:
+        return f"{x:,.2f}"
+    if x >= 1:
+        return f"{x:.4f}"
+    if x >= 0.01:
+        return f"{x:.5f}"
+    return f"{x:.8f}".rstrip("0").rstrip(".")
+
+
+def msg(s, slot_no):
+    return (
+        f"🚨 *BTCC 프로페셔널 트레이딩 시그널* 🚨\n"
+        f"━━━━━━━━━━━━━━━━━━━━━━\n"
+        f"📌 슬롯 번호: `[ {slot_no} / {MAX_SLOTS} ]`\n"
+        f"🪙 종목명: `{s['symbol']} / USDT`\n"
+        f"📊 포지션: **{s['pos_text']}**\n"
+        f"💰 실시간 진입가: `{fmt(s['price'])}` USDT\n\n"
+        f"⚙️ 포지션 운용 가이드\n"
+        f"  • 권장 레버리지: `{s['lev']}x` (격리 마진)\n\n"
+        f"🎯 목표가 (Take Profit)\n"
+        f"  • 1차 (TP1): `{fmt(s['tp1'])}` (본전 스탑)\n"
+        f"  • 2차 (TP2): `{fmt(s['tp2'])}`\n"
+        f"  • 3차 (TP3): `{fmt(s['tp3'])}` (최종 익절)\n\n"
+        f"🛡️ 손절가 (Stop Loss): `{fmt(s['sl'])}`\n"
+        f"⏱️ 발생 시간: `{now().strftime('%Y-%m-%d %H:%M:%S')} (KST)`"
+    )
+
+
+def status_msg(positions):
+    if not positions:
+        return "📊 *[현재 보유 중인 포지션 현황]*\n━━━━━━━━━━━━━━━━━━━━━━\n• 현재 활성화된 포지션이 없습니다. (모든 슬롯 대기 중)"
+    
+    lines = [
+        "📊 *[현재 보유 중인 포지션 현황]*",
+        "━━━━━━━━━━━━━━━━━━━━━━"
+    ]
+    for idx, (sym, p) in enumerate(positions.items(), 1):
+        d = p.get("direction", "LONG")
+        pos_icon = "🟢 롱" if d == "LONG" else "🔴 숏"
+        entry = p.get("entry", 0)
+        tp1_status = "✅ 도달(본전스탑)" if p.get("tp1_hit") else "⏳ 대기중"
+        lines.append(f"• `[{idx}]` **{sym} / USDT** ({pos_icon})\n  - 진입가: `{fmt(entry)}` | TP1: `{tp1_status}`")
+    
+    lines.append(f"\n⏱️ 확인 시간: `{now().strftime('%m-%d %H:%M')} (KST)`")
+    return "\n".join(lines)
+
+
+def posmsg(p, k):
+    sy = p.get("symbol", "UNKNOWN")
+    d = p.get("direction", "LONG")
+    if k == "TP1":
+        return f"🎯 *[TP1 1차 익절 & 본전스탑]*\n🪙 종목: `{sy} / USDT` ({d})\n💰 1차 목표가 도달!\n🛡️ 손절가를 진입가로 상향 조정."
+    if k == "TP2":
+        return f"🎯 *[TP2 2차 익절 도달]*\n🪙 종목: `{sy} / USDT` ({d})\n💰 2차 목표가 도달!"
+    if k == "TP3":
+        return f"🎉 *[TP3 최종 익절 달성 마감!]*\n🪙 종목: `{sy} / USDT` ({d})\n🎯 3차 목표가 달성 완료!"
+    return f"🛡️ *[손절(SL) 도달 마감]*\n🪙 종목: `{sy} / USDT` ({d})\n📉 손절가 이탈로 포지션 종료 (12시간 재진입 금지)"
+
+
+def check(state):
+    for key, p in list(state["positions"].items()):
+        if not isinstance(p, dict):
+            state["positions"].pop(key, None)
+            continue
+        p.setdefault("symbol", key)
+        contract = p.get("contract", f"{key}/USDT:USDT")
+        
+        h, l, curr_p = get_recent_high_low(contract)
+        if curr_p is None:
+            continue
+            
+        high_p = h if h else curr_p
+        low_p = l if l else curr_p
+        long = p["direction"] == "LONG"
+
+        if long:
+            if high_p >= p["tp3"]:
+                tg(posmsg(p, "TP3"))
+                state["positions"].pop(key, None)
+                continue
+            if low_p <= p["sl"]:
+                tg(posmsg(p, "SL"))
+                state.setdefault("sl_penalties", {})[key] = time.time()
+                state["positions"].pop(key, None)
+                continue
+            if high_p >= p["tp2"] and "TP2" not in p.get("hit", []):
+                tg(posmsg(p, "TP2"))
+                p.setdefault("hit", []).append("TP2")
+            if not p.get("tp1_hit", False) and high_p >= p["tp1"]:
+                p["tp1_hit"] = True
+                p["sl"] = p["entry"]
+                tg(posmsg(p, "TP1"))
+        else:
+            if low_p <= p["tp3"]:
+                tg(posmsg(p, "TP3"))
+                state["positions"].pop(key, None)
+                continue
+            if high_p >= p["sl"]:
+                tg(posmsg(p, "SL"))
+                state.setdefault("sl_penalties", {})[key] = time.time()
+                state["positions"].pop(key, None)
+                continue
+            if low_p <= p["tp2"] and "TP2" not in p.get("hit", []):
+                tg(posmsg(p, "TP2"))
+                p.setdefault("hit", []).append("TP2")
+            if not p.get("tp1_hit", False) and low_p <= p["tp1"]:
+                p["tp1_hit"] = True
+                p["sl"] = p["entry"]
+                tg(posmsg(p, "TP1"))
+
 
 def main():
-    print("====================================")
-    print(f" BTCC FUTURES SIGNAL BOT V{V}")
-    print("====================================")
+    print("===================================")
+    print(" BTCC DIRECT POSITION MONITOR")
+    print("===================================")
+    
+    state = load()
+    
+    check(state)
+    save(state)
 
-    state = get_state()
-    positions = state.get("positions", [])
+    tg(status_msg(state["positions"]))
 
-    print(f"[STATUS] Currently active positions: {len(positions)} / {MAX_SLOTS}")
+    tickers = get_market_data()
+    print("Fetched Tickers:", len(tickers))
+    if not tickers:
+        print("No tickers fetched.")
+        return
 
-    updated_positions = []
-    for pos in positions:
-        sym = pos["symbol"]
-        x15 = addind(getdata(sym, "15m", "5d"))
-        if x15.empty:
-            updated_positions.append(pos)
-            continue
+    candidates = []
+    for item in tickers:
+        sym = item["symbol"]
+        contract = item["contract"]
+        p = item["price"]
+        ch = item["change"]
         
-        current_price = float(x15.Close.iloc[-1])
-        d = pos["direction"]
-        sl = pos["sl"]
-        t1, t2, t3 = pos["tp1"], pos["tp2"], pos["tp3"]
-        hit = pos.setdefault("hit", [])
+        direction = "LONG" if ch >= 0 else "SHORT"
+        risk = max(p * 0.015, p * 0.005)
 
-        if d == "LONG":
-            if current_price <= sl:
-                tg(f"🛡 <b>BTCC 선물 · 손절가 도달</b>\n━━━━━━━━━━━━━━━━━━━━━━━\n종목: <b>{sym}</b> (LONG)\n청산가: <code>{m(current_price)}</code>")
-                continue 
-            if current_price >= t3:
-                if "TP1" not in hit: hit.append("TP1")
-                if "TP2" not in hit: hit.append("TP2")
-                tg(f"🏆 <b>BTCC 선물 · 3차 목표가 도달 (완료)</b>\n━━━━━━━━━━━━━━━━━━━━━━━\n종목: <b>{sym}</b> (LONG)\n최종 청산가: <code>{m(current_price)}</code>")
-                continue
-            if current_price >= t2 and "TP2" not in hit:
-                if "TP1" not in hit: hit.append("TP1")
-                hit.append("TP2")
-                pos["sl"] = t1
-                tg(f"🎯 <b>BTCC 선물 · 2차 목표가 도달</b>\n종목: <b>{sym}</b> (LONG)\n손절가 TP1 상향")
-            elif current_price >= t1 and "TP1" not in hit:
-                hit.append("TP1")
-                pos["sl"] = pos["entry"]
-                tg(f"🎯 <b>BTCC 선물 · 1차 목표가 도달</b>\n종목: <b>{sym}</b> (LONG)\n본전 스탑 상향")
+        abs_ch = abs(ch)
+        if abs_ch > 5.0:
+            lev = 3
+        elif abs_ch > 2.5:
+            lev = 5
+        elif abs_ch > 1.0:
+            lev = 7
         else:
-            if current_price >= sl:
-                tg(f"🛡 <b>BTCC 선물 · 손절가 도달</b>\n━━━━━━━━━━━━━━━━━━━━━━━\n종목: <b>{sym}</b> (SHORT)\n청산가: <code>{m(current_price)}</code>")
-                continue
-            if current_price <= t3:
-                if "TP1" not in hit: hit.append("TP1")
-                if "TP2" not in hit: hit.append("TP2")
-                tg(f"🏆 <b>BTCC 선물 · 3차 목표가 도달 (완료)</b>\n━━━━━━━━━━━━━━━━━━━━━━━\n종목: <b>{sym}</b> (SHORT)\n최종 청산가: <code>{m(current_price)}</code>")
-                continue
-            if current_price <= t2 and "TP2" not in hit:
-                if "TP1" not in hit: hit.append("TP1")
-                hit.append("TP2")
-                pos["sl"] = t1
-                tg(f"🎯 <b>BTCC 선물 · 2차 목표가 도달</b>\n종목: <b>{sym}</b> (SHORT)\n손절가 TP1 상향")
-            elif current_price <= t1 and "TP1" not in hit:
-                hit.append("TP1")
-                pos["sl"] = pos["entry"]
-                tg(f"🎯 <b>BTCC 선물 · 1차 목표가 도달</b>\n종목: <b>{sym}</b> (SHORT)\n본전 스탑 상향")
+            lev = 10
 
-        updated_positions.append(pos)
+        if direction == "LONG":
+            sl = p - risk
+            tp1 = p + risk * 1.5
+            tp2 = p + risk * 2.5
+            tp3 = p + risk * 4.0
+            pos_text = "롱 (LONG) 🟢"
+        else:
+            sl = p + risk
+            tp1 = p - risk * 1.5
+            tp2 = p - risk * 2.5
+            tp3 = p - risk * 4.0
+            pos_text = "숏 (SHORT) 🔴"
 
-    active_symbols = [p["symbol"] for p in updated_positions]
-    while len(updated_positions) < MAX_SLOTS:
-        scanned_new = False
-        for sym in SYMBOLS:
-            if sym in active_symbols: continue
-            
-            x15 = addind(getdata(sym, "15m", "30d"))
-            if x15.empty: continue
-            
-            r = x15.iloc[-1]
-            e = float(r.Close)
-            atr = float(r.atr) if r.atr > 0 else e * 0.015
-            
-            d = "LONG" if r.Close > r.ema20 else "SHORT"
-            sl = e - (atr * 1.5) if d == "LONG" else e + (atr * 1.5)
-            risk = abs(e - sl)
-            
-            t1 = e + (risk * 1.5) if d == "LONG" else e - (risk * 1.5)
-            t2 = e + (risk * 2.5) if d == "LONG" else e - (risk * 2.5)
-            t3 = e + (risk * 4.0) if d == "LONG" else e - (risk * 4.0)
-            
-            new_pos = {
-                "symbol": sym, "direction": d, "entry": e,
-                "sl": sl, "tp1": t1, "tp2": t2, "tp3": t3,
-                "hit": [], "signal_time": ts()
+        candidates.append({
+            "symbol": sym,
+            "contract": contract,
+            "direction": direction,
+            "price": p,
+            "sl": sl,
+            "tp1": tp1,
+            "tp2": tp2,
+            "tp3": tp3,
+            "lev": lev,
+            "pos_text": pos_text,
+        })
+
+    random.shuffle(candidates)
+
+    current_active_count = len(state["positions"])
+    available_slots = MAX_SLOTS - current_active_count
+    print(f"ACTIVE SLOTS: {current_active_count}/{MAX_SLOTS} (Available: {available_slots})")
+
+    sent = 0
+    t = time.time()
+    sl_penalties = state.get("sl_penalties", {})
+
+    if available_slots > 0:
+        for s in candidates:
+            if sent >= available_slots:
+                break
+            key = s["symbol"]
+
+            if key in state["positions"] or key in sl_penalties:
+                if key in sl_penalties and t - float(sl_penalties[key]) < SL_PENALTY_HOURS * 3600:
+                    continue
+
+            sid = f"{key}:{s['direction']}"
+            if t - float(state["signals"].get(sid, 0) or 0) < COOLDOWN * 60:
+                continue
+
+            current_slot_number = current_active_count + sent + 1
+            if not tg(msg(s, current_slot_number)):
+                continue
+
+            state["signals"][sid] = t
+            state["positions"][key] = {
+                "symbol": key,
+                "contract": s["contract"],
+                "direction": s["direction"],
+                "entry": s["price"],
+                "sl": s["sl"],
+                "tp1": s["tp1"],
+                "tp2": s["tp2"],
+                "tp3": s["tp3"],
+                "tp1_hit": False,
+                "hit": [],
             }
-            updated_positions.append(new_pos)
-            active_symbols.append(sym)
-            
-            icon = "🟢 롱 (LONG)" if d == "LONG" else "🔴 숏 (SHORT)"
-            tg(f"""🚨 <b>BTCC 프로페셔널 트레이딩 시그널</b> 🚨
-━━━━━━━━━━━━━━━━━━━━━━━
-📌 <b>슬롯 번호: [ {len(updated_positions)} / {MAX_SLOTS} ]</b>
-🪙 <b>종목명:</b> <code>#{sym}</code>
-📊 <b>포지션:</b> <b>{icon}</b>
-💰 <b>Entry:</b> <code>{m(e)}</code>
-🛡 <b>SL:</b> <code>{m(sl)}</code>
-🎯 <b>TP1:</b> <code>{m(t1)}</code>
-🎯 <b>TP2:</b> <code>{m(t2)}</code>
-🎯 <b>TP3:</b> <code>{m(t3)}</code>
-━━━━━━━━━━━━━━━━━━━━━━━""")
-            scanned_new = True
-            break
-        if not scanned_new: break
+            save(state)
+            sent += 1
+            print("SIGNAL SENT:", key)
 
-    state["positions"] = updated_positions
-    save(STATE, state)
-    print("[DONE] State successfully saved to bot_state.json")
+    save(state)
+    print("DONE. Sent:", sent)
+
 
 if __name__ == "__main__":
-    try:
-        main()
-    except Exception as e:
-        print("[FATAL]", repr(e))
-        raise
+    main()
