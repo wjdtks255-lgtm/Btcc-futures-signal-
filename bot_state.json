@@ -81,12 +81,14 @@
       "symbol": "MEMECOIN",
       "direction": "SHORT",
       "entry": 0.01216,
-      "sl": 0.0123424,
+      "sl": 0.01216,
       "tp1": 0.0118864,
       "tp2": 0.011704,
       "tp3": 0.0114304,
-      "tp1_hit": false,
-      "hit": []
+      "tp1_hit": true,
+      "hit": [
+        "TP2"
+      ]
     }
   },
   "signals": {
