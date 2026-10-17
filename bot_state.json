@@ -22,19 +22,6 @@
       "tp1_hit": true,
       "hit": []
     },
-    "ONG": {
-      "symbol": "ONG",
-      "direction": "SHORT",
-      "entry": 0.08136,
-      "sl": 0.08136,
-      "tp1": 0.0795294,
-      "tp2": 0.078309,
-      "tp3": 0.0764784,
-      "tp1_hit": true,
-      "hit": [
-        "TP2"
-      ]
-    },
     "KSTR": {
       "symbol": "KSTR",
       "direction": "SHORT",
@@ -72,11 +59,11 @@
       "symbol": "ASTR",
       "direction": "SHORT",
       "entry": 0.006183,
-      "sl": 0.006275745,
+      "sl": 0.006183,
       "tp1": 0.0060438825,
       "tp2": 0.0059511375,
       "tp3": 0.00581202,
-      "tp1_hit": false,
+      "tp1_hit": true,
       "hit": []
     },
     "V": {
@@ -87,6 +74,17 @@
       "tp1": 413.39675,
       "tp2": 419.46125,
       "tp3": 428.558,
+      "tp1_hit": false,
+      "hit": []
+    },
+    "JUP": {
+      "symbol": "JUP",
+      "direction": "SHORT",
+      "entry": 0.2944,
+      "sl": 0.29881599999999997,
+      "tp1": 0.287776,
+      "tp2": 0.28336,
+      "tp3": 0.276736,
       "tp1_hit": false,
       "hit": []
     }
@@ -121,7 +119,8 @@
     "TAG:LONG": 1792195014.1730802,
     "MEMECOIN:SHORT": 1792208854.3014092,
     "ASTR:SHORT": 1792239587.534511,
-    "V:LONG": 1792252189.6988792
+    "V:LONG": 1792252189.6988792,
+    "JUP:SHORT": 1792260870.151977
   },
   "sl_penalties": {
     "EDEN": 1792079142.8891487,
